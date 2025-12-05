@@ -1,7 +1,7 @@
 import { Image, StyleSheet, View } from "react-native";
 import Logo from "../../../assets/images/logoPuffZero.png";
 import { Colors } from "../../constants/theme";
-import AppText from "../appText";
+import TitleBlock from "../onboarding/titleBlock";
 
 interface AuthHeaderProps {
   title: string;
@@ -12,13 +12,10 @@ export default function AuthHeader({ title, subtitle }: AuthHeaderProps) {
   return (
     <View style={styles.headerRow}>
       <View style={styles.headerTextContainer}>
-        <AppText weight="bold" style={styles.title}>
-          {title}
-        </AppText>
-
-        <AppText weight="semibold" style={styles.subtitle}>
-          {subtitle}
-        </AppText>
+        <TitleBlock
+          title={title}
+          subtitle={subtitle}
+        />
       </View>
 
       <Image
