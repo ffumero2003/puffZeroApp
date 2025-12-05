@@ -1,13 +1,12 @@
 import SeparatorRow from "@/src/components/onboarding/separatorRow";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
-import Logo from "../../assets/images/logoPuffZero.png";
+import { Keyboard, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import AppText from "../../src/components/appText";
+import AuthHeader from "../../src/components/auth/authHeader";
+import ContinueButton from "../../src/components/onboarding/continueButton";
 import GoogleButton from "../../src/components/onboarding/googleButton";
-import KeepGoingButton from "../../src/components/onboarding/keepGoingButton";
 import OnboardingHeader from "../../src/components/onboarding/onboardingHeader";
-import RegisterText from "../../src/components/onboarding/registerText";
 import UnderlineInput from "../../src/components/onboarding/underlineInput";
 import { Colors } from "../../src/constants/theme";
 
@@ -15,124 +14,165 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  /** --------------------------
+   * VALIDACIONES
+   -----------------------------*/
+  const validateEmail = (value: string) => {
+    setEmail(value);
+
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!value) {
+      setEmailError("Este campo es obligatorio.");
+    } else if (!regex.test(value)) {
+      setEmailError("Correo inválido.");
+    } else {
+      setEmailError("");
+    }
+  };
+
+  const validatePassword = (value: string) => {
+    setPassword(value);
+
+    if (!value) {
+      setPasswordError("Este campo es obligatorio.");
+    } else if (value.length < 6) {
+      setPasswordError("Mínimo 6 caracteres.");
+    } else {
+      setPasswordError("");
+    }
+  };
+
+  /** BOTÓN DESHABILITADO SI HAY ERRORES */
+  const isInvalid = !email || !password || emailError || passwordError;
+
   return (
-    <View style={styles.container}>
-      <OnboardingHeader showProgress={false} style={{ marginBottom: 20 }} />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <OnboardingHeader showProgress={false} style={{ marginBottom: 20 }} />
 
-      {/* Título */}
-      <AppText weight="bold" style={styles.title}>Iniciar Sesión</AppText>
-      <AppText weight="semibold" style={styles.subtitle}>
-        Vuelve a tomar control de tu vida
-      </AppText>
-      
-
-      <UnderlineInput
-        placeholder="Correo"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
-
-      {/* Contraseña */}
-      <UnderlineInput
-        placeholder="Contraseña"
-        value={password}
-        onChangeText={setPassword}
-        autoCapitalize="none"
-        secureTextEntry
-      />
-
-      {/* Forgot Password */}
-      <TouchableOpacity
-        onPress={() => router.push("/(auth)/forgotPassword")}
-        style={styles.forgotContainer}
-      >
-        
-       <AppText weight="bold" style={styles.forgotLink}>Recuperar</AppText>
-        
-      </TouchableOpacity>
-
-
-      {/* Botón principal */}
-      <KeepGoingButton text="Iniciar Sesión" onPress={() => {}} />
-
-       {/* Separador */}
-      {/* Separador con líneas */}
-      <SeparatorRow />
-
-
-      {/* Google Login */}
-      <GoogleButton />
-
-      {/* Ir al registro */}
-      <RegisterText />
-
-      {/* Icono de nube (opcional debajo) */}
-      <View style={{ alignItems: "center"}}>
-        <Image
-          source={Logo}
-          style={styles.image}
-          resizeMode="contain"
+        <AuthHeader
+          title="Iniciar Sesión"
+          subtitle="Vuelve a tomar control de tu vida"
         />
-      </View>
 
-    </View>
+        {/* CORREO */}
+        <UnderlineInput
+          placeholder="Correo"
+          value={email}
+          onChangeText={validateEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
+        {emailError ? (
+          <AppText style={styles.errorText} weight="extrabold">
+            {emailError}
+          </AppText>
+        ) : null}
+
+        {/* CONTRASEÑA */}
+        <UnderlineInput
+          placeholder="Contraseña"
+          value={password}
+          onChangeText={validatePassword}
+          autoCapitalize="none"
+          secureTextEntry
+        />
+        {passwordError ? (
+          <AppText style={styles.errorText} weight="extrabold">
+            {passwordError}
+          </AppText>
+        ) : null}
+
+        {/* Forgot Password */}
+        <TouchableOpacity
+          onPress={() => router.push("/(auth)/forgotPassword")}
+          style={styles.forgotContainer}
+        >
+          <AppText weight="bold" style={styles.forgotLink}>
+            Recuperar
+          </AppText>
+        </TouchableOpacity>
+
+        <ContinueButton
+          text="Iniciar Sesión"
+          route="/loginSuccess"
+          disabled={isInvalid}
+        />
+
+        <SeparatorRow />
+
+        <GoogleButton />
+
+        <View style={styles.bottomContainer}>
+          <AppText style={styles.text}>
+            Al iniciar sesión, confirmás que leíste y aceptás la{" "}
+            <AppText
+              weight="bold"
+              style={styles.link}
+              onPress={() => router.push("/privacyPolicy")}
+            >
+              Política de Privacidad
+            </AppText>{" "}
+            y los{" "}
+            <AppText
+              weight="bold"
+              style={styles.link}
+              onPress={() => router.push("/termsOfUse")}
+            >
+              Términos de Uso
+            </AppText>
+            .
+          </AppText>
+        </View>
+      </View>
+    </TouchableWithoutFeedback>
   );
+
+
 }
 
 const styles = StyleSheet.create({
-  
   container: {
     flex: 1,
     backgroundColor: Colors.light.background,
     paddingHorizontal: 24,
     paddingTop: 20,
   },
-  title: {
-    fontSize: 30,
-    color: Colors.light.text,
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: Colors.light.textSecondary,
-    marginBottom: 10,
-    opacity: 0.5
-  },
-  input: {
-    backgroundColor: "#E6E4FF",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 15,
-    fontSize: 18,
-    marginTop: 30,
-    color: Colors.light.text,
-    fontFamily: "Manrope_400Regular",
-  },
-  or: {
-    textAlign: "center",
-    color: Colors.light.text,
-    fontSize: 22,
-    marginVertical: 18,
-  },
-  
-  
-  image: {
-    width: "100%",
-    height: 200
-  }, 
- 
 
   forgotContainer: {
-  marginTop: 10,
-  alignSelf: "flex-start",
-},
+    marginTop: 10,
+    alignSelf: "flex-start",
+  },
 
-forgotLink: {
-  color: Colors.light.primary,
-  fontSize: 18,
-},
+  forgotLink: {
+    color: Colors.light.primary,
+    fontSize: 18,
+  },
 
+  errorText: {
+    color: Colors.light.danger,
+    fontSize: 16,
+    marginTop: 4,
+    marginLeft: 4,
+  },
+  bottomContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    marginBottom: 30, // ajustá según tu diseño
+  },
+
+  text: {
+    textAlign: "center",
+    fontSize: 14,
+    color: Colors.light.textMuted,
+    lineHeight: 20,
+  },
+
+  link: {
+    color: Colors.light.primary,
+  },
 
 });

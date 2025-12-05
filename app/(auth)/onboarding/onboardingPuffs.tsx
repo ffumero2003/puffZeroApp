@@ -1,18 +1,37 @@
-import TitleBlock from "@/src/components/onboarding/titleBlock";
 import Slider from "@react-native-community/slider";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
+
 import AppText from "../../../src/components/appText";
 import ContinueButton from "../../../src/components/onboarding/continueButton";
 import OnboardingHeader from "../../../src/components/onboarding/onboardingHeader";
+import TitleBlock from "../../../src/components/onboarding/titleBlock";
 import { Colors } from "../../../src/constants/theme";
+
+import Animated, {
+  useAnimatedProps,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+
+const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 export default function OnboardingPuffs() {
   const [value, setValue] = useState(0);
-  const [inputValue, setInputValue] = useState("");
+
+  // Counter animado
+  const animatedValue = useSharedValue(0);
+  const animatedProps = useAnimatedProps(() => ({
+    text: Math.round(animatedValue.value).toString(),
+  }));
+
+  useEffect(() => {
+    animatedValue.value = withTiming(value, { duration: 250 });
+  }, [value]);
 
   function getAddictionLevel(n: number) {
-    if (n > 300) return "Super Pesada"
+    if (n > 300) return "Super Pesada";
     if (n > 175) return "Pesada";
     if (n >= 75) return "Normal";
     return "Suave";
@@ -20,73 +39,80 @@ export default function OnboardingPuffs() {
 
   const addiction = getAddictionLevel(value);
 
+  // 🔥 Animación del label
+  const labelAnim = useSharedValue(0);
+
+  useEffect(() => {
+    labelAnim.value = 0;
+    labelAnim.value = withTiming(1, { duration: 250 });
+  }, [addiction]);
+
+  const labelStyle = useAnimatedStyle(() => ({
+    opacity: labelAnim.value,
+    transform: [
+      { scale: 0.9 + labelAnim.value * 0.1 },     // zoom sutil
+      { translateY: (1 - labelAnim.value) * 6 },  // baja → sube
+    ],
+  }));
+
   return (
     <View style={styles.container}>
-
       <OnboardingHeader step={4} total={10} />
 
-      {/* CONTENIDO */}
       <View style={styles.content}>
         <TitleBlock
           title="¿Cuántos puffs consumís por día?"
-          subtitle="Podés indicar un número aproximado, si en los primeros días vemos que el límite es muy bajo, lo ajustaremos sin problema."
+          subtitle="No tiene que ser exacto. Si en los primeros días notamos que el límite es muy bajo, lo ajustamos sin problema."
         />
 
-
+        {/* Slider */}
         <Slider
           style={styles.slider}
           value={value}
           onValueChange={setValue}
           minimumValue={0}
           maximumValue={400}
+          step={1}
           minimumTrackTintColor={Colors.light.primary}
           maximumTrackTintColor="#CFCBFF"
           thumbTintColor={Colors.light.primary}
-          step={1}
         />
 
-        <TextInput
+        {/* Counter animado */}
+        <AnimatedTextInput
           style={styles.input}
-          value={String(value)}
-          onChangeText={(text) => {
-            const num = Number(text);
-            if (!isNaN(num)) {
-              setValue(num);
-            }
-          }}
-          keyboardType="numeric"
+          editable={false}
+          animatedProps={animatedProps}
         />
 
-        <AppText weight="semibold" style={styles.classification}>
-          {addiction}
-        </AppText>
+        {/* 🔥 Label animado */}
+        <Animated.View style={labelStyle}>
+          <AppText weight="semibold" style={styles.classification}>
+            {addiction}
+          </AppText>
+        </Animated.View>
       </View>
 
-     
-
-      <ContinueButton 
-      text="Continuar"
-      route="/(auth)/onboarding/onboardingMoneySpent"
-      style={{ paddingBottom: 30 }}
+      <ContinueButton
+        text="Continuar"
+        route="/(auth)/onboarding/onboardingMoneySpent"
+        disabled={value < 15}
+        style={{ paddingBottom: 30 }}
       />
-
     </View>
   );
-
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.light.background,
-   
     paddingHorizontal: 24,
     paddingTop: 30,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 10,
-    marginTop: 60,
+    marginTop: 40,
   },
   slider: {
     width: "100%",
@@ -111,8 +137,4 @@ const styles = StyleSheet.create({
     color: Colors.light.primary,
     marginTop: 20,
   },
-  bottomButtonContainer: {
-    width: "100%",
-    paddingBottom: 40,
-},
 });

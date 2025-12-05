@@ -1,7 +1,7 @@
-import { router } from "expo-router";
 import { Image, StyleSheet, View } from "react-native";
+
 import AppText from "../../../src/components/appText";
-import KeepGoingButton from "../../../src/components/onboarding/keepGoingButton";
+import ContinueButton from "../../../src/components/onboarding/continueButton";
 import OnboardingHeader from "../../../src/components/onboarding/onboardingHeader";
 import TitleBlock from "../../../src/components/onboarding/titleBlock";
 import { Colors } from "../../../src/constants/theme";
@@ -14,32 +14,37 @@ export default function OnboardingComparison() {
       <OnboardingHeader step={6} total={10} />
 
       <View style={styles.content}>
-
-        
-
-        <TitleBlock 
-        title="Avanzá hacia una vida sin vape el doble de rápido"
-        subtitle="Tu transición al dejar el vape"
+        <TitleBlock
+          title="Avanzá hacia una vida sin vape el doble de rápido"
+          subtitle="Tu transición al dejar el vape"
         />
 
-        {/* IMAGEN COMPLETA */}
+        {/* Imagen completa */}
         <Image
           source={ComparisonImage}
           style={styles.image}
           resizeMode="contain"
         />
 
-        {/* TEXTO INFERIOR */}
+        {/* Texto inferior */}
         <AppText style={styles.description}>
-          PuffZero te acompaña, te motiva y te ayuda a mantenerte constante.
+          Puff
+          <AppText
+            weight="extrabold"
+            style={{ color: Colors.light.primary }}
+          >
+            Zero
+          </AppText>{" "}
+          te acompaña, te motiva y te ayuda a mantenerte constante.
         </AppText>
 
-        <KeepGoingButton
-          text="Continuar"
-          onPress={() => router.push("/(auth)/onboarding/onboardingGoal")}
-        />
-
+        
       </View>
+      <ContinueButton
+          text="Continuar"
+          route="/(auth)/onboarding/onboardingGoal"
+          style={{ paddingBottom: 30 }}
+        />
     </View>
   );
 }
@@ -57,7 +62,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: 220,  // ajustá si es más alta o más baja
+    height: 220, // ajustá si es más alta o más baja
     marginVertical: 20,
   },
   description: {

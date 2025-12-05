@@ -1,100 +1,142 @@
-import TitleBlock from "@/src/components/onboarding/titleBlock";
 import { useState } from "react";
-import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
 import AppText from "../../../src/components/appText";
 import ContinueButton from "../../../src/components/onboarding/continueButton";
 import OnboardingHeader from "../../../src/components/onboarding/onboardingHeader";
+import TitleBlock from "../../../src/components/onboarding/titleBlock";
 import { Colors } from "../../../src/constants/theme";
+
+/* 🔥 Lista de monedas de Latinoamérica */
+const LATAM_CURRENCIES = [
+  { code: "CRC", label: "Costa Rica (Colones)" },
+  { code: "USD", label: "El Salvador / Panamá (USD)" },
+  { code: "MXN", label: "México (Pesos Mexicanos)" },
+  { code: "COP", label: "Colombia (Pesos Colombianos)" },
+  { code: "PEN", label: "Perú (Sol Peruano)" },
+  { code: "CLP", label: "Chile (Peso Chileno)" },
+  { code: "ARS", label: "Argentina (Peso Argentino)" },
+  { code: "GTQ", label: "Guatemala (Quetzal)" },
+  { code: "HNL", label: "Honduras (Lempira)" },
+  { code: "NIO", label: "Nicaragua (Córdoba)" },
+  { code: "PYG", label: "Paraguay (Guaraní)" },
+  { code: "UYU", label: "Uruguay (Peso Uruguayo)" },
+  { code: "VES", label: "Venezuela (Bolívar)" },
+];
+
+/* 🔥 Formato automático de moneda según país (para el PREVIEW) */
+function formatCurrency(value: string, currency: string) {
+  if (!value) return "";
+
+  const number = Number(value);
+  if (isNaN(number)) return "";
+
+  return new Intl.NumberFormat("es-LA", {
+    style: "currency",
+    currency,
+    minimumFractionDigits:
+      currency === "CRC" || currency === "CLP" || currency === "PYG" ? 0 : 2,
+  }).format(number);
+}
 
 export default function OnboardingMoneySpent() {
   const [amount, setAmount] = useState("");
-  const [currency, setCurrency] = useState("CRC"); // "CRC" | "USD"
+  const [currency, setCurrency] = useState("CRC");
   const [pickerOpen, setPickerOpen] = useState(false);
 
-  function formatDisplayCurrency(code: string) {
-    return code === "CRC" ? "Colones" : "Dólares";
-  }
+  const formatted = formatCurrency(amount, currency);
 
   return (
-    <View style={styles.container}>
-      <OnboardingHeader step={5} total={10} />
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 1 : 0}
+    >
+      <View style={styles.container}>
+        <OnboardingHeader step={5} total={10} />
 
-      <View style={styles.content}>
-        <TitleBlock
-          title="¿Cuánto gastás por semana?"
-          subtitle="Registrar tus gastos te muestra cuánto podrías ahorrar."
-        />
-
-        {/* INPUT NUMÉRICO */}
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          placeholder="0"
-          placeholderTextColor="#A0A0BF"
-          value={amount}
-          onChangeText={(text) => {
-            const clean = text.replace(/[^0-9]/g, "");
-            setAmount(clean);
-          }}
-        />
-
-        {/* SELECTOR DE MONEDA */}
-        <TouchableOpacity
-          style={styles.currencyPicker}
-          onPress={() => setPickerOpen(true)}
+        {/* Scroll para inputs */}
+        <ScrollView
+          style={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <AppText weight="semibold" style={styles.currencyText}>
-            {formatDisplayCurrency(currency)}
-          </AppText>
+          <TitleBlock
+            title="¿Cuánto gastás por semana?"
+            subtitle="Registrar tus gastos te muestra cuánto podrías ahorrar."
+          />
 
-          <AppText style={{ fontSize: 14 }}>⌄</AppText>
-        </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            keyboardType="numeric"
+            placeholder="0"
+            placeholderTextColor="#A0A0BF"
+            value={amount}
+            onChangeText={(text) => {
+              const clean = text.replace(/[^0-9]/g, "");
+              setAmount(clean);
+            }}
+          />
 
-        {/* PICKER MODAL (simple) */}
-        {pickerOpen && (
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalBox}>
-              <TouchableOpacity
-                style={styles.modalOption}
-                onPress={() => {
-                  setCurrency("CRC");
-                  setPickerOpen(false);
-                }}
-              >
-                <AppText weight="medium">Colones (CRC)</AppText>
-              </TouchableOpacity>
+          {formatted ? (
+            <AppText style={styles.previewText}>
+              ≈ {formatted} por semana
+            </AppText>
+          ) : null}
 
-              <TouchableOpacity
-                style={styles.modalOption}
-                onPress={() => {
-                  setCurrency("USD");
-                  setPickerOpen(false);
-                }}
-              >
-                <AppText weight="medium">Dólares (USD)</AppText>
-              </TouchableOpacity>
+          {/* Selector de moneda */}
+          <TouchableOpacity
+            style={styles.currencyPicker}
+            onPress={() => setPickerOpen(true)}
+          >
+            <AppText weight="semibold" style={styles.currencyText}>
+              {LATAM_CURRENCIES.find((c) => c.code === currency)?.label}
+            </AppText>
+            <AppText style={styles.arrow}>▼</AppText>
+          </TouchableOpacity>
+          </ScrollView>
+          
 
-              <TouchableOpacity
-                style={styles.modalCancel}
-                onPress={() => setPickerOpen(false)}
-              >
-                <AppText weight="medium" style={{ color: Colors.light.danger }}>
-                  Cancelar
-                </AppText>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
+          {/* Modal de selección */}
+           {pickerOpen && (
+            <Pressable style={styles.modalOverlay} onPress={() => setPickerOpen(false)}>
+              <View style={styles.modalBox}>
+                <ScrollView style={{ maxHeight: 300 }}>
+                  {LATAM_CURRENCIES.map((item) => (
+                    <TouchableOpacity
+                      key={item.code}
+                      style={styles.modalOption}
+                      onPress={() => {
+                        setCurrency(item.code);
+                        setPickerOpen(false);
+                      }}
+                    >
+                      <AppText weight="medium">{item.label}</AppText>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </Pressable>
+          )}
 
-        
-      </View>
-      {/* BOTÓN */}
-        <ContinueButton 
+        {/* Botón fijo al fondo */}
+        <ContinueButton
           text="Continuar"
           route="/(auth)/onboarding/onboardingComparison"
           style={{ paddingBottom: 30 }}
+          disabled={!amount}
         />
-    </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -107,17 +149,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    marginTop: 60,
-  },
-  title: {
-    fontSize: 32,
-    color: Colors.light.text,
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: Colors.light.textMuted,
-    marginBottom: 40,
+    marginTop: 40,
   },
   input: {
     backgroundColor: "#E6E4FF",
@@ -127,48 +159,57 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: Colors.light.text,
     fontFamily: "Manrope_600SemiBold",
-    width: "100%",
+  },
+  previewText: {
+    marginTop: 8,
+    fontSize: 16,
+    marginHorizontal: 10,
+    color: Colors.light.textMuted,
   },
   currencyPicker: {
     marginTop: 20,
     alignSelf: "center",
     backgroundColor: "#E6E4FF",
     borderRadius: 20,
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 22,
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 10,
+    elevation: 2,
   },
   currencyText: {
-    fontSize: 18,
+    fontSize: 16,
     color: Colors.light.text,
   },
-
-  /* MODAL */
+  arrow: {
+    fontSize: 16,
+    color: Colors.light.text,
+    marginLeft: 4,
+  },
   modalOverlay: {
-    position: "absolute",
-    top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.3)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalBox: {
-    width: "85%",
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 16,
-    gap: 16,
-  },
-  modalOption: {
-    paddingVertical: 10,
-  },
-  modalCancel: {
-    paddingVertical: 10,
-    alignItems: "center",
-  },
-  bottomButtonContainer: {
-    width: "100%",
-    paddingBottom: 40,
+  ...StyleSheet.absoluteFillObject,  // ← full pantalla REAL
+  backgroundColor: "rgba(0,0,0,0.5)",
+  justifyContent: "center",
+  alignItems: "center",
+  paddingHorizontal: 20,
+  zIndex: 99,
 },
+
+modalBox: {
+  width: "100%",
+  maxWidth: 380,
+  backgroundColor: Colors.light.secondary,
+  paddingVertical: 10,
+  borderRadius: 16,
+  maxHeight: "60%",      // ← NO pongas height: 100%, rompe scroll
+},
+
+  
+  modalOption: {
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.light.border,
+  },
 });

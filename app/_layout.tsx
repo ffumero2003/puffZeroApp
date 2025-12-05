@@ -8,6 +8,7 @@ import {
   useFonts
 } from "@expo-google-fonts/manrope";
 import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -22,20 +23,19 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
+    <>
+      {/* 👇 Fuerza hora negra en TODA la app */}
+      <StatusBar style="dark" />
 
-      
-        animation: "slide_from_right",
-
-        gestureEnabled: true,
-
-       
-        animationDuration: 250,
-
-        animationTypeForReplace: "push",
-      }}
-    />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: "slide_from_right",
+          gestureEnabled: true,
+          animationDuration: 250,
+          animationTypeForReplace: "push",
+        }}
+      />
+    </>
   );
 }

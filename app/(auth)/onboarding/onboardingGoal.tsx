@@ -10,13 +10,14 @@ const GOAL_OPTIONS = [
   {
     id: "reduce",
     badge: "MONITOREAR Y REDUCIR  📊",
-    text: "Quiero controlar y bajar mi consumo",
+    text: "Quiero medir mi consumo diario y reducirlo de forma constante",
   },
   {
     id: "quit",
     badge: "DEJAR POR COMPLETO  🔥",
-    text: "Quiero eliminar el vape de mi vida",
+    text: "Quiero dejar el vape definitivamente y no volver a depender de él",
   },
+
 ];
 
 export default function OnboardingGoal() {

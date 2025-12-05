@@ -9,13 +9,14 @@ import TitleBlock from "../../../src/components/onboarding/titleBlock";
 import { Colors } from "../../../src/constants/theme";
 
 const CONCERNS = [
-  { id: "ansiedad", title: "Ansiedad y síndrome de abstinencia 🧊" },
+  { id: "ansiedad", title: "Ansiedad 🧊" },
+  { id: "abstinencia", title: "Síndrome de Abstinencia 🫠"},
   { id: "presion", title: "Presión Social 🧍🏻‍♂️" },
   { id: "estres", title: "Manejo de estrés 😟" },
   { id: "miedo", title: "Miedo a fallar 🎢" },
   { id: "habitos", title: "Hábitos y rutinas diarias 🐒" },
   { id: "tiempo", title: "Tiempo y paciencia 🕒" },
-  { id: "productividad", title: "Productividad / concentración 🧳" },
+  { id: "productividad", title: "Productividad 🧳" },
 ];
 
 export default function OnboardingWorries() {

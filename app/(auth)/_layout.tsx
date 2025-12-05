@@ -7,7 +7,7 @@ export default function AuthLayout() {
         headerShown: false,
         animation: "slide_from_right", // 👈 ESTA ES LA MAGIA
         gestureEnabled: true, // permite swipe back
-        animationDuration: 350,
+        animationDuration: 250,
       }}
     />
   );
