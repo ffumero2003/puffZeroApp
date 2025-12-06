@@ -7,10 +7,15 @@ interface AuthContextProps {
   session: Session | null;
   loading: boolean;
   signUp: (
-    email: string, 
+    email: string,
     password: string,
     full_name: string
   ) => Promise<{ data: any; error: any }>;
+  signIn: (
+    email: string,
+    password: string
+  ) => Promise<{ data: any; error: any }>;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -18,6 +23,8 @@ const AuthContext = createContext<AuthContextProps>({
   session: null,
   loading: true,
   signUp: async () => ({ data: null, error: null }),
+  signIn: async () => ({ data: null, error: null }),
+  signOut: async () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -35,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(session?.user ?? null);
       setLoading(false);
     };
- 
+
     setup();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -48,20 +55,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => authListener.subscription.unsubscribe();
   }, []);
 
+  // SIGN UP
   const signUp = async (email: string, password: string, full_name: string) => {
-    const { data, error } = await supabase.auth.signUp({
+    return await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { full_name },
       },
     });
+  };
+
+  // SIGN IN
+  const signIn = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     return { data, error };
   };
 
+  // SIGN OUT
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp }}>
+    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,7 +1,7 @@
 import SeparatorRow from "@/src/components/onboarding/separatorRow";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Keyboard, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Alert, Keyboard, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import AppText from "../../src/components/appText";
 import AuthHeader from "../../src/components/auth/authHeader";
 import ContinueButton from "../../src/components/onboarding/continueButton";
@@ -9,6 +9,7 @@ import GoogleButton from "../../src/components/onboarding/googleButton";
 import OnboardingHeader from "../../src/components/onboarding/onboardingHeader";
 import UnderlineInput from "../../src/components/onboarding/underlineInput";
 import { Colors } from "../../src/constants/theme";
+import { useAuth } from "../../src/providers/authProvider";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -16,6 +17,22 @@ export default function Login() {
 
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+  // Supabase login
+
+  const { signIn } = useAuth();
+
+  async function handleLogin() {
+    const { data, error } = await signIn(email, password);
+
+    if (error) {
+      Alert.alert("Error al iniciar sesión", error.message);
+      return;
+    }
+
+    router.replace("/loginSuccess"); // o la vista real de home que usás
+  }
+
 
   /** --------------------------
    * VALIDACIONES
@@ -98,9 +115,10 @@ export default function Login() {
 
         <ContinueButton
           text="Iniciar Sesión"
-          route="/loginSuccess"
+          onPress={handleLogin}
           disabled={isInvalid}
         />
+
 
         <SeparatorRow />
 
