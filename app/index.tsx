@@ -58,6 +58,7 @@ export default function Splash() {
         </Text>
       </View>
 
+
       <ActivityIndicator
         size="large"
         color={Colors.light.primary}

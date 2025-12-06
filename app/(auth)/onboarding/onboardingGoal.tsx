@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import ContinueButton from "../../../src/components/onboarding/continueButton";
@@ -5,6 +6,7 @@ import OnboardingHeader from "../../../src/components/onboarding/onboardingHeade
 import OnboardingOptionCard from "../../../src/components/onboarding/onboardingOptionCard";
 import TitleBlock from "../../../src/components/onboarding/titleBlock";
 import { Colors } from "../../../src/constants/theme";
+import { useOnboarding } from "../../../src/providers/onboardingProvider";
 
 const GOAL_OPTIONS = [
   {
@@ -22,6 +24,8 @@ const GOAL_OPTIONS = [
 
 export default function OnboardingGoal() {
   const [selected, setSelected] = useState<string | null>(null);
+  const { setGoal } = useOnboarding();
+
 
   return (
     <View style={styles.container}>
@@ -46,12 +50,17 @@ export default function OnboardingGoal() {
       </View>
 
      
-      <ContinueButton 
+      <ContinueButton
         text="Continuar"
-        route="/(auth)/onboarding/onboardingSpeedPlan"
-        style={{ paddingBottom: 30 }}
         disabled={selected === null}
+        onPress={() => {
+          setGoal(selected!);  // 💾 Guarda la meta
+          console.log("🎯 Meta seleccionada:", selected);
+          router.push("/(auth)/onboarding/onboardingSpeedPlan");
+        }}
+        style={{ paddingBottom: 30 }}
       />
+
     </View>
   );
 }

@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
@@ -6,6 +7,7 @@ import OnboardingHeader from "../../../src/components/onboarding/onboardingHeade
 import OnboardingOptionCard from "../../../src/components/onboarding/onboardingOptionCard";
 import TitleBlock from "../../../src/components/onboarding/titleBlock";
 import { Colors } from "../../../src/constants/theme";
+import { useOnboarding } from "../../../src/providers/onboardingProvider";
 const OPTIONS = [
   {
     id: "14",
@@ -36,6 +38,8 @@ const OPTIONS = [
 
 export default function OnboardingSpeedPlan() {
   const [selected, setSelected] = useState<string | null>(null);
+  const { setGoalSpeed } = useOnboarding();
+
 
   return (
     <View style={styles.container}>
@@ -63,11 +67,15 @@ export default function OnboardingSpeedPlan() {
         ))}
       </ScrollView>
 
-      <ContinueButton 
+      <ContinueButton
         text="Continuar"
-        route="/(auth)/onboarding/onboardingMotivation"
-        style={{ paddingBottom: 30 }}
         disabled={selected === null}
+        onPress={() => {
+          setGoalSpeed(selected!);
+          console.log("🚀 Velocidad seleccionada:", selected);
+          router.push("/(auth)/onboarding/onboardingMotivation");
+        }}
+        style={{ paddingBottom: 30 }}
       />
     </View>
   );

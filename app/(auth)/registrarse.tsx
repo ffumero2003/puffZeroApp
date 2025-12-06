@@ -1,6 +1,14 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from "react-native";
+import {
+  Alert,
+  Keyboard,
+  ScrollView,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+
 import AppText from "../../src/components/appText";
 import AuthHeader from "../../src/components/auth/authHeader";
 import ContinueButton from "../../src/components/onboarding/continueButton";
@@ -10,80 +18,191 @@ import SeparatorRow from "../../src/components/onboarding/separatorRow";
 import UnderlineInput from "../../src/components/onboarding/underlineInput";
 import { Colors } from "../../src/constants/theme";
 
+import { createProfile } from "../../src/lib/profile";
+import { useAuth } from "../../src/providers/authProvider";
+import { useOnboarding } from "../../src/providers/onboardingProvider"; // 👈 ESTA es la correcta
+
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [usuario, setUsuario] = useState("");
+  const [nombre, setNombre] = useState("");
 
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [usuarioError, setUsuarioError] = useState("");
+  const [nombreError, setNombreError] = useState("");
+
+  // Supabase Auth
+  const { signUp } = useAuth();
+
+  // 🔥 Onboarding context — SE USA AQUÍ, NO DENTRO DE LA FUNCIÓN
+  const {
+    puffs_per_day,
+    money_per_month,
+    currency,
+    goal,
+    goal_speed,
+    why_stopped,
+    worries,
+    resetAll,
+  } = useOnboarding();
+
+  // ---------------------------
+  //   HANDLE REGISTER
+  // ---------------------------
+  async function handleRegister() {
+    // 1) Crear usuario en Auth
+    const { data, error } = await signUp(email, password, nombre);
+
+    if (error) {
+      Alert.alert("Error", error.message);
+      return;
+    }
+
+    const user_id = data?.user?.id;
+
+    if (!user_id) {
+      Alert.alert("Error", "No se pudo obtener el usuario.");
+      return;
+    }
+
+    // 2) Crear perfil en Supabase con datos reales del onboarding
+    const { error: profileError } = await createProfile({
+      user_id,
+      full_name: nombre,
+      puffs_per_day,
+      money_per_month,
+      currency,
+      goal,
+      goal_speed,
+      why_stopped,
+      worries,
+    });
+
+    if (profileError) {
+      Alert.alert("Error creando perfil", profileError.message);
+      return;
+    }
+
+    // 3) Limpiar estado del onboarding
+    resetAll();
+
+    Alert.alert("Cuenta creada", "Revisá tu correo para confirmar tu cuenta.");
+    router.push("/(auth)/onboarding/review");
+  }
 
   /* ---------------------------
      VALIDACIONES
   ------------------------------*/
 
-  const validateUsuario = (value: string) => {
-    setUsuario(value);
+  const validateNombre = (value: string) => {
+    setNombre(value);
 
-    if (!value.trim()) setUsuarioError("Este campo es obligatorio.");
-    else if (value.length < 3) setUsuarioError("Mínimo 3 caracteres.");
-    else if (/\s/.test(value)) setUsuarioError("No puede contener espacios.");
-    else setUsuarioError("");
+    const trimmed = value.trim();
+
+    if (!trimmed) {
+      setNombreError("Este campo es obligatorio.");
+      return;
+    }
+
+    if (!/^[A-Za-zÁÉÍÓÚáéíóúñÑ ]+$/.test(trimmed)) {
+      setNombreError("Solo se permiten letras.");
+      return;
+    }
+
+    const partes = trimmed.split(" ");
+
+    if (partes.length < 2) {
+      setNombreError("Incluí nombre y apellido.");
+      return;
+    }
+
+    if (partes.some((p) => p.length < 2)) {
+      setNombreError("Cada nombre/apellido debe tener al menos 2 letras.");
+      return;
+    }
+
+    setNombreError("");
   };
 
   const validateEmail = (value: string) => {
-    setEmail(value);
+    setEmail(value.trim());
+
+    if (!value.trim()) {
+      setEmailError("Este campo es obligatorio.");
+      return;
+    }
+
+    if (/\s/.test(value)) {
+      setEmailError("El correo no puede tener espacios.");
+      return;
+    }
+
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!value) setEmailError("Este campo es obligatorio.");
-    else if (!regex.test(value)) setEmailError("Correo inválido.");
-    else setEmailError("");
+    if (!regex.test(value)) {
+      setEmailError("Correo inválido.");
+      return;
+    }
+
+    setEmailError("");
   };
 
   const validatePassword = (value: string) => {
     setPassword(value);
-    if (!value) setPasswordError("Este campo es obligatorio.");
-    else if (value.length < 6) setPasswordError("Mínimo 6 caracteres.");
-    else setPasswordError("");
+
+    if (!value.trim()) {
+      setPasswordError("Este campo es obligatorio.");
+      return;
+    }
+
+    if (/\s/.test(value)) {
+      setPasswordError("La contraseña no puede contener espacios.");
+      return;
+    }
+
+    if (value.length < 6) {
+      setPasswordError("Mínimo 6 caracteres.");
+      return;
+    }
+
+    if (!/[0-9]/.test(value)) {
+      setPasswordError("Debe incluir al menos un número.");
+      return;
+    }
+
+    if (!/[A-Za-z]/.test(value)) {
+      setPasswordError("Debe incluir al menos una letra.");
+      return;
+    }
+
+    setPasswordError("");
   };
 
-  /* ---------------------------
-     DESHABILITAR BOTÓN
-  ------------------------------*/
   const isInvalid =
-    !email ||
-    !password ||
-    !usuario ||
-    emailError ||
-    passwordError ||
-    usuarioError;
+    !email || !password || !nombre || emailError || passwordError || nombreError;
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <OnboardingHeader showProgress={false} style={{ marginBottom: 20 }} />
 
-        {/* Título */}
         <AuthHeader
           title="Crear Cuenta"
           subtitle="Configurá tu cuenta y empezá tu proceso."
         />
 
         <ScrollView showsVerticalScrollIndicator={false}>
-          {/* Usuario */}
           <UnderlineInput
-            placeholder="Usuario"
-            value={usuario}
-            onChangeText={validateUsuario}
+            placeholder="Nombre Completo"
+            value={nombre}
+            onChangeText={validateNombre}
             autoCapitalize="none"
             keyboardType="default"
           />
-          {usuarioError ? (
-            <AppText style={styles.errorText}>{usuarioError}</AppText>
+          {nombreError ? (
+            <AppText style={styles.errorText}>{nombreError}</AppText>
           ) : null}
 
-          {/* Correo */}
           <UnderlineInput
             placeholder="Correo"
             value={email}
@@ -95,7 +214,6 @@ export default function Register() {
             <AppText style={styles.errorText}>{emailError}</AppText>
           ) : null}
 
-          {/* Contraseña */}
           <UnderlineInput
             placeholder="Contraseña"
             value={password}
@@ -107,18 +225,15 @@ export default function Register() {
             <AppText style={styles.errorText}>{passwordError}</AppText>
           ) : null}
 
-          {/* Botón principal */}
           <ContinueButton
             text="Registrarse"
             disabled={isInvalid}
-            onPress={() => router.push("/(auth)/onboarding/review")}
+            onPress={handleRegister}
             style={{ marginTop: 30 }}
           />
 
-          {/* Separador */}
           <SeparatorRow />
 
-          {/* Google Login */}
           <GoogleButton />
         </ScrollView>
       </View>
@@ -133,7 +248,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 20,
   },
-
   errorText: {
     color: Colors.light.danger,
     fontSize: 16,

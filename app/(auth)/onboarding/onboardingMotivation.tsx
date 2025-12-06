@@ -1,9 +1,10 @@
-import OnboardingWhiteButton from "@/src/components/onboarding/onboardingWhiteButton";
 import { router } from "expo-router";
 import { ScrollView, StyleSheet, View } from "react-native";
 import OnboardingHeader from "../../../src/components/onboarding/onboardingHeader";
+import OnboardingWhiteButton from "../../../src/components/onboarding/onboardingWhiteButton";
 import TitleBlock from "../../../src/components/onboarding/titleBlock";
 import { Colors } from "../../../src/constants/theme";
+import { useOnboarding } from "../../../src/providers/onboardingProvider";
 
 const MOTIVATION_OPTIONS = [
   { id: "salud", title: "Salud ❤️" },
@@ -16,6 +17,8 @@ const MOTIVATION_OPTIONS = [
 ];
 
 export default function OnboardingMotivation() {
+  const { setWhyStopped } = useOnboarding();
+
   return (
     <View style={styles.container}>
       <OnboardingHeader step={9} total={10} />
@@ -34,7 +37,11 @@ export default function OnboardingMotivation() {
           <OnboardingWhiteButton
             key={opt.id}
             title={opt.title}
-            onPress={() => router.push("/(auth)/onboarding/onboardingWorries")}
+            onPress={() => {
+              setWhyStopped([opt.id]);     // 💾 Guardar en el contexto
+              console.log("Motivación seleccionada:", opt.id);
+              router.push("/(auth)/onboarding/onboardingWorries");
+            }}
           />
         ))}
       </ScrollView>

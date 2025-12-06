@@ -1,12 +1,13 @@
 import Slider from "@react-native-community/slider";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
-
 import AppText from "../../../src/components/appText";
 import ContinueButton from "../../../src/components/onboarding/continueButton";
 import OnboardingHeader from "../../../src/components/onboarding/onboardingHeader";
 import TitleBlock from "../../../src/components/onboarding/titleBlock";
 import { Colors } from "../../../src/constants/theme";
+import { useOnboarding } from "../../../src/providers/onboardingProvider";
 
 import Animated, {
   useAnimatedProps,
@@ -19,6 +20,8 @@ const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 export default function OnboardingPuffs() {
   const [value, setValue] = useState(0);
+
+  const { setPuffs } = useOnboarding();
 
   // Counter animado
   const animatedValue = useSharedValue(0);
@@ -95,10 +98,15 @@ export default function OnboardingPuffs() {
 
       <ContinueButton
         text="Continuar"
-        route="/(auth)/onboarding/onboardingMoneySpent"
-        disabled={value < 15}
+        disabled={value < 20}
+        onPress={() => {
+          setPuffs(value);
+          console.log("Puffs guardados en provider:", value);   // 👈 prueba
+          router.push("/(auth)/onboarding/onboardingMoneySpent");
+        }}
         style={{ paddingBottom: 30 }}
       />
+
     </View>
   );
 }

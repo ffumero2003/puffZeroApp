@@ -7,6 +7,7 @@ import OnboardingMultiSelectButton from "../../../src/components/onboarding/mult
 import OnboardingHeader from "../../../src/components/onboarding/onboardingHeader";
 import TitleBlock from "../../../src/components/onboarding/titleBlock";
 import { Colors } from "../../../src/constants/theme";
+import { useOnboarding } from "../../../src/providers/onboardingProvider";
 
 const CONCERNS = [
   { id: "ansiedad", title: "Ansiedad 🧊" },
@@ -21,12 +22,13 @@ const CONCERNS = [
 
 export default function OnboardingWorries() {
   const [selected, setSelected] = useState<string[]>([]);
+  const { setWorries } = useOnboarding();
 
   const toggleSelect = (id: string) => {
     setSelected((prev) =>
       prev.includes(id)
-        ? prev.filter((item) => item !== id) // remove
-        : [...prev, id] // add
+        ? prev.filter((item) => item !== id)
+        : [...prev, id]
     );
   };
 
@@ -58,7 +60,11 @@ export default function OnboardingWorries() {
         <KeepGoingButton
           text="Continuar"
           disabled={selected.length === 0}
-          onPress={() => router.push("/(auth)/registrarse")}
+          onPress={() => {
+            setWorries(selected);   // 💾 Guardamos el array completo
+            console.log("Preocupaciones guardadas:", selected);
+            router.push("/(auth)/registrarse");
+          }}
         />
       </View>
     </View>

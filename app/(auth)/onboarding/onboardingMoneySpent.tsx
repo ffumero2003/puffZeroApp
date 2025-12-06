@@ -2,24 +2,33 @@ import { useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
+import { router } from "expo-router";
+import { useRef } from "react";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming
+} from "react-native-reanimated";
 import AppText from "../../../src/components/appText";
 import ContinueButton from "../../../src/components/onboarding/continueButton";
 import OnboardingHeader from "../../../src/components/onboarding/onboardingHeader";
 import TitleBlock from "../../../src/components/onboarding/titleBlock";
 import { Colors } from "../../../src/constants/theme";
+import { useOnboarding } from "../../../src/providers/onboardingProvider";
 
 /* 🔥 Lista de monedas de Latinoamérica */
 const LATAM_CURRENCIES = [
+  { code: "USD_SV", label: "El Salvador (USD)" },
+  { code: "USD_PA", label: "Panamá (USD)" },
   { code: "CRC", label: "Costa Rica (Colones)" },
-  { code: "USD", label: "El Salvador / Panamá (USD)" },
   { code: "MXN", label: "México (Pesos Mexicanos)" },
   { code: "COP", label: "Colombia (Pesos Colombianos)" },
   { code: "PEN", label: "Perú (Sol Peruano)" },
@@ -33,45 +42,84 @@ const LATAM_CURRENCIES = [
   { code: "VES", label: "Venezuela (Bolívar)" },
 ];
 
-/* 🔥 Formato automático de moneda según país (para el PREVIEW) */
+/* 🔥 Mínimos realistas por moneda */
+const MIN_BY_CURRENCY: Record<string, number> = {
+  CRC: 10000,
+  USD_SV: 20,
+  USD_PA: 20,
+  MXN: 300,
+  COP: 25000,
+  PEN: 20,
+  CLP: 7000,
+  ARS: 10000,
+  GTQ: 50,
+  HNL: 200,
+  NIO: 400,
+  PYG: 40000,
+  UYU: 300,
+  VES: 250,
+};
+
+/* 🔥 Formato automático amigable */
 function formatCurrency(value: string, currency: string) {
   if (!value) return "";
 
   const number = Number(value);
   if (isNaN(number)) return "";
 
+  // USD_SV → USD  / USD_PA → USD
+  const isoCurrency = currency.startsWith("USD") ? "USD" : currency;
+
   return new Intl.NumberFormat("es-LA", {
     style: "currency",
-    currency,
-    minimumFractionDigits:
-      currency === "CRC" || currency === "CLP" || currency === "PYG" ? 0 : 2,
+    currency: isoCurrency,
   }).format(number);
 }
 
+
 export default function OnboardingMoneySpent() {
   const [amount, setAmount] = useState("");
-  const [currency, setCurrency] = useState("CRC");
+  const [localCurrency, setLocalCurrency] = useState("CRC");
   const [pickerOpen, setPickerOpen] = useState(false);
 
-  const formatted = formatCurrency(amount, currency);
+  const { setMoney, setCurrency } = useOnboarding();
+
+  const formatted = formatCurrency(amount, localCurrency);
+  const amountNumber = Number(amount);
+
+  const minValue = MIN_BY_CURRENCY[localCurrency];
+
+  const overlayOpacity = useSharedValue(0);
+  const modalTranslate = useSharedValue(50);
+  const modalOpacity = useSharedValue(0);
+
+  const overlayStyle = useAnimatedStyle(() => ({
+    opacity: overlayOpacity.value,
+  }));
+
+  const modalBoxStyle = useAnimatedStyle(() => ({
+    opacity: modalOpacity.value,
+    transform: [{ translateY: modalTranslate.value }],
+  }));
+
+  const modalRef = useRef<View>(null);
+
 
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 1 : 0}
     >
       <View style={styles.container}>
         <OnboardingHeader step={5} total={10} />
 
-        {/* Scroll para inputs */}
         <ScrollView
           style={styles.content}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
           <TitleBlock
-            title="¿Cuánto gastás por semana?"
+            title="¿Cuánto gastás por mes?"
             subtitle="Registrar tus gastos te muestra cuánto podrías ahorrar."
           />
 
@@ -81,10 +129,7 @@ export default function OnboardingMoneySpent() {
             placeholder="0"
             placeholderTextColor="#A0A0BF"
             value={amount}
-            onChangeText={(text) => {
-              const clean = text.replace(/[^0-9]/g, "");
-              setAmount(clean);
-            }}
+            onChangeText={(t) => setAmount(t.replace(/[^0-9]/g, ""))}
           />
 
           {formatted ? (
@@ -93,52 +138,97 @@ export default function OnboardingMoneySpent() {
             </AppText>
           ) : null}
 
-          {/* Selector de moneda */}
+          {/* Picker */}
           <TouchableOpacity
             style={styles.currencyPicker}
-            onPress={() => setPickerOpen(true)}
+            onPress={() => {
+            setPickerOpen(true);
+
+            overlayOpacity.value = withTiming(1, { duration: 200 });
+            modalTranslate.value = withTiming(0, {
+              duration: 260,
+              easing: Easing.out(Easing.quad),
+            });
+            modalOpacity.value = withTiming(1, { duration: 260 });
+          }}
+
           >
             <AppText weight="semibold" style={styles.currencyText}>
-              {LATAM_CURRENCIES.find((c) => c.code === currency)?.label}
+              {LATAM_CURRENCIES.find((c) => c.code === localCurrency)?.label}
             </AppText>
             <AppText style={styles.arrow}>▼</AppText>
           </TouchableOpacity>
-          </ScrollView>
-          
+        </ScrollView>
 
-          {/* Modal de selección */}
-           {pickerOpen && (
-            <Pressable style={styles.modalOverlay} onPress={() => setPickerOpen(false)}>
-              <View style={styles.modalBox}>
-                <ScrollView style={{ maxHeight: 300 }}>
-                  {LATAM_CURRENCIES.map((item) => (
-                    <TouchableOpacity
-                      key={item.code}
-                      style={styles.modalOption}
-                      onPress={() => {
-                        setCurrency(item.code);
-                        setPickerOpen(false);
-                      }}
-                    >
-                      <AppText weight="medium">{item.label}</AppText>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            </Pressable>
-          )}
+        {/* Modal */}
+        {pickerOpen && (
+        <Animated.View
+          style={[styles.modalOverlay, overlayStyle]}
+          onStartShouldSetResponder={() => true}
+          onResponderRelease={(e) => {
+            if (!modalRef.current) return;
 
-        {/* Botón fijo al fondo */}
+            // verificar si el usuario tocó FUERA del modal
+            modalRef.current.measure((x, y, width, height, pageX, pageY) => {
+              const touchX = e.nativeEvent.pageX;
+              const touchY = e.nativeEvent.pageY;
+
+              const inside =
+                touchX >= pageX &&
+                touchX <= pageX + width &&
+                touchY >= pageY &&
+                touchY <= pageY + height;
+
+              if (!inside) {
+                overlayOpacity.value = withTiming(0, { duration: 150 });
+                modalOpacity.value = withTiming(0, { duration: 150 });
+                modalTranslate.value = withTiming(50, { duration: 150 });
+
+                setTimeout(() => setPickerOpen(false), 150);
+              }
+            });
+          }}
+        >
+          <Animated.View
+            ref={modalRef}
+            style={[styles.modalBox, modalBoxStyle]}
+            onStartShouldSetResponder={() => true}
+          >
+            <ScrollView style={{ maxHeight: 300 }}>
+              {LATAM_CURRENCIES.map((item) => (
+                <TouchableOpacity
+                  key={item.code}
+                  style={styles.modalOption}
+                  onPress={() => {
+                    setLocalCurrency(item.code);
+                    setPickerOpen(false);
+                  }}
+                >
+                  <AppText weight="medium">{item.label}</AppText>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </Animated.View>
+        </Animated.View>
+      )}
+
+
         <ContinueButton
           text="Continuar"
-          route="/(auth)/onboarding/onboardingComparison"
+          disabled={amountNumber < minValue}
+          onPress={() => {
+            setMoney(amountNumber);
+            setCurrency(localCurrency);
+
+            router.push("/(auth)/onboarding/onboardingComparison");
+          }}
           style={{ paddingBottom: 30 }}
-          disabled={!amount}
         />
       </View>
     </KeyboardAvoidingView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
