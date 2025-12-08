@@ -111,7 +111,7 @@ export default function OnboardingMoneySpent() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View style={styles.container}>
-        <OnboardingHeader step={5} total={10} />
+        <OnboardingHeader step={6} total={11} />
 
         <ScrollView
           style={styles.content}

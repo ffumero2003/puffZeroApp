@@ -6,33 +6,32 @@ import LoginText from "../../../src/components/onboarding/loginText";
 import OnboardingHeader from "../../../src/components/onboarding/onboardingHeader";
 import { Colors } from "../../../src/constants/theme";
 
-import MoneySaved from "../../../assets/images/onboarding/onboardingMoneySaved.png";
+import ProgressScreen from "../../../assets/images/onboarding/onboardingZuffyPage.png";
 
-export default function OnboardingMoneySaved() {
+export default function OnboardingProgress() {
   return (
     <>
       <View style={styles.headerContainer}>
-        <OnboardingHeader  step={3} total={11}/>
+        <OnboardingHeader  step={2} total={11}/>
       </View>
       <View style={styles.container}>
         
         <Image
-          source={MoneySaved}
+          source={ProgressScreen}
           style={styles.phoneImage}
           resizeMode="contain"
         />
 
         <AppText weight="bold" style={styles.title}>
-          Cada puff evitado suma a tu ahorro
+          Zuffy, tu acompañante en el proceso
         </AppText>
 
         <KeepGoingButton 
-        text="Continuar"
-        onPress={() => router.push("/(auth)/onboarding/onboardingGraph")}
+        text="Continuar" 
+        onPress={() => router.push("/(auth)/onboarding/onboardingMoneySaved")}
         />
 
         <LoginText />
-
       </View>
     </>
   );
@@ -65,5 +64,6 @@ const styles = StyleSheet.create({
     color: Colors.light.text,
     textAlign: "center",
   },
+  
   
 });

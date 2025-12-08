@@ -11,7 +11,7 @@ import ComparisonImage from "../../../assets/images/onboarding/conPuffZero.png";
 export default function OnboardingComparison() {
   return (
     <View style={styles.container}>
-      <OnboardingHeader step={6} total={10} />
+      <OnboardingHeader step={7} total={11} />
 
       <View style={styles.content}>
         <TitleBlock

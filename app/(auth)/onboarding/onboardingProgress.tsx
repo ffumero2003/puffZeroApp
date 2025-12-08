@@ -12,7 +12,7 @@ export default function OnboardingProgress() {
   return (
     <>
       <View style={styles.headerContainer}>
-        <OnboardingHeader  step={1} total={10}/>
+        <OnboardingHeader  step={1} total={11}/>
       </View>
       <View style={styles.container}>
         
@@ -28,7 +28,7 @@ export default function OnboardingProgress() {
 
         <KeepGoingButton 
         text="Continuar" 
-        onPress={() => router.push("/(auth)/onboarding/onboardingMoneySaved")}
+        onPress={() => router.push("/(auth)/onboarding/onboardingZuffy")}
         />
 
         <LoginText />

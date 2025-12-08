@@ -60,7 +60,7 @@ export default function OnboardingPuffs() {
 
   return (
     <View style={styles.container}>
-      <OnboardingHeader step={4} total={10} />
+      <OnboardingHeader step={5} total={11} />
 
       <View style={styles.content}>
         <TitleBlock

@@ -34,7 +34,7 @@ export default function OnboardingWorries() {
 
   return (
     <View style={styles.container}>
-      <OnboardingHeader step={10} total={10} />
+      <OnboardingHeader step={11} total={11} />
 
       <ScrollView
         style={styles.content}

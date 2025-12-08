@@ -43,7 +43,7 @@ export default function OnboardingSpeedPlan() {
 
   return (
     <View style={styles.container}>
-      <OnboardingHeader step={8} total={10} />
+      <OnboardingHeader step={9} total={11} />
 
       <ScrollView
         style={styles.content}

@@ -29,7 +29,7 @@ export default function OnboardingGoal() {
 
   return (
     <View style={styles.container}>
-      <OnboardingHeader step={7} total={10} />
+      <OnboardingHeader step={8} total={11} />
 
       <View style={styles.content}>
         <TitleBlock

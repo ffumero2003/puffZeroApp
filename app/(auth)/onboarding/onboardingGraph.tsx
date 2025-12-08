@@ -12,7 +12,7 @@ export default function OnboardingMoneySaved() {
   return (
     <>
       <View style={styles.headerContainer}>
-        <OnboardingHeader  step={3} total={10}/>
+        <OnboardingHeader  step={4} total={11}/>
       </View>
       <View style={styles.container}>
         

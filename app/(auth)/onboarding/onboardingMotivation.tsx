@@ -21,7 +21,7 @@ export default function OnboardingMotivation() {
 
   return (
     <View style={styles.container}>
-      <OnboardingHeader step={9} total={10} />
+      <OnboardingHeader step={10} total={11} />
 
       <ScrollView
         style={styles.content}
