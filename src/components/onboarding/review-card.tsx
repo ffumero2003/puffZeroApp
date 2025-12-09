@@ -1,6 +1,6 @@
 import { Image, ImageSourcePropType, StyleSheet, View } from "react-native";
 import { Colors } from "../../constants/theme";
-import AppText from "../appText";
+import AppText from "../app-text";
 
 interface ReviewCardProps {
   name: string;

@@ -10,8 +10,8 @@ import {
 
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { AuthProvider } from "../src/providers/authProvider";
-import { OnboardingProvider } from "../src/providers/onboardingProvider";
+import { AuthProvider } from "../src/providers/auth-provider";
+import { OnboardingProvider } from "../src/providers/onboarding-provider";
 
 export default function RootLayout() {
   const [loaded] = useFonts({

@@ -1,6 +1,6 @@
 import { Colors } from "@/src/constants/theme";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import AppText from "../appText";
+import AppText from "../app-text";
 
 interface Props {
   id: string;

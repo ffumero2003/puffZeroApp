@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, TouchableOpacity } from "react-native";
-import AppText from "../appText";
+import AppText from "../app-text";
 
 export default function GoogleButton(){
   return(

@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import { StyleSheet } from "react-native";
 import { Colors } from "../../constants/theme";
-import AppText from "../appText";
+import AppText from "../app-text";
 
 export default function LoginText(){
   return(

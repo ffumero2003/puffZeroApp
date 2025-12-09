@@ -4,8 +4,8 @@
     "slug": "puffzero",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "scheme": "puffzeroapp",
+    "icon": "./assets/images/images/logo-puff-zero.png",
+    "scheme": "puffzero",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -14,7 +14,8 @@
       "backgroundColor": "#F6F3FF"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.puffzero"
     },
     "android": {
       "adaptiveIcon": {

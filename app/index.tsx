@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Image, Text, View } from "react-native";
-import Logo from "../assets/images/logoPuffZeroCircle.png";
+import Logo from "../assets/images/logo-puff-zero-circle.png";
 import { Colors } from "../src/constants/theme";
 
 // Simulación de carga de datos del usuario

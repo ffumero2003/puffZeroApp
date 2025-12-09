@@ -1,37 +1,38 @@
 import { router } from "expo-router";
 import { Image, StyleSheet, View } from "react-native";
-import AppText from "../../../src/components/appText";
-import KeepGoingButton from "../../../src/components/onboarding/keepGoingButton";
-import LoginText from "../../../src/components/onboarding/loginText";
-import OnboardingHeader from "../../../src/components/onboarding/onboardingHeader";
+import AppText from "../../../src/components/app-text";
+import KeepGoingButton from "../../../src/components/onboarding/keep-going-button";
+import LoginText from "../../../src/components/onboarding/login-text";
+import OnboardingHeader from "../../../src/components/onboarding/onboarding-header";
 import { Colors } from "../../../src/constants/theme";
 
-import ProgressScreen from "../../../assets/images/onboarding/onboardingZuffyPage.png";
+import MoneySaved from "../../../assets/images/onboarding/onboarding-money-saved.png";
 
-export default function OnboardingProgress() {
+export default function OnboardingMoneySaved() {
   return (
     <>
       <View style={styles.headerContainer}>
-        <OnboardingHeader  step={2} total={11}/>
+        <OnboardingHeader  step={3} total={11}/>
       </View>
       <View style={styles.container}>
         
         <Image
-          source={ProgressScreen}
+          source={MoneySaved}
           style={styles.phoneImage}
           resizeMode="contain"
         />
 
         <AppText weight="bold" style={styles.title}>
-          Zuffy, tu acompañante en el proceso
+          Cada puff evitado suma a tu ahorro
         </AppText>
 
         <KeepGoingButton 
-        text="Continuar" 
-        onPress={() => router.push("/(auth)/onboarding/onboardingMoneySaved")}
+        text="Continuar"
+        onPress={() => router.push("/(auth)/onboarding/onboarding-graph")}
         />
 
         <LoginText />
+
       </View>
     </>
   );
@@ -64,6 +65,5 @@ const styles = StyleSheet.create({
     color: Colors.light.text,
     textAlign: "center",
   },
-  
   
 });

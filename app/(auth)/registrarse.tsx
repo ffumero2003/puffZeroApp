@@ -9,18 +9,18 @@ import {
   View,
 } from "react-native";
 
-import AppText from "../../src/components/appText";
-import AuthHeader from "../../src/components/auth/authHeader";
-import ContinueButton from "../../src/components/onboarding/continueButton";
-import GoogleButton from "../../src/components/onboarding/googleButton";
-import OnboardingHeader from "../../src/components/onboarding/onboardingHeader";
-import SeparatorRow from "../../src/components/onboarding/separatorRow";
-import UnderlineInput from "../../src/components/onboarding/underlineInput";
+import AppText from "../../src/components/app-text";
+import AuthHeader from "../../src/components/auth/auth-header";
+import ContinueButton from "../../src/components/onboarding/continue-button";
+import GoogleButton from "../../src/components/onboarding/google-button";
+import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
+import SeparatorRow from "../../src/components/onboarding/separator-row";
+import UnderlineInput from "../../src/components/onboarding/underline-input";
 import { Colors } from "../../src/constants/theme";
 
 import { createProfile } from "../../src/lib/profile";
-import { useAuth } from "../../src/providers/authProvider";
-import { useOnboarding } from "../../src/providers/onboardingProvider"; // 👈 ESTA es la correcta
+import { useAuth } from "../../src/providers/auth-provider";
+import { useOnboarding } from "../../src/providers/onboarding-provider"; // 👈 ESTA es la correcta
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -200,7 +200,7 @@ export default function Register() {
             keyboardType="default"
           />
           {nombreError ? (
-            <AppText style={styles.errorText}>{nombreError}</AppText>
+            <AppText style={styles.errorText} weight="extrabold">{nombreError}</AppText>
           ) : null}
 
           <UnderlineInput
@@ -211,7 +211,7 @@ export default function Register() {
             keyboardType="email-address"
           />
           {emailError ? (
-            <AppText style={styles.errorText}>{emailError}</AppText>
+            <AppText style={styles.errorText} weight="extrabold">{emailError}</AppText>
           ) : null}
 
           <UnderlineInput
@@ -222,7 +222,7 @@ export default function Register() {
             secureTextEntry
           />
           {passwordError ? (
-            <AppText style={styles.errorText}>{passwordError}</AppText>
+            <AppText style={styles.errorText} weight="extrabold">{passwordError}</AppText>
           ) : null}
 
           <ContinueButton

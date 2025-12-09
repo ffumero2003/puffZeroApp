@@ -1,15 +1,15 @@
-import SeparatorRow from "@/src/components/onboarding/separatorRow";
+import SeparatorRow from "@/src/components/onboarding/separator-row";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, Keyboard, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
-import AppText from "../../src/components/appText";
-import AuthHeader from "../../src/components/auth/authHeader";
-import ContinueButton from "../../src/components/onboarding/continueButton";
-import GoogleButton from "../../src/components/onboarding/googleButton";
-import OnboardingHeader from "../../src/components/onboarding/onboardingHeader";
-import UnderlineInput from "../../src/components/onboarding/underlineInput";
+import AppText from "../../src/components/app-text";
+import AuthHeader from "../../src/components/auth/auth-header";
+import ContinueButton from "../../src/components/onboarding/continue-button";
+import GoogleButton from "../../src/components/onboarding/google-button";
+import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
+import UnderlineInput from "../../src/components/onboarding/underline-input";
 import { Colors } from "../../src/constants/theme";
-import { useAuth } from "../../src/providers/authProvider";
+import { useAuth } from "../../src/providers/auth-provider";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -30,7 +30,7 @@ export default function Login() {
       return;
     }
 
-    router.replace("/loginSuccess"); // o la vista real de home que usás
+    router.replace("/login-success"); // o la vista real de home que usás
   }
 
 
@@ -105,7 +105,7 @@ export default function Login() {
 
         {/* Forgot Password */}
         <TouchableOpacity
-          onPress={() => router.push("/(auth)/forgotPassword")}
+          onPress={() => router.push("/(auth)/forgot-password")}
           style={styles.forgotContainer}
         >
           <AppText weight="bold" style={styles.forgotLink}>
@@ -130,7 +130,7 @@ export default function Login() {
             <AppText
               weight="bold"
               style={styles.link}
-              onPress={() => router.push("/privacyPolicy")}
+              onPress={() => router.push("/privacy-policy")}
             >
               Política de Privacidad
             </AppText>{" "}
@@ -138,7 +138,7 @@ export default function Login() {
             <AppText
               weight="bold"
               style={styles.link}
-              onPress={() => router.push("/termsOfUse")}
+              onPress={() => router.push("/terms-of-use")}
             >
               Términos de Uso
             </AppText>

@@ -1,7 +1,7 @@
 import { Image, StyleSheet, View } from "react-native";
-import Logo from "../../../assets/images/logoPuffZero.png";
+import Logo from "../../../assets/images/logo-puff-zero.png";
 import { Colors } from "../../constants/theme";
-import TitleBlock from "../onboarding/titleBlock";
+import TitleBlock from "../onboarding/title-block";
 
 interface AuthHeaderProps {
   title: string;

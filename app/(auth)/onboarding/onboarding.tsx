@@ -1,8 +1,8 @@
 import { Image, StyleSheet, View } from "react-native";
-import HomeScreen from "../../../assets/images/onboarding/onboardingHomePage.png";
-import AppText from "../../../src/components/appText";
-import ContinueButton from "../../../src/components/onboarding/continueButton";
-import LoginText from "../../../src/components/onboarding/loginText";
+import HomeScreen from "../../../assets/images/onboarding/onboarding-home-page.png";
+import AppText from "../../../src/components/app-text";
+import ContinueButton from "../../../src/components/onboarding/continue-button";
+import LoginText from "../../../src/components/onboarding/login-text";
 import { Colors } from "../../../src/constants/theme";
 
 export default function Onboarding() {
@@ -22,7 +22,7 @@ export default function Onboarding() {
       
       <ContinueButton 
         text="Empieza Sesión"
-        route="/(auth)/onboarding/onboardingProgress"
+        route="/(auth)/onboarding/onboarding-progress"
       />
 
       <LoginText />

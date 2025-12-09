@@ -1,12 +1,12 @@
 import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import ContinueButton from "../../../src/components/onboarding/continueButton";
-import OnboardingHeader from "../../../src/components/onboarding/onboardingHeader";
-import OnboardingOptionCard from "../../../src/components/onboarding/onboardingOptionCard";
-import TitleBlock from "../../../src/components/onboarding/titleBlock";
+import ContinueButton from "../../../src/components/onboarding/continue-button";
+import OnboardingHeader from "../../../src/components/onboarding/onboarding-header";
+import OnboardingOptionCard from "../../../src/components/onboarding/onboarding-option-card";
+import TitleBlock from "../../../src/components/onboarding/title-block";
 import { Colors } from "../../../src/constants/theme";
-import { useOnboarding } from "../../../src/providers/onboardingProvider";
+import { useOnboarding } from "../../../src/providers/onboarding-provider";
 
 const GOAL_OPTIONS = [
   {
@@ -56,7 +56,7 @@ export default function OnboardingGoal() {
         onPress={() => {
           setGoal(selected!);  // 💾 Guarda la meta
           console.log("🎯 Meta seleccionada:", selected);
-          router.push("/(auth)/onboarding/onboardingSpeedPlan");
+          router.push("/(auth)/onboarding/onboarding-speed-plan");
         }}
         style={{ paddingBottom: 30 }}
       />

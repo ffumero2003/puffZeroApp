@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
 import { Colors } from "../../constants/theme";
-import AppText from "../appText";
+import AppText from "../app-text";
 
 export default function SeparatorRow(){
   return(

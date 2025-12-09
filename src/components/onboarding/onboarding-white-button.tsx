@@ -1,6 +1,6 @@
 import { Colors } from "@/src/constants/theme";
 import { StyleSheet, TouchableOpacity } from "react-native";
-import AppText from "../appText";
+import AppText from "../app-text";
 
 export default function OnboardingWhiteButton({ title, onPress }: { title: string; onPress: () => void }) {
   return (

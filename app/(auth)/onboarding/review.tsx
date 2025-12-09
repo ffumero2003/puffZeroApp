@@ -1,14 +1,14 @@
 import { Image, ScrollView, StyleSheet, View } from "react-native";
-import ReviewsModal from "../../../assets/images/onboarding/reviewsModal.png";
+import ReviewsModal from "../../../assets/images/onboarding/reviews-modal.png";
 
-import AppText from "../../../src/components/appText";
-import ContinueButton from "../../../src/components/onboarding/continueButton";
-import ReviewCard from "../../../src/components/onboarding/reviewCard";
+import AppText from "../../../src/components/app-text";
+import ContinueButton from "../../../src/components/onboarding/continue-button";
+import ReviewCard from "../../../src/components/onboarding/review-card";
 import { Colors } from "../../../src/constants/theme";
 
-import AlexReview from "../../../assets/images/reviews/alexReview.jpg";
-import AntonioReview from "../../../assets/images/reviews/antonioReview.jpg";
-import MariaReview from "../../../assets/images/reviews/mariaReview.jpg";
+import AlexReview from "../../../assets/images/reviews/alex-review.jpg";
+import AntonioReview from "../../../assets/images/reviews/antonio-review.jpg";
+import MariaReview from "../../../assets/images/reviews/maria-review.jpg";
 
 export default function Review() {
   return (

@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
-import AppText from "../src/components/appText";
-import OnboardingHeader from "../src/components/onboarding/onboardingHeader";
+import AppText from "../src/components/app-text";
+import OnboardingHeader from "../src/components/onboarding/onboarding-header";
 import { Colors } from "../src/constants/theme";
 
 export default function LoginSuccess() {

@@ -1,6 +1,6 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { Colors } from "../../../src/constants/theme";
-import AppText from "../appText";
+import AppText from "../app-text";
 
 export default function MultiSelectButton({
   title,

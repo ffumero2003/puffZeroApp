@@ -2,12 +2,12 @@ import Slider from "@react-native-community/slider";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
-import AppText from "../../../src/components/appText";
-import ContinueButton from "../../../src/components/onboarding/continueButton";
-import OnboardingHeader from "../../../src/components/onboarding/onboardingHeader";
-import TitleBlock from "../../../src/components/onboarding/titleBlock";
+import AppText from "../../../src/components/app-text";
+import ContinueButton from "../../../src/components/onboarding/continue-button";
+import OnboardingHeader from "../../../src/components/onboarding/onboarding-header";
+import TitleBlock from "../../../src/components/onboarding/title-block";
 import { Colors } from "../../../src/constants/theme";
-import { useOnboarding } from "../../../src/providers/onboardingProvider";
+import { useOnboarding } from "../../../src/providers/onboarding-provider";
 
 import Animated, {
   useAnimatedProps,
@@ -102,7 +102,7 @@ export default function OnboardingPuffs() {
         onPress={() => {
           setPuffs(value);
           console.log("Puffs guardados en provider:", value);   // 👈 prueba
-          router.push("/(auth)/onboarding/onboardingMoneySpent");
+          router.push("/(auth)/onboarding/onboarding-money-spent");
         }}
         style={{ paddingBottom: 30 }}
       />
