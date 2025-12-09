@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    "lib": ["deno.window", "dom"],
+    "types": ["jsr:@supabase/functions-js/edge-runtime.d.ts"]
+  }
+}

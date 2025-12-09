@@ -28,9 +28,12 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
+    "extra": {
+      "supabaseRedirectUrl": "puffzero://reset-password"
+    },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
     ],
     "experiments": {
       "typedRoutes": true,

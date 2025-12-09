@@ -1,15 +1,45 @@
-import { useState } from "react";
+import * as Linking from "expo-linking";
+import { useEffect, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import AppText from "../../src/components/app-text";
 import KeepGoingButton from "../../src/components/onboarding/keep-going-button";
 import UnderlineInput from "../../src/components/onboarding/underline-input";
 import { Colors } from "../../src/constants/theme";
+import { supabase } from "../../src/lib/supabase";
 import { updatePassword } from "../../src/services/auth-services";
 
 export default function ResetPasswordScreen() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // 🔥 Capturar token del deep link al abrir esta pantalla
+  useEffect(() => {
+    const handleDeepLink = async () => {
+      const url = await Linking.getInitialURL();
+      if (!url) return;
+
+      // Parsear URL
+      const parsed = Linking.parse(url);
+      const token = parsed.queryParams?.access_token;
+
+      if (token) {
+        // Restaurar sesión temporal (recovery mode)
+        const { error } = await supabase.auth.setSession({
+          access_token: token,
+          refresh_token: token,
+        });
+
+        if (error) {
+          console.log("Error al setear sesión:", error);
+        } else {
+          console.log("Sesión restaurada para reset de contraseña");
+        }
+      }
+    };
+
+    handleDeepLink();
+  }, []);
 
   const handleSubmit = async () => {
     if (!password || !confirm) {
