@@ -1,148 +1,198 @@
+import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
-import KeepGoingButton from "../../../src/components/onboarding/keep-going-button";
-import OnboardingHeader from "../../../src/components/onboarding/onboarding-header";
+import { useCallback } from "react";
+import { Image, Pressable, StyleSheet, View } from "react-native";
+import NotificationsModal from "../../../assets/images/onboarding/notifications-modal.png";
+import AppText from "../../../src/components/app-text";
 import { Colors } from "../../../src/constants/theme";
 
 export default function NotificationsStep() {
+
+  // 👉 Función para pedir permisos nativos
+  const requestPermission = useCallback(async () => {
+    try {
+      const { status } = await Notifications.requestPermissionsAsync();
+
+      // status puede ser: "granted", "denied", "undetermined"
+      console.log("Notification status:", status);
+
+      // Independientemente del resultado → ir a step2
+      router.push("/(onboarding)/post-signup/step2");
+    } catch (err) {
+      console.log("Error requesting notifications:", err);
+      router.push("/(onboarding)/post-signup/step2");
+    }
+  }, []);
+
+  // 👉 "Don't Allow" (NO se pide permiso)
+  const skipPermission = () => {
+    router.push("/(onboarding)/post-signup/step2");
+  };
+
   return (
     <View style={styles.container}>
-      <OnboardingHeader step={1} total={4} />
 
-      {/* Título */}
-      <Text style={styles.title}>Alcanza tus metas con{"\n"}recordatorios</Text>
-      <Text style={styles.subtitle}>
-        Un pequeño recordatorio puede marcar la diferencia en tu día.
-      </Text>
+      {/* 🔵 SECCIÓN SUPERIOR — título + subtítulo */}
+      <View style={styles.topSection}>
+        <AppText weight="bold" style={styles.title}>
+          Alcanza tus metas con{"\n"}recordatorios
+        </AppText>
 
-      {/* Mock del sistema */}
-      <View style={styles.mockCard}>
-        <Text style={styles.appName}>“PuffZero” quiere enviarte notificaciones</Text>
-        <Text style={styles.mockDescription}>
-          Pueden incluir alertas, recordatorios, sonidos o insignias.{"\n"}
-          Podés desactivarlas cuando querás desde Configuración.
-        </Text>
+        <AppText weight="medium" style={styles.subtitle}>
+          Un pequeño recordatorio puede marcar la diferencia en tu día.
+        </AppText>
+      </View>
 
-        <View style={styles.buttonsRow}>
-          <View style={[styles.btnOption, { backgroundColor: "#E7E7E7" }]}>
-            <Text style={[styles.btnText, { color: "#000" }]}>Don't Allow</Text>
-          </View>
+      {/* 🟣 SECCIÓN CENTRAL — mockCard perfectamente centrado */}
+      <View style={styles.middleSection}>
+        <View style={styles.mockCard}>
 
-          <View style={[styles.btnOption, { backgroundColor: "#3D7BFF" }]}>
-            <Text style={[styles.btnText, { color: "#fff" }]}>Allow</Text>
+          <AppText weight="semibold" style={styles.appName}>
+            “Puff
+            <AppText
+              weight="extrabold"
+              style={{ color: Colors.light.primary }}
+            >
+              Zero
+            </AppText>
+            ” quiere enviarte notificaciones
+          </AppText>
+
+          <AppText weight="regular" style={styles.mockDescription}>
+            Pueden incluir alertas, recordatorios, sonidos o insignias.{"\n"}
+            Podés desactivarlas cuando querás desde Configuración.
+          </AppText>
+
+          <View style={styles.buttonsRow}>
+
+            {/* Don't Allow */}
+            <Pressable 
+              onPress={skipPermission}
+              style={[styles.btnOption, { backgroundColor: "#E7E7E7" }]}
+            >
+              <AppText weight="semibold" style={[styles.btnText, { color: "#000" }]}>
+                Don't Allow
+              </AppText>
+            </Pressable>
+
+            {/* Allow */}
+            <Pressable
+              onPress={requestPermission}
+              style={[styles.btnOption, { backgroundColor: Colors.light.primary }]}
+            >
+              <AppText weight="semibold" style={[styles.btnText, { color: "#fff" }]}>
+                Allow
+              </AppText>
+            </Pressable>
+
           </View>
         </View>
       </View>
 
-      <Text style={styles.hand}>👉</Text>
-
-      {/* Caja informativa */}
-      <View style={styles.infoBox}>
-        <Text style={styles.infoText}>
-          La gran mayoría de usuarios mantienen mejor su progreso usando recordatorios.
-        </Text>
-      </View>
-
-      {/* Botón continuar */}
-      <View style={styles.buttonContainer}>
-        <KeepGoingButton
-          text="Continuar"
-          onPress={() => router.push("/(onboarding)/post-signup/step2")}
+      {/* 🟢 SECCIÓN INFERIOR — imagen abajo */}
+      <View style={styles.bottomSection}>
+        <Image
+          source={NotificationsModal}
+          style={styles.bottomModalImage}
+          resizeMode="contain"
         />
       </View>
+
     </View>
   );
-}
+  }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-    paddingHorizontal: 24,
-    paddingTop: 30,
-  },
 
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: Colors.light.text,
-    marginTop: 20,
-    lineHeight: 32,
-  },
+  // 🎨 STYLES
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: Colors.light.background,
+      paddingHorizontal: 24,
+      paddingTop: 30,
+    },
 
-  subtitle: {
-    fontSize: 16,
-    color: Colors.light.textSecondary,
-    marginTop: 8,
-    marginBottom: 30,
-  },
+    // 🔵 TOP: título + subtítulo
+    topSection: {
+      flex: 1,
+      justifyContent: "flex-start",
+      paddingTop: 50,
+    },
 
-  mockCard: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 20,
-    width: "100%",
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 3,
-  },
+    title: {
+      fontSize: 28,
+      color: Colors.light.text,
+      lineHeight: 32,
+      marginBottom: 8,
+    },
 
-  appName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000",
-    marginBottom: 8,
-  },
+    subtitle: {
+      fontSize: 16,
+      color: Colors.light.textSecondary,
+      marginBottom: 20,
+    },
 
-  mockDescription: {
-    fontSize: 14,
-    color: "#444",
-    marginBottom: 20,
-    lineHeight: 18,
-  },
+    // 🟣 MIDDLE: mockCard centrado perfectamente
+    middleSection: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
 
-  buttonsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
+    mockCard: {
+      backgroundColor: "#fff",
+      borderRadius: 16,
+      padding: 20,
+      width: "92%",
+      alignSelf: "center",
 
-  btnOption: {
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    borderRadius: 10,
-  },
+      shadowColor: "#000",
+      shadowOpacity: 0.08,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 3 },
+      elevation: 3,
+    },
 
-  btnText: {
-    fontSize: 15,
-    fontWeight: "600",
-  },
+    appName: {
+      fontSize: 16,
+      marginBottom: 8,
+      color: Colors.light.text,
+    },
 
-  hand: {
-    fontSize: 30,
-    textAlign: "center",
-    marginTop: 10,
-    width: "100%",
-  },
+    mockDescription: {
+      fontSize: 14,
+      color: Colors.light.textSecondary,
+      lineHeight: 18,
+      marginBottom: 20,
+    },
 
-  infoBox: {
-    backgroundColor: "#EDE7FF",
-    padding: 16,
-    borderRadius: 16,
-    marginTop: 30,
-    alignItems: "center",
-  },
+    buttonsRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
 
-  infoText: {
-    color: "#5A4BA8",
-    fontSize: 14,
-    textAlign: "center",
-    lineHeight: 18,
-  },
+    btnOption: {
+      paddingVertical: 10,
+      paddingHorizontal: 18,
+      borderRadius: 10,
+      width: "48%",
+      alignItems: "center",
+    },
 
-  buttonContainer: {
-    marginTop: "auto",
-    paddingBottom: 40,
-  },
-});
+    btnText: {
+      fontSize: 15,
+    },
+
+    // 🟢 BOTTOM: imagen pegada abajo
+    bottomSection: {
+      flex: 1,
+      justifyContent: "flex-end",
+      alignItems: "center",
+      paddingBottom: 30,
+    },
+
+    bottomModalImage: {
+      width: "100%",
+      height: 200,
+    },
+  });

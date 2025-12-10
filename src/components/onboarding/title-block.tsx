@@ -1,5 +1,5 @@
-import { StyleSheet, View } from "react-native";
-import { Colors } from "../../constants/theme";
+import { View } from "react-native";
+import { layout } from "../../../src/styles/layout";
 import AppText from "../app-text";
 
 interface Props {
@@ -10,12 +10,12 @@ interface Props {
 export default function TitleBlock({ title, subtitle }: Props) {
   return (
     <View>
-      <AppText weight="bold" style={styles.title}>
+      <AppText weight="bold" style={layout.title}>
         {title}
       </AppText>
 
       {subtitle && (
-        <AppText style={styles.subtitle}>
+        <AppText style={layout.subtitle}>
           {subtitle}
         </AppText>
       )}
@@ -23,16 +23,4 @@ export default function TitleBlock({ title, subtitle }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 30,
-    color: Colors.light.text,
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: Colors.light.textSecondary,
-    marginBottom: 25,
-    opacity: 0.5
-  },
-});
+

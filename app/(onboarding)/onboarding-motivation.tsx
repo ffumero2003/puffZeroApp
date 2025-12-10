@@ -1,10 +1,10 @@
 import { router } from "expo-router";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
 import OnboardingWhiteButton from "../../src/components/onboarding/onboarding-white-button";
 import TitleBlock from "../../src/components/onboarding/title-block";
-import { Colors } from "../../src/constants/theme";
 import { useOnboarding } from "../../src/providers/onboarding-provider";
+import { layout } from "../../src/styles/layout";
 
 const MOTIVATION_OPTIONS = [
   { id: "salud", title: "Salud ❤️" },
@@ -20,26 +20,29 @@ export default function OnboardingMotivation() {
   const { setWhyStopped } = useOnboarding();
 
   return (
-    <View style={styles.container}>
+    <View style={layout.containerWithLoadingBar}>
       <OnboardingHeader step={10} total={11} />
 
-      <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 40 }}
-      >
+      {/* 🔵 TitleBlock fuera del Scroll para que NO se desplace */}
+      <View style={layout.content}>
         <TitleBlock
           title="¿Por qué querés dejar de vapear?"
           subtitle="Entender tu motivación fortalece tu proceso."
         />
+      </View>
 
+      {/* 🟣 Scroll exclusivo para las opciones */}
+      <ScrollView
+        
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 40 }}
+      >
         {MOTIVATION_OPTIONS.map((opt) => (
           <OnboardingWhiteButton
             key={opt.id}
             title={opt.title}
             onPress={() => {
-              setWhyStopped([opt.id]);     // 💾 Guardar en el contexto
-              console.log("Motivación seleccionada:", opt.id);
+              setWhyStopped([opt.id]);
               router.push("/onboarding-worries");
             }}
           />
@@ -49,15 +52,4 @@ export default function OnboardingMotivation() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-    paddingHorizontal: 24,
-    paddingTop: 30,
-  },
-  content: {
-    flex: 1,
-    marginTop: 40,
-  },
-});
+

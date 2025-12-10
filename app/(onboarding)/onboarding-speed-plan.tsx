@@ -1,13 +1,14 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 import ContinueButton from "../../src/components/onboarding/continue-button";
 import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
 import OnboardingOptionCard from "../../src/components/onboarding/onboarding-option-card";
 import TitleBlock from "../../src/components/onboarding/title-block";
-import { Colors } from "../../src/constants/theme";
 import { useOnboarding } from "../../src/providers/onboarding-provider";
+import { layout } from "../../src/styles/layout";
+
 const OPTIONS = [
   {
     id: "14",
@@ -40,21 +41,24 @@ export default function OnboardingSpeedPlan() {
   const [selected, setSelected] = useState<string | null>(null);
   const { setGoalSpeed } = useOnboarding();
 
-
   return (
-    <View style={styles.container}>
+    <View style={layout.containerWithLoadingBar}>
       <OnboardingHeader step={9} total={11} />
 
-      <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 40 }}
-      >
+      {/* 🔵 TitleBlock estático, NO scroll */}
+      <View style={layout.content}>
         <TitleBlock
           title="¿Qué tan rápido querés alcanzar tu meta?"
           subtitle="Escogé el plan que mejor vaya con tu forma de vivir y tu momento actual."
         />
+      </View>
 
+      {/* 🟣 Scroll solo para las opciones */}
+      <ScrollView
+        
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 40 }}
+      >
         {OPTIONS.map((opt) => (
           <OnboardingOptionCard
             key={opt.id}
@@ -67,6 +71,7 @@ export default function OnboardingSpeedPlan() {
         ))}
       </ScrollView>
 
+      {/* 🟢 Botón fuera del scroll */}
       <ContinueButton
         text="Continuar"
         disabled={selected === null}
@@ -80,20 +85,3 @@ export default function OnboardingSpeedPlan() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-    paddingHorizontal: 24,
-    paddingTop: 30,
-  },
-  content: {
-    flex: 1,
-    marginTop: 40,
-  },
-  bottomButtonContainer: {
-    width: "100%",
-    paddingBottom: 40,
-  },
-});

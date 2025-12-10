@@ -17,57 +17,62 @@ import Splash from "../src/screens/splash";
 
 
 function RootNavigation() {
-    const { user, initializing } = useAuth();
-    const { onboardingCompleted, loading } = useOnboarding();
-    const segments = useSegments();
+  const { user, initializing } = useAuth();
+  const { onboardingCompleted, loading } = useOnboarding();
+  const segments = useSegments();
 
-    const isLoading = initializing || loading;
+  // 🟣 Importar DEV_MODE
+  const { DEV_MODE, DEV_SCREEN } = require("../src/config/dev");
+
+  const isLoading = initializing || loading;
+
+  useEffect(() => {
+    // 🚀 BYPASS ABSOLUTO — si estoy en dev, voy directo a una pantalla
+    if (DEV_MODE) {
+      router.replace(DEV_SCREEN);
+      return;
+    }
+
+    // 🔥 LÓGICA REAL empieza aquí
+    if (isLoading) return;
 
     const group = segments[0];
     const inAuth = group === "(auth)";
     const inOnboarding = group === "(onboarding)";
     const inApp = group === "(app)";
 
-    // 🔥 Toda la navegación controlada aquí
-    useEffect(() => {
-      if (isLoading) return;
-
-      // 1️⃣ SIN SESIÓN → onboarding o auth
-      if (!user) {
-        if (!inOnboarding && !inAuth) {
-          router.replace("/(onboarding)/onboarding");
-        }
-        return;
+    if (!user) {
+      if (!inOnboarding && !inAuth) {
+        router.replace("/(onboarding)/onboarding");
       }
+      return;
+    }
 
-      // 2️⃣ CON SESIÓN pero SIN post-signup
-      if (!onboardingCompleted) {
-        if (!inOnboarding) {
-          router.replace("/(onboarding)/post-signup/step1");
-        }
-        return;
+    if (!onboardingCompleted) {
+      if (!inOnboarding) {
+        router.replace("/(onboarding)/post-signup/step1");
       }
+      return;
+    }
 
-      // 3️⃣ COMPLETO TODO → HOME
-      if (!inApp) {
-        router.replace("/(app)/home");
-      }
-    }, [isLoading, user, onboardingCompleted, segments]);
+    if (!inApp) {
+      router.replace("/(app)/home");
+    }
+  }, [isLoading, user, onboardingCompleted, segments]);
 
-    // 🔵 UI normal SIEMPRE se retorna aquí, NUNCA en useEffect
-    if (isLoading) return <Splash />;
+  if (isLoading && !DEV_MODE) return <Splash />;
 
-    return (
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          animation: "slide_from_right",
-          gestureEnabled: true,
-          animationDuration: 250,
-        }}
-      />
-    );
-  }
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        animation: "slide_from_right",
+        gestureEnabled: true,
+        animationDuration: 250,
+      }}
+    />
+  );
+}
 
 
 

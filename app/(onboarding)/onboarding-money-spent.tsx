@@ -23,6 +23,7 @@ import OnboardingHeader from "../../src/components/onboarding/onboarding-header"
 import TitleBlock from "../../src/components/onboarding/title-block";
 import { Colors } from "../../src/constants/theme";
 import { useOnboarding } from "../../src/providers/onboarding-provider";
+import { layout } from "../../src/styles/layout";
 
 /* 🔥 Lista de monedas de Latinoamérica */
 const LATAM_CURRENCIES = [
@@ -110,11 +111,11 @@ export default function OnboardingMoneySpent() {
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={styles.container}>
+      <View style={layout.containerWithLoadingBar}>
         <OnboardingHeader step={6} total={11} />
 
         <ScrollView
-          style={styles.content}
+          style={layout.content}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
@@ -124,7 +125,7 @@ export default function OnboardingMoneySpent() {
           />
 
           <TextInput
-            style={styles.input}
+            style={layout.input}
             keyboardType="numeric"
             placeholder="0"
             placeholderTextColor="#A0A0BF"
@@ -133,7 +134,7 @@ export default function OnboardingMoneySpent() {
           />
 
           {formatted ? (
-            <AppText style={styles.previewText}>
+            <AppText style={layout.previewText}>
               ≈ {formatted} por semana
             </AppText>
           ) : null}
@@ -231,31 +232,8 @@ export default function OnboardingMoneySpent() {
 
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-    paddingHorizontal: 24,
-    paddingTop: 30,
-  },
-  content: {
-    flex: 1,
-    marginTop: 40,
-  },
-  input: {
-    backgroundColor: "#E6E4FF",
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    fontSize: 22,
-    color: Colors.light.text,
-    fontFamily: "Manrope_600SemiBold",
-  },
-  previewText: {
-    marginTop: 8,
-    fontSize: 16,
-    marginHorizontal: 10,
-    color: Colors.light.textMuted,
-  },
+  
+  
   currencyPicker: {
     marginTop: 20,
     alignSelf: "center",

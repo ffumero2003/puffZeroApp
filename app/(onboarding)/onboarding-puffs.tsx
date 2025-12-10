@@ -8,6 +8,7 @@ import OnboardingHeader from "../../src/components/onboarding/onboarding-header"
 import TitleBlock from "../../src/components/onboarding/title-block";
 import { Colors } from "../../src/constants/theme";
 import { useOnboarding } from "../../src/providers/onboarding-provider";
+import { layout } from "../../src/styles/layout";
 
 import Animated, {
   useAnimatedProps,
@@ -59,10 +60,10 @@ export default function OnboardingPuffs() {
   }));
 
   return (
-    <View style={styles.container}>
+    <View style={layout.containerWithLoadingBar}>
       <OnboardingHeader step={5} total={11} />
 
-      <View style={styles.content}>
+      <View style={layout.content}>
         <TitleBlock
           title="¿Cuántos puffs consumís por día?"
           subtitle="No tiene que ser exacto. Si en los primeros días notamos que el límite es muy bajo, lo ajustamos sin problema."
@@ -112,16 +113,7 @@ export default function OnboardingPuffs() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-    paddingHorizontal: 24,
-    paddingTop: 30,
-  },
-  content: {
-    flex: 1,
-    marginTop: 40,
-  },
+  
   slider: {
     width: "100%",
     height: 50,

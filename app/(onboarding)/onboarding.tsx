@@ -1,21 +1,21 @@
-import { Image, StyleSheet, View } from "react-native";
+import { Image, View } from "react-native";
 import HomeScreen from "../../assets/images/onboarding/onboarding-home-page.png";
 import AppText from "../../src/components/app-text";
 import ContinueButton from "../../src/components/onboarding/continue-button";
 import LoginText from "../../src/components/onboarding/login-text";
-import { Colors } from "../../src/constants/theme";
+import { layout } from "../../src/styles/layout";
 
 export default function Onboarding() {
   return (
-    <View style={styles.container}>
+    <View style={layout.container}>
       
       <Image
         source={HomeScreen}
-        style={styles.phoneImage}
+        style={layout.bigImage}
         resizeMode="contain"
       />
 
-      <AppText style={styles.title} weight="extrabold">
+      <AppText style={layout.titleCenter} weight="extrabold">
         Lleva tu consumo al día, sin complicaciones
       </AppText>
 
@@ -32,25 +32,3 @@ export default function Onboarding() {
 }
 
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-    alignItems: "center",
-    justifyContent: "flex-end",
-    paddingHorizontal: 24,
-    paddingBottom: 50,
-  },
-  phoneImage: {
-    width: "100%",
-    height: 430,
-  },
-  title: {
-    marginTop: 30,
-    fontSize: 28,
-    color: Colors.light.text,
-    textAlign: "center",
-  },
-
- 
-});
