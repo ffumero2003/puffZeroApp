@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Redirigiendo a PuffZero…</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 80px;
+      color: #1F2859;
+    }
+    a {
+      color: #5974FF;
+      font-weight: bold;
+      font-size: 18px;
+    }
+  </style>
+
+  <script>
+    // Obtener token de la URL
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+
+    if (token) {
+      // Intentar abrir la app PuffZero
+      window.location.href = `puffzero://reset-password?token=${token}`;
+
+      // Si la app no abre en 2 segundos, mostrar link manual
+      setTimeout(() => {
+        document.getElementById("fallback").style.display = "block";
+      }, 2000);
+    } else {
+      document.body.innerHTML = "<h2>Token inválido.</h2>";
+    }
+  </script>
+
+</head>
+<body>
+
+  <h2>Abriendo PuffZero…</h2>
+  <p>Si no se abre automáticamente, tocá el enlace de abajo:</p>
+
+  <a id="fallback" href="#" style="display:none;">
+    Abrir PuffZero manualmente
+  </a>
+
+</body>
+</html>

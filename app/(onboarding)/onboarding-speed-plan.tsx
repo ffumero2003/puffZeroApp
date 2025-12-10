@@ -2,12 +2,12 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-import ContinueButton from "../../../src/components/onboarding/continue-button";
-import OnboardingHeader from "../../../src/components/onboarding/onboarding-header";
-import OnboardingOptionCard from "../../../src/components/onboarding/onboarding-option-card";
-import TitleBlock from "../../../src/components/onboarding/title-block";
-import { Colors } from "../../../src/constants/theme";
-import { useOnboarding } from "../../../src/providers/onboarding-provider";
+import ContinueButton from "../../src/components/onboarding/continue-button";
+import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
+import OnboardingOptionCard from "../../src/components/onboarding/onboarding-option-card";
+import TitleBlock from "../../src/components/onboarding/title-block";
+import { Colors } from "../../src/constants/theme";
+import { useOnboarding } from "../../src/providers/onboarding-provider";
 const OPTIONS = [
   {
     id: "14",
@@ -73,7 +73,7 @@ export default function OnboardingSpeedPlan() {
         onPress={() => {
           setGoalSpeed(selected!);
           console.log("🚀 Velocidad seleccionada:", selected);
-          router.push("/(auth)/onboarding/onboarding-motivation");
+          router.push("/onboarding-motivation");
         }}
         style={{ paddingBottom: 30 }}
       />

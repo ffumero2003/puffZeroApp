@@ -1,10 +1,10 @@
 import { router } from "expo-router";
 import { ScrollView, StyleSheet, View } from "react-native";
-import OnboardingHeader from "../../../src/components/onboarding/onboarding-header";
-import OnboardingWhiteButton from "../../../src/components/onboarding/onboarding-white-button";
-import TitleBlock from "../../../src/components/onboarding/title-block";
-import { Colors } from "../../../src/constants/theme";
-import { useOnboarding } from "../../../src/providers/onboarding-provider";
+import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
+import OnboardingWhiteButton from "../../src/components/onboarding/onboarding-white-button";
+import TitleBlock from "../../src/components/onboarding/title-block";
+import { Colors } from "../../src/constants/theme";
+import { useOnboarding } from "../../src/providers/onboarding-provider";
 
 const MOTIVATION_OPTIONS = [
   { id: "salud", title: "Salud ❤️" },
@@ -40,7 +40,7 @@ export default function OnboardingMotivation() {
             onPress={() => {
               setWhyStopped([opt.id]);     // 💾 Guardar en el contexto
               console.log("Motivación seleccionada:", opt.id);
-              router.push("/(auth)/onboarding/onboarding-worries");
+              router.push("/onboarding-worries");
             }}
           />
         ))}

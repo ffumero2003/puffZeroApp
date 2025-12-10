@@ -1,14 +1,14 @@
 import { Image, ScrollView, StyleSheet, View } from "react-native";
-import ReviewsModal from "../../../assets/images/onboarding/reviews-modal.png";
-
 import AppText from "../../../src/components/app-text";
 import ContinueButton from "../../../src/components/onboarding/continue-button";
 import ReviewCard from "../../../src/components/onboarding/review-card";
 import { Colors } from "../../../src/constants/theme";
 
+import ReviewsModal from "../../../assets/images/onboarding/reviews-modal.png";
 import AlexReview from "../../../assets/images/reviews/alex-review.jpg";
 import AntonioReview from "../../../assets/images/reviews/antonio-review.jpg";
 import MariaReview from "../../../assets/images/reviews/maria-review.jpg";
+
 
 export default function Review() {
   return (
@@ -66,10 +66,10 @@ export default function Review() {
   {/* BUTTON FIXED AT BOTTOM */}
   <ContinueButton 
     text="Continuar"
-    route="/(auth)/registrarse"
+    route="/(onboarding)/post-signup/step-notifications"
     style={{ paddingBottom: 30 }}
-          
   />
+
 
 </View>
 

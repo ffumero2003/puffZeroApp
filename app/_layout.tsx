@@ -8,12 +8,70 @@ import {
   useFonts,
 } from "@expo-google-fonts/manrope";
 
-import * as Linking from "expo-linking";
-import { Stack, router } from "expo-router";
+import { Stack, router, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { AuthProvider } from "../src/providers/auth-provider";
-import { OnboardingProvider } from "../src/providers/onboarding-provider";
+import { AuthProvider, useAuth } from "../src/providers/auth-provider";
+import { OnboardingProvider, useOnboarding } from "../src/providers/onboarding-provider";
+import Splash from "../src/screens/splash";
+
+
+function RootNavigation() {
+    const { user, initializing } = useAuth();
+    const { onboardingCompleted, loading } = useOnboarding();
+    const segments = useSegments();
+
+    const isLoading = initializing || loading;
+
+    const group = segments[0];
+    const inAuth = group === "(auth)";
+    const inOnboarding = group === "(onboarding)";
+    const inApp = group === "(app)";
+
+    // 🔥 Toda la navegación controlada aquí
+    useEffect(() => {
+      if (isLoading) return;
+
+      // 1️⃣ SIN SESIÓN → onboarding o auth
+      if (!user) {
+        if (!inOnboarding && !inAuth) {
+          router.replace("/(onboarding)/onboarding");
+        }
+        return;
+      }
+
+      // 2️⃣ CON SESIÓN pero SIN post-signup
+      if (!onboardingCompleted) {
+        if (!inOnboarding) {
+          router.replace("/(onboarding)/post-signup/step1");
+        }
+        return;
+      }
+
+      // 3️⃣ COMPLETO TODO → HOME
+      if (!inApp) {
+        router.replace("/(app)/home");
+      }
+    }, [isLoading, user, onboardingCompleted, segments]);
+
+    // 🔵 UI normal SIEMPRE se retorna aquí, NUNCA en useEffect
+    if (isLoading) return <Splash />;
+
+    return (
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: "slide_from_right",
+          gestureEnabled: true,
+          animationDuration: 250,
+        }}
+      />
+    );
+  }
+
+
+
+
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -25,44 +83,13 @@ export default function RootLayout() {
     Manrope_800ExtraBold,
   });
 
-  useEffect(() => {
-    // Escucha enlaces tipo puffzero://reset-password
-    const subscription = Linking.addEventListener("url", ({ url }) => {
-      console.log("Deep link recibido:", url);
-
-      if (url.startsWith("puffzero://reset-password")) {
-        router.push("/reset-password");
-      }
-    });
-
-    // Captura el caso de cuando la app se abre desde cero por un deep link
-    Linking.getInitialURL().then((url) => {
-      if (url && url.startsWith("puffzero://reset-password")) {
-        router.push("/reset-password");
-      }
-    });
-
-    return () => subscription.remove();
-  }, []);
-
   if (!loaded) return null;
 
   return (
     <AuthProvider>
       <OnboardingProvider>
-
         <StatusBar style="dark" />
-
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            animation: "slide_from_right",
-            gestureEnabled: true,
-            animationDuration: 250,
-            animationTypeForReplace: "push",
-          }}
-        />
-
+        <RootNavigation />
       </OnboardingProvider>
     </AuthProvider>
   );

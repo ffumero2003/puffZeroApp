@@ -2,12 +2,12 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-import KeepGoingButton from "../../../src/components/onboarding/keep-going-button";
-import OnboardingMultiSelectButton from "../../../src/components/onboarding/multi-select-button";
-import OnboardingHeader from "../../../src/components/onboarding/onboarding-header";
-import TitleBlock from "../../../src/components/onboarding/title-block";
-import { Colors } from "../../../src/constants/theme";
-import { useOnboarding } from "../../../src/providers/onboarding-provider";
+import KeepGoingButton from "../../src/components/onboarding/keep-going-button";
+import OnboardingMultiSelectButton from "../../src/components/onboarding/multi-select-button";
+import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
+import TitleBlock from "../../src/components/onboarding/title-block";
+import { Colors } from "../../src/constants/theme";
+import { useOnboarding } from "../../src/providers/onboarding-provider";
 
 const CONCERNS = [
   { id: "ansiedad", title: "Ansiedad 🧊" },

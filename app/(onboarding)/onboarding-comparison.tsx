@@ -1,12 +1,13 @@
 import { Image, StyleSheet, View } from "react-native";
 
-import AppText from "../../../src/components/app-text";
-import ContinueButton from "../../../src/components/onboarding/continue-button";
-import OnboardingHeader from "../../../src/components/onboarding/onboarding-header";
-import TitleBlock from "../../../src/components/onboarding/title-block";
-import { Colors } from "../../../src/constants/theme";
+import AppText from "../../src/components/app-text";
+import ContinueButton from "../../src/components/onboarding/continue-button";
+import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
+import TitleBlock from "../../src/components/onboarding/title-block";
+import { Colors } from "../../src/constants/theme";
 
-import ComparisonImage from "../../../assets/images/onboarding/con-puff-zero.png";
+
+import ComparisonImage from "../../assets/images/onboarding/con-puff-zero.png";
 
 export default function OnboardingComparison() {
   return (
@@ -42,7 +43,7 @@ export default function OnboardingComparison() {
       </View>
       <ContinueButton
           text="Continuar"
-          route="/(auth)/onboarding/onboarding-goal"
+          route="/onboarding-goal"
           style={{ paddingBottom: 30 }}
         />
     </View>

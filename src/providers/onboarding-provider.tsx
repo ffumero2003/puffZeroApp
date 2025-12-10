@@ -1,4 +1,6 @@
-import { createContext, useContext, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createContext, useContext, useEffect, useState } from "react";
+import { DEBUG } from "../config/debug";
 
 interface OnboardingData {
   puffs_per_day: number | null;
@@ -9,6 +11,9 @@ interface OnboardingData {
   why_stopped: string[];
   worries: string[];
 
+  onboardingCompleted: boolean;        // 🔥 NUEVO
+  loading: boolean;                    // 🔥 NUEVO
+
   setPuffs: (n: number) => void;
   setMoney: (n: number) => void;
   setCurrency: (c: string) => void;
@@ -17,12 +22,16 @@ interface OnboardingData {
   setWhyStopped: (arr: string[]) => void;
   setWorries: (arr: string[]) => void;
 
+  completeOnboarding: () => Promise<void>; // 🔥 NUEVO
   resetAll: () => void;
 }
 
 const OnboardingContext = createContext<OnboardingData | null>(null);
 
 export function OnboardingProvider({ children }: { children: React.ReactNode }) {
+  const [loading, setLoading] = useState(true);
+  const [onboardingCompleted, setOnboardingCompleted] = useState(false);
+
   const [puffs_per_day, setPuffs_per_day] = useState<number | null>(null);
   const [money_per_month, setMoney_per_month] = useState<number | null>(null);
   const [currency, setCurrencyState] = useState<string | null>(null);
@@ -31,6 +40,48 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   const [why_stopped, setWhyStoppedState] = useState<string[]>([]);
   const [worries, setWorriesState] = useState<string[]>([]);
 
+  // 🔥 Cargar el estado guardado (persistencia)
+  // useEffect(() => {
+  //   const loadFlag = async () => {
+  //     const flag = await AsyncStorage.getItem("onboardingCompleted");
+  //     setOnboardingCompleted(flag === "true");
+  //     setLoading(false);
+  //   };
+  //   loadFlag();
+  // }, []);
+
+    useEffect(() => {
+      const loadFlag = async () => {
+        const stored = await AsyncStorage.getItem("onboardingCompleted");
+        let completed = stored === "true";
+
+        // -------------------------------------
+        // 🔥 DEBUG: Forzar estados
+        // -------------------------------------
+        if (DEBUG.forceOnboardingCompleted !== null) {
+          console.log(
+            "⚠️ DEBUG: Forzando onboardingCompleted =",
+            DEBUG.forceOnboardingCompleted
+          );
+          completed = DEBUG.forceOnboardingCompleted;
+        }
+
+        setOnboardingCompleted(completed);
+        setLoading(false);
+      };
+
+      loadFlag();
+    }, []);
+
+
+
+  // 🔥 Marcar onboarding como terminado
+  async function completeOnboarding() {
+    setOnboardingCompleted(true);
+    await AsyncStorage.setItem("onboardingCompleted", "true");
+  }
+
+  // 🔥 Reset (si el usuario quiere empezar onboarding de nuevo)
   function resetAll() {
     setPuffs_per_day(null);
     setMoney_per_month(null);
@@ -39,6 +90,8 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     setGoalSpeedState(null);
     setWhyStoppedState([]);
     setWorriesState([]);
+    setOnboardingCompleted(false);
+    AsyncStorage.removeItem("onboardingCompleted");
   }
 
   return (
@@ -52,6 +105,9 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         why_stopped,
         worries,
 
+        onboardingCompleted,
+        loading,
+
         setPuffs: setPuffs_per_day,
         setMoney: setMoney_per_month,
         setCurrency: setCurrencyState,
@@ -60,6 +116,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         setWhyStopped: setWhyStoppedState,
         setWorries: setWorriesState,
 
+        completeOnboarding,   // 🔥 para llamar al final del onboarding
         resetAll,
       }}
     >

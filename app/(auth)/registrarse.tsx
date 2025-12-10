@@ -87,7 +87,8 @@ export default function Register() {
     resetAll();
 
     Alert.alert("Cuenta creada", "Revisá tu correo para confirmar tu cuenta.");
-    router.push("/(auth)/onboarding/review");
+    // Redirige al paso de review dentro del grupo de onboarding
+    router.push("/(onboarding)/post-signup/step-review");
   }
 
   /* ---------------------------

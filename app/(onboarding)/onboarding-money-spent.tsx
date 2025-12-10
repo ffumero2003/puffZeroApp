@@ -17,12 +17,12 @@ import Animated, {
   useSharedValue,
   withTiming
 } from "react-native-reanimated";
-import AppText from "../../../src/components/app-text";
-import ContinueButton from "../../../src/components/onboarding/continue-button";
-import OnboardingHeader from "../../../src/components/onboarding/onboarding-header";
-import TitleBlock from "../../../src/components/onboarding/title-block";
-import { Colors } from "../../../src/constants/theme";
-import { useOnboarding } from "../../../src/providers/onboarding-provider";
+import AppText from "../../src/components/app-text";
+import ContinueButton from "../../src/components/onboarding/continue-button";
+import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
+import TitleBlock from "../../src/components/onboarding/title-block";
+import { Colors } from "../../src/constants/theme";
+import { useOnboarding } from "../../src/providers/onboarding-provider";
 
 /* 🔥 Lista de monedas de Latinoamérica */
 const LATAM_CURRENCIES = [
@@ -220,7 +220,7 @@ export default function OnboardingMoneySpent() {
             setMoney(amountNumber);
             setCurrency(localCurrency);
 
-            router.push("/(auth)/onboarding/onboarding-comparison");
+            router.push("/onboarding-comparison");
           }}
           style={{ paddingBottom: 30 }}
         />

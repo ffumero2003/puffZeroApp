@@ -1,54 +1,49 @@
-import * as Linking from "expo-linking";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
-import AppText from "../../src/components/app-text";
-import KeepGoingButton from "../../src/components/onboarding/keep-going-button";
-import UnderlineInput from "../../src/components/onboarding/underline-input";
-import { Colors } from "../../src/constants/theme";
-import { supabase } from "../../src/lib/supabase";
-import { updatePassword } from "../../src/services/auth-services";
+import AppText from "../src/components/app-text";
+import KeepGoingButton from "../src/components/onboarding/keep-going-button";
+import UnderlineInput from "../src/components/onboarding/underline-input";
+import { Colors } from "../src/constants/theme";
+import { supabase } from "../src/lib/supabase";
 
 export default function ResetPasswordScreen() {
+  const { token: rawToken } = useLocalSearchParams();
+  const token = Array.isArray(rawToken) ? rawToken[0] : rawToken;
+  
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // 🔥 Capturar token del deep link al abrir esta pantalla
+  // ❗ Activar sesión de recuperación
   useEffect(() => {
-    const handleDeepLink = async () => {
-      const url = await Linking.getInitialURL();
-      if (!url) return;
+    const activateRecovery = async () => {
+      if (!token) return;
 
-      // Parsear URL
-      const parsed = Linking.parse(url);
-      const token = parsed.queryParams?.access_token;
+      const { error } = await supabase.auth.setSession({
+        access_token: token,
+        refresh_token: token,
+      });
 
-      if (token) {
-        // Restaurar sesión temporal (recovery mode)
-        const { error } = await supabase.auth.setSession({
-          access_token: token,
-          refresh_token: token,
-        });
-
-        if (error) {
-          console.log("Error al setear sesión:", error);
-        } else {
-          console.log("Sesión restaurada para reset de contraseña");
-        }
+      if (error) {
+        console.log("Error al activar sesión de recuperación:", error);
+      } else {
+        console.log("Sesión de recuperación activada.");
       }
     };
 
-    handleDeepLink();
-  }, []);
+    activateRecovery();
+  }, [token]);
+
 
   const handleSubmit = async () => {
-    if (!password || !confirm) {
-      Alert.alert("Error", "Completá ambos campos.");
+    if (!token) {
+      Alert.alert("Error", "Token inválido.");
       return;
     }
 
-    if (password.length < 6) {
-      Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres.");
+    if (!password || !confirm) {
+      Alert.alert("Error", "Completá ambos campos.");
       return;
     }
 
@@ -58,17 +53,19 @@ export default function ResetPasswordScreen() {
     }
 
     setLoading(true);
-    const { error } = await updatePassword(password);
+
+    // 🔥 Ahora ya podés actualizar la contraseña
+    const { error } = await supabase.auth.updateUser({ password });
+
     setLoading(false);
 
     if (error) {
       Alert.alert("Error", error.message);
-    } else {
-      Alert.alert(
-        "Listo",
-        "Tu contraseña fue actualizada con éxito. Ahora podés iniciar sesión."
-      );
+      return;
     }
+
+    Alert.alert("Listo", "Tu contraseña fue actualizada.");
+    router.replace("/login");
   };
 
   return (

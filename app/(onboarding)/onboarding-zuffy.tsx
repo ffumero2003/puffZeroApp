@@ -1,38 +1,37 @@
 import { router } from "expo-router";
 import { Image, StyleSheet, View } from "react-native";
-import AppText from "../../../src/components/app-text";
-import KeepGoingButton from "../../../src/components/onboarding/keep-going-button";
-import LoginText from "../../../src/components/onboarding/login-text";
-import OnboardingHeader from "../../../src/components/onboarding/onboarding-header";
-import { Colors } from "../../../src/constants/theme";
+import AppText from "../../src/components/app-text";
+import KeepGoingButton from "../../src/components/onboarding/keep-going-button";
+import LoginText from "../../src/components/onboarding/login-text";
+import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
+import { Colors } from "../../src/constants/theme";
 
-import Graph from "../../../assets/images/onboarding/onboarding-graph.png";
+import ProgressScreen from "../../assets/images/onboarding/onboarding-zuffy-page.png";
 
-export default function OnboardingMoneySaved() {
+export default function OnboardingProgress() {
   return (
     <>
       <View style={styles.headerContainer}>
-        <OnboardingHeader  step={4} total={11}/>
+        <OnboardingHeader  step={2} total={11}/>
       </View>
       <View style={styles.container}>
         
         <Image
-          source={Graph}
+          source={ProgressScreen}
           style={styles.phoneImage}
           resizeMode="contain"
         />
 
         <AppText weight="bold" style={styles.title}>
-          Visualiza tu progreso día a día
+          Zuffy, tu acompañante en el proceso
         </AppText>
 
         <KeepGoingButton 
-        text="Continuar"
-        onPress={() => router.push("/(auth)/onboarding/onboarding-puffs")}
+        text="Continuar" 
+        onPress={() => router.push("/onboarding-money-saved")}
         />
 
         <LoginText />
-
       </View>
     </>
   );
@@ -65,5 +64,6 @@ const styles = StyleSheet.create({
     color: Colors.light.text,
     textAlign: "center",
   },
+  
   
 });
