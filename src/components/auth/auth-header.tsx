@@ -1,6 +1,6 @@
 import { Image, View } from "react-native";
 import Logo from "../../../assets/images/logo-puff-zero.png";
-import { layout } from "../../../src/styles/layout";
+import { components } from "../../../src/styles/components";
 import TitleBlockAuth from "./title-block-auth";
 
 interface AuthHeaderProps {
@@ -10,8 +10,8 @@ interface AuthHeaderProps {
 
 export default function AuthHeader({ title, subtitle }: AuthHeaderProps) {
   return (
-    <View style={layout.headerRow}>
-      <View style={layout.headerTextContainer}>
+    <View style={components.headerRow}>
+      <View style={components.headerTextContainer}>
         <TitleBlockAuth
           title={title}
           subtitle={subtitle}
@@ -20,7 +20,7 @@ export default function AuthHeader({ title, subtitle }: AuthHeaderProps) {
 
       <Image
         source={Logo}
-        style={layout.headerLogo}
+        style={components.headerLogo}
         resizeMode="contain"
       />
     </View>

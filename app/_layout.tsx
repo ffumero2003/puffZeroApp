@@ -8,13 +8,18 @@ import {
   useFonts,
 } from "@expo-google-fonts/manrope";
 
+import * as Linking from "expo-linking";
 import { Stack, router, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import * as WebBrowser from "expo-web-browser";
 import { useEffect } from "react";
+
 import { AuthProvider, useAuth } from "../src/providers/auth-provider";
 import { OnboardingProvider, useOnboarding } from "../src/providers/onboarding-provider";
 import Splash from "../src/screens/splash";
 
+// 👉 NECESARIO para PKCE + expo-web-browser
+WebBrowser.maybeCompleteAuthSession();
 
 function RootNavigation() {
   const { user, initializing } = useAuth();
@@ -27,13 +32,45 @@ function RootNavigation() {
   const isLoading = initializing || loading;
 
   useEffect(() => {
+    console.log("📡 RootNavigation mounted — setting up deep link listener…");
+
+    // 🔗 Escuchar deep links mientras la app está abierta
+    const sub = Linking.addEventListener("url", ({ url }) => {
+      console.log("🔗 Deep link received:", url);
+
+      if (url.startsWith("puffzero://auth/callback")) {
+        console.log("🚀 Navigating to /auth/callback (live listener)");
+        router.replace("/(auth)/callback");
+      }
+    });
+
+    // 🔍 Revisar si la app se abrió inicialmente por un deep link
+    const checkInitialUrl = async () => {
+      const initial = await Linking.getInitialURL();
+      if (initial) {
+        console.log("🔗 Initial URL:", initial);
+
+        if (initial.startsWith("puffzero://auth/callback")) {
+          console.log("🚀 Navigating to /auth/callback (initial URL)");
+          router.replace("/(auth)/callback");
+        }
+      }
+    };
+    checkInitialUrl();
+
+    return () => sub.remove();
+  }, []);
+
+  // ---------------------------------------
+  // 🔥 Lógica de navegación existente
+  // ---------------------------------------
+  useEffect(() => {
     // 🚀 BYPASS ABSOLUTO — si estoy en dev, voy directo a una pantalla
     if (DEV_MODE) {
       router.replace(DEV_SCREEN);
       return;
     }
 
-    // 🔥 LÓGICA REAL empieza aquí
     if (isLoading) return;
 
     const group = segments[0];
@@ -69,20 +106,18 @@ function RootNavigation() {
   if (isLoading && !DEV_MODE) return <Splash />;
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        animation: "slide_from_right",
-        gestureEnabled: true,
-        animationDuration: 250,
-      }}
-    />
+    <>
+     
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: "slide_from_right",
+        }}
+      />
+    </>
   );
+
 }
-
-
-
-
 
 export default function RootLayout() {
   const [loaded] = useFonts({
