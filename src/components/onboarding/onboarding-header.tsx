@@ -1,7 +1,8 @@
 import { router } from "expo-router";
 import { useEffect, useRef } from "react";
-import { Animated, Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Animated, Image, TouchableOpacity, View } from "react-native";
 import BackArrow from "../../../assets/images/icons/back.png";
+import { components } from "../../../src/styles/components";
 import { Colors } from "../../constants/theme";
 
 interface Props {
@@ -39,10 +40,10 @@ export default function OnboardingHeader({
   });
 
   return (
-    <View style={[styles.wrapper, style]}>
+    <View style={[components.wrapper, style]}>
       
       {showBack && (
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.back()} style={components.backButton}>
           <Image
             source={BackArrow}
             style={{ width: 30, height: 30, tintColor: Colors.light.text }}
@@ -51,8 +52,8 @@ export default function OnboardingHeader({
       )}
 
       {showProgress && (
-        <View style={styles.progressContainer}>
-          <Animated.View style={[styles.progressFill, { width: widthInterpolated }]} />
+        <View style={components.progressContainer}>
+          <Animated.View style={[components.progressFill, { width: widthInterpolated }]} />
         </View>
       )}
 
@@ -60,28 +61,3 @@ export default function OnboardingHeader({
   );
 }
 
-const styles = StyleSheet.create({
-  wrapper: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    marginTop: 40,
-    gap: 10,
-  },
-  backButton: {
-    marginRight: 12,
-  },
-  progressContainer: {
-    flex: 1,
-    height: 16,
-    backgroundColor: Colors.light.secondary,
-    borderRadius: 20,
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    backgroundColor: Colors.light.primary,
-    borderRadius: 20,
-  },
-});

@@ -1,6 +1,6 @@
 import { router } from "expo-router";
-import { StyleSheet, TouchableOpacity } from "react-native";
-import { Colors } from "../../constants/theme";
+import { TouchableOpacity } from "react-native";
+import { components } from "../../../src/styles/components";
 import AppText from "../app-text";
 
 export default function RegisterText(){
@@ -9,21 +9,10 @@ export default function RegisterText(){
       onPress={() => router.push("/(auth)/registrarse")}
       style={{ marginTop: 30 }}
       >
-      <AppText style={styles.register}>
-        ¿No tenés cuenta? <AppText weight="bold" style={styles.link}>Registrate</AppText>
+      <AppText style={components.register}>
+        ¿No tenés cuenta? <AppText weight="bold" style={components.link}>Registrate</AppText>
       </AppText>
     </TouchableOpacity>
   )
 }
 
-const styles = StyleSheet.create({
-  register: {
-    textAlign: "center",
-    fontSize: 18,
-    color: Colors.light.text,
-  },
-  link: {
-    color: Colors.light.primary,
-  },
-
-});

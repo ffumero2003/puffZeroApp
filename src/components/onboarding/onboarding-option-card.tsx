@@ -1,5 +1,5 @@
-import { Colors } from "@/src/constants/theme";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
+import { components } from "../../../src/styles/components";
 import AppText from "../app-text";
 
 interface Props {
@@ -20,52 +20,19 @@ export default function OnboardingOptionCard({
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.8}
-      style={[styles.card, selected && styles.cardSelected]}
+      style={[components.card, selected && components.cardSelected]}
     >
-      <View style={[styles.badge, selected && styles.badgeSelected]}>
-        <AppText weight="extrabold" style={styles.badgeText}>
-          {title}
+      <View style={[components.badge, selected && components.badgeSelected]}>
+        <AppText weight="extrabold" style={components.badgeText}>
+          {title} 
         </AppText>
       </View>
 
-      <AppText weight="medium" style={styles.description}>
+      <AppText weight="medium" style={components.description}>
         {description}
       </AppText>
     </TouchableOpacity>
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: Colors.light.secondaryBackground,
-    borderWidth: 2,
-    borderColor: "#C9D2FB",
-    borderRadius: 20,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    marginBottom: 20,
-  },
-  cardSelected: {
-    backgroundColor: "#E5E0FF",
-    borderColor: Colors.light.primary,
-  },
-  badge: {
-    alignSelf: "flex-start",
-    backgroundColor: Colors.light.primary,
-    paddingHorizontal: 5,
-    paddingVertical: 5,
-    borderRadius: 12,
-    marginBottom: 6,
-  },
-  badgeSelected: {
-    borderColor: Colors.light.primary,
-  },
-  badgeText: {
-    fontSize: 16,
-    color: Colors.light.textWhite,
-  },
-  description: {
-    color: Colors.light.text,
-    fontSize: 18,
-  },
-});
+

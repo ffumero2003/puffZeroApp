@@ -4,7 +4,9 @@ import { useCallback } from "react";
 import { Image, Pressable, StyleSheet, View } from "react-native";
 import NotificationsModal from "../../../assets/images/onboarding/notifications-modal.png";
 import AppText from "../../../src/components/app-text";
+import OnboardingHeader from "../../../src/components/onboarding/onboarding-header";
 import { Colors } from "../../../src/constants/theme";
+import { layout } from "../../../src/styles/layout";
 
 export default function NotificationsStep() {
 
@@ -30,20 +32,28 @@ export default function NotificationsStep() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={layout.screenContainer}>
+
+      {/* 🔵 HEADER FIJO ARRIBA — mismo estilo que las demás pantallas */}
+      <OnboardingHeader
+        step={0}
+        total={11}
+        showBack={false}
+        showProgress={false}
+      />
 
       {/* 🔵 SECCIÓN SUPERIOR — título + subtítulo */}
       <View style={styles.topSection}>
-        <AppText weight="bold" style={styles.title}>
+        <AppText weight="bold" style={layout.title}>
           Alcanza tus metas con{"\n"}recordatorios
         </AppText>
 
-        <AppText weight="medium" style={styles.subtitle}>
+        <AppText weight="medium" style={layout.subtitle}>
           Un pequeño recordatorio puede marcar la diferencia en tu día.
         </AppText>
       </View>
 
-      {/* 🟣 SECCIÓN CENTRAL — mockCard perfectamente centrado */}
+      {/* 🟣 SECCIÓN CENTRAL — mockCard */}
       <View style={styles.middleSection}>
         <View style={styles.mockCard}>
 
@@ -51,7 +61,7 @@ export default function NotificationsStep() {
             “Puff
             <AppText
               weight="extrabold"
-              style={{ color: Colors.light.primary }}
+              style={layout.link}
             >
               Zero
             </AppText>
@@ -78,9 +88,9 @@ export default function NotificationsStep() {
             {/* Allow */}
             <Pressable
               onPress={requestPermission}
-              style={[styles.btnOption, { backgroundColor: Colors.light.primary }]}
+              style={[styles.btnOptionAllow, { backgroundColor: Colors.light.primary }]}
             >
-              <AppText weight="semibold" style={[styles.btnText, { color: "#fff" }]}>
+              <AppText weight="semibold" style={[styles.btnTextAllow, { color: "#fff" }]}>
                 Allow
               </AppText>
             </Pressable>
@@ -89,28 +99,24 @@ export default function NotificationsStep() {
         </View>
       </View>
 
-      {/* 🟢 SECCIÓN INFERIOR — imagen abajo */}
+      {/* 🟢 IMAGEN INFERIOR */}
       <View style={styles.bottomSection}>
         <Image
           source={NotificationsModal}
-          style={styles.bottomModalImage}
+          style={layout.headerImage}
           resizeMode="contain"
         />
       </View>
 
     </View>
   );
+
   }
 
 
   // 🎨 STYLES
   const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: Colors.light.background,
-      paddingHorizontal: 24,
-      paddingTop: 30,
-    },
+    
 
     // 🔵 TOP: título + subtítulo
     topSection: {
@@ -119,18 +125,6 @@ export default function NotificationsStep() {
       paddingTop: 50,
     },
 
-    title: {
-      fontSize: 28,
-      color: Colors.light.text,
-      lineHeight: 32,
-      marginBottom: 8,
-    },
-
-    subtitle: {
-      fontSize: 16,
-      color: Colors.light.textSecondary,
-      marginBottom: 20,
-    },
 
     // 🟣 MIDDLE: mockCard centrado perfectamente
     middleSection: {
@@ -181,6 +175,20 @@ export default function NotificationsStep() {
 
     btnText: {
       fontSize: 15,
+      
+    },
+
+    btnOptionAllow: {
+      paddingVertical: 10,
+      paddingHorizontal: 18,
+      borderRadius: 0,
+      width: "48%",
+      alignItems: "center",
+    },
+
+    btnTextAllow: {
+      fontSize: 15,
+      
     },
 
     // 🟢 BOTTOM: imagen pegada abajo
@@ -191,8 +199,5 @@ export default function NotificationsStep() {
       paddingBottom: 30,
     },
 
-    bottomModalImage: {
-      width: "100%",
-      height: 200,
-    },
+   
   });

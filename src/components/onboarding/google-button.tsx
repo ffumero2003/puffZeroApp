@@ -1,33 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
+import { components } from "../../../src/styles/components";
 import AppText from "../app-text";
 
 export default function GoogleButton(){
   return(
-    <TouchableOpacity style={styles.googleBtn} activeOpacity={0.7}>
+    <TouchableOpacity style={components.googleBtn} activeOpacity={0.7}>
       <Ionicons name="logo-google" size={20} color="#fff" />
-      <AppText weight="semibold" style={styles.googleText}>
+      <AppText weight="semibold" style={components.googleText}>
         Continuar con Google
       </AppText>
     </TouchableOpacity>
   )
 }
-
-const styles = StyleSheet.create({
-  googleBtn: {
-    backgroundColor: "#000",
-    paddingVertical: 14,
-    borderRadius: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  googleText: {
-    color: "#fff",
-    marginLeft: 8,
-    fontSize: 18,
-  },
-
-
-
-});

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -10,13 +10,13 @@ import {
 } from "react-native";
 
 import { router } from "expo-router";
-import { useRef } from "react";
 import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming
 } from "react-native-reanimated";
+
 import AppText from "../../src/components/app-text";
 import ContinueButton from "../../src/components/onboarding/continue-button";
 import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
@@ -43,7 +43,6 @@ const LATAM_CURRENCIES = [
   { code: "VES", label: "Venezuela (Bolívar)" },
 ];
 
-/* 🔥 Mínimos realistas por moneda */
 const MIN_BY_CURRENCY: Record<string, number> = {
   CRC: 10000,
   USD_SV: 20,
@@ -61,20 +60,17 @@ const MIN_BY_CURRENCY: Record<string, number> = {
   VES: 250,
 };
 
-/* 🔥 Formato automático amigable */
 function formatCurrency(value: string, currency: string) {
   if (!value) return "";
+  const num = Number(value);
+  if (isNaN(num)) return "";
 
-  const number = Number(value);
-  if (isNaN(number)) return "";
-
-  // USD_SV → USD  / USD_PA → USD
-  const isoCurrency = currency.startsWith("USD") ? "USD" : currency;
+  const iso = currency.startsWith("USD") ? "USD" : currency;
 
   return new Intl.NumberFormat("es-LA", {
     style: "currency",
-    currency: isoCurrency,
-  }).format(number);
+    currency: iso,
+  }).format(num);
 }
 
 
@@ -87,9 +83,9 @@ export default function OnboardingMoneySpent() {
 
   const formatted = formatCurrency(amount, localCurrency);
   const amountNumber = Number(amount);
-
   const minValue = MIN_BY_CURRENCY[localCurrency];
 
+  /* 🔥 Animaciones */
   const overlayOpacity = useSharedValue(0);
   const modalTranslate = useSharedValue(50);
   const modalOpacity = useSharedValue(0);
@@ -105,80 +101,94 @@ export default function OnboardingMoneySpent() {
 
   const modalRef = useRef<View>(null);
 
-
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={layout.containerWithLoadingBar}>
-        <OnboardingHeader step={6} total={11} />
+      <View style={layout.screenContainer}>
 
-        <ScrollView
-          style={layout.content}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          <TitleBlock
-            title="¿Cuánto gastás por mes?"
-            subtitle="Registrar tus gastos te muestra cuánto podrías ahorrar."
-          />
+        {/* 🔵 GROUP 1 — Header + contenido scroll */}
+        <View style={{ flex: 1 }}>
+          <OnboardingHeader step={6} total={11} />
 
-          <TextInput
-            style={layout.input}
-            keyboardType="numeric"
-            placeholder="0"
-            placeholderTextColor="#A0A0BF"
-            value={amount}
-            onChangeText={(t) => setAmount(t.replace(/[^0-9]/g, ""))}
-          />
-
-          {formatted ? (
-            <AppText style={layout.previewText}>
-              ≈ {formatted} por semana
-            </AppText>
-          ) : null}
-
-          {/* Picker */}
-          <TouchableOpacity
-            style={styles.currencyPicker}
-            onPress={() => {
-            setPickerOpen(true);
-
-            overlayOpacity.value = withTiming(1, { duration: 200 });
-            modalTranslate.value = withTiming(0, {
-              duration: 260,
-              easing: Easing.out(Easing.quad),
-            });
-            modalOpacity.value = withTiming(1, { duration: 260 });
-          }}
-
+          <ScrollView
+            style={layout.content}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
           >
-            <AppText weight="semibold" style={styles.currencyText}>
-              {LATAM_CURRENCIES.find((c) => c.code === localCurrency)?.label}
-            </AppText>
-            <AppText style={styles.arrow}>▼</AppText>
-          </TouchableOpacity>
-        </ScrollView>
+            <TitleBlock
+              title="¿Cuánto gastás por mes?"
+              subtitle="Registrar tus gastos te muestra cuánto podrías ahorrar."
+            />
 
-        {/* Modal */}
-        {pickerOpen && (
+            <TextInput
+              style={styles.inputCurrency}
+              keyboardType="numeric"
+              placeholder="0"
+              placeholderTextColor="#A0A0BF"
+              value={amount}
+              onChangeText={(t) => setAmount(t.replace(/[^0-9]/g, ""))}
+            />
+
+            {formatted ? (
+              <AppText style={layout.previewText}>
+                ≈ {formatted} por semana
+              </AppText>
+            ) : null}
+
+            {/* Picker */}
+            <TouchableOpacity
+              style={styles.currencyPicker}
+              onPress={() => {
+                setPickerOpen(true);
+
+                overlayOpacity.value = withTiming(1, { duration: 200 });
+                modalTranslate.value = withTiming(0, {
+                  duration: 260,
+                  easing: Easing.out(Easing.quad),
+                });
+                modalOpacity.value = withTiming(1, { duration: 260 });
+              }}
+            >
+              <AppText weight="semibold" style={styles.currencyText}>
+                {LATAM_CURRENCIES.find((c) => c.code === localCurrency)?.label}
+              </AppText>
+              <AppText style={styles.arrow}>▼</AppText>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+
+        {/* 🟢 GROUP 2 — Botón siempre abajo */}
+        <ContinueButton
+          text="Continuar"
+          disabled={amountNumber < minValue}
+          onPress={() => {
+            setMoney(amountNumber);
+            setCurrency(localCurrency);
+            router.push("/onboarding-comparison");
+          }}
+          style={layout.bottomButtonSpacing}
+        />
+
+      </View>
+
+      {/* 🟣 MODAL (fuera del layout para overlay full-screen) */}
+      {pickerOpen && (
         <Animated.View
           style={[styles.modalOverlay, overlayStyle]}
           onStartShouldSetResponder={() => true}
           onResponderRelease={(e) => {
             if (!modalRef.current) return;
 
-            // verificar si el usuario tocó FUERA del modal
             modalRef.current.measure((x, y, width, height, pageX, pageY) => {
-              const touchX = e.nativeEvent.pageX;
-              const touchY = e.nativeEvent.pageY;
-
+              const { pageX: tx, pageY: ty } = e.nativeEvent;
               const inside =
-                touchX >= pageX &&
-                touchX <= pageX + width &&
-                touchY >= pageY &&
-                touchY <= pageY + height;
+                tx >= pageX &&
+                tx <= pageX + width &&
+                ty >= pageY &&
+                ty <= pageY + height;
 
               if (!inside) {
                 overlayOpacity.value = withTiming(0, { duration: 150 });
@@ -190,11 +200,7 @@ export default function OnboardingMoneySpent() {
             });
           }}
         >
-          <Animated.View
-            ref={modalRef}
-            style={[styles.modalBox, modalBoxStyle]}
-            onStartShouldSetResponder={() => true}
-          >
+          <Animated.View ref={modalRef} style={[styles.modalBox, modalBoxStyle]}>
             <ScrollView style={{ maxHeight: 300 }}>
               {LATAM_CURRENCIES.map((item) => (
                 <TouchableOpacity
@@ -213,27 +219,22 @@ export default function OnboardingMoneySpent() {
         </Animated.View>
       )}
 
-
-        <ContinueButton
-          text="Continuar"
-          disabled={amountNumber < minValue}
-          onPress={() => {
-            setMoney(amountNumber);
-            setCurrency(localCurrency);
-
-            router.push("/onboarding-comparison");
-          }}
-          style={{ paddingBottom: 30 }}
-        />
-      </View>
     </KeyboardAvoidingView>
   );
 }
 
 
 const styles = StyleSheet.create({
-  
-  
+  inputCurrency: {
+      backgroundColor: "#E6E4FF",
+      borderRadius: 12,
+      paddingVertical: 14,
+      paddingHorizontal: 20,
+      fontSize: 22,
+      color: Colors.light.text,
+      fontFamily: "Manrope_600SemiBold",
+      marginTop: 20
+    },
   currencyPicker: {
     marginTop: 20,
     alignSelf: "center",
@@ -244,36 +245,37 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    elevation: 2,
   },
+
   currencyText: {
     fontSize: 16,
     color: Colors.light.text,
   },
+
   arrow: {
     fontSize: 16,
     color: Colors.light.text,
     marginLeft: 4,
   },
+
   modalOverlay: {
-  ...StyleSheet.absoluteFillObject,  // ← full pantalla REAL
-  backgroundColor: "rgba(0,0,0,0.5)",
-  justifyContent: "center",
-  alignItems: "center",
-  paddingHorizontal: 20,
-  zIndex: 99,
-},
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    zIndex: 99,
+  },
 
-modalBox: {
-  width: "100%",
-  maxWidth: 380,
-  backgroundColor: Colors.light.secondary,
-  paddingVertical: 10,
-  borderRadius: 16,
-  maxHeight: "60%",      // ← NO pongas height: 100%, rompe scroll
-},
+  modalBox: {
+    width: "100%",
+    maxWidth: 380,
+    backgroundColor: Colors.light.secondary,
+    paddingVertical: 10,
+    borderRadius: 16,
+    maxHeight: "60%",
+  },
 
-  
   modalOption: {
     paddingVertical: 14,
     paddingHorizontal: 20,

@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   },
 
   reviewText: {
-    fontSize: 15,
+    fontSize: 16,
     lineHeight: 22,
     color: Colors.light.text,
   },

@@ -3,12 +3,13 @@ import { Colors } from "../constants/theme";
 
 export const layout = StyleSheet.create({
 
-  /* 🔵 CONTENEDOR BASE PARA TODAS LAS PANTALLAS */
+  /* 🔵 VISTAS */
   screenContainer: {
     flex: 1,
     backgroundColor: Colors.light.background,
     paddingHorizontal: 24,
     paddingTop: 30,
+    justifyContent: "space-between"
   },
 
   containerWithLoadingBar: {
@@ -27,6 +28,12 @@ export const layout = StyleSheet.create({
     paddingBottom: 50,
   },
 
+  containerAuth : {
+    flex: 1,
+    backgroundColor: Colors.light.background,
+    paddingHorizontal: 24,
+    paddingTop: 20,
+  },
   /* 🔵 HEADER SUPERIOR (OnboardingHeader) */
   headerContainer: {
     backgroundColor: Colors.light.background,
@@ -38,8 +45,8 @@ export const layout = StyleSheet.create({
 
   /* 🔵 BLOQUE DE CONTENIDO CENTRAL */
   content: {
-    flex: 1,
-    marginTop: 30,
+    
+    marginTop: 40,
   },
 
   /* 🔵 SECCIONES FLEXIBLES (UP, MIDDLE, BOTTOM) */
@@ -67,7 +74,14 @@ export const layout = StyleSheet.create({
     color: Colors.light.text,
     lineHeight: 32,
     
-    marginBottom: 10,
+    
+  },
+
+  errorText: {
+    color: Colors.light.danger,
+    fontSize: 16,
+    marginTop: 4,
+    marginLeft: 4,
   },
 
   titleCenter: {
@@ -76,12 +90,25 @@ export const layout = StyleSheet.create({
     color: Colors.light.text,
     textAlign: "center",
   },
+  titleCenterNoMargin: {
+
+    fontSize: 28,
+    color: Colors.light.text,
+    textAlign: "center",
+  },
 
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     color: Colors.light.textSecondary,
     marginTop: 8,
-    marginBottom: 20,
+    marginBottom: 20
+  },
+
+  subtitleAuth: {
+    fontSize: 16,
+    color: Colors.light.textSecondary,
+    marginTop: 8,
+    
   },
 
   description: {
@@ -110,7 +137,7 @@ export const layout = StyleSheet.create({
   /* 🔵 IMÁGENES GRANDES (mockups tipo celular) */
   image: {
     width: "100%",
-    height: 220, // ajustá si es más alta o más baja
+    height: 230, // ajustá si es más alta o más baja
     marginVertical: 20,
   },
   bigImage: {
@@ -118,18 +145,16 @@ export const layout = StyleSheet.create({
     height: 430,
   },
 
-  /* 🔵 ESPACIADO PARA BOTONES INFERIORES */
-  bottomButtonSpacing: {
-    paddingBottom: 30,
-  },
 
 
   //footer login link
 
   footer: {
-      marginTop: 20,
+      
       color: Colors.light.text,
       fontSize: 18,
+      textAlign: "center",
+      paddingBottom: 30
     },
     link: {
       color: Colors.light.primary,
@@ -154,4 +179,105 @@ export const layout = StyleSheet.create({
       color: Colors.light.textMuted,
     },
 
-});
+    //Login
+
+    forgotContainer: {
+      marginTop: 10,
+      alignSelf: "flex-start",
+    },
+
+    forgotLink: {
+      color: Colors.light.primary,
+      fontSize: 18,
+    },
+
+
+  bottomContainer: {
+      flex: 1,
+      justifyContent: "flex-end",
+      marginBottom: 30, // ajustá según tu diseño
+    },
+
+    text: {
+      textAlign: "center",
+      fontSize: 14,
+      color: Colors.light.textMuted,
+      lineHeight: 20,
+    },
+
+    linkLogin: {
+      color: Colors.light.primary,
+    },
+
+
+    //privacy policy/terms of use
+
+  
+    sectionTitle: {
+      fontSize: 18,
+      color: Colors.light.text,
+      fontWeight: "bold",
+      marginTop: 20,
+      marginBottom: 6,
+    },
+    subsectionTitle: {
+      fontSize: 16,
+      color: Colors.light.text,
+      fontWeight: "600",
+      marginTop: 10,
+      marginBottom: 4,
+    },
+    paragraph: {
+      fontSize: 15,
+      color: Colors.light.textMuted,
+      lineHeight: 22,
+    },
+    contentPolicyTerms: {
+      marginTop: 20
+    },
+
+
+    //Reviews
+
+    reviewCard: {
+      backgroundColor: "white",
+      padding: 18,
+      borderRadius: 20,
+      marginBottom: 20,
+      borderWidth: 1,
+      borderColor: "#D7D7F3",
+    },
+
+    profileCircle: {
+      width: 45,
+      height: 45,
+      borderRadius: 25,
+      backgroundColor: "#E0E0E0",
+      marginBottom: 10,
+    },
+
+    reviewHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 6,
+    },
+
+    reviewStars: {
+      fontSize: 16,
+    },
+
+    reviewText: {
+      fontSize: 15,
+      color: Colors.light.text,
+      lineHeight: 20,
+    },
+
+    headerImage: {
+    width: "100%",
+    height: 200,   // ajustá según tu imagen real
+    marginBottom: 20,
+  },
+
+  });
+
+    

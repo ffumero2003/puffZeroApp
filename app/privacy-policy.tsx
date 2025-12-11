@@ -1,32 +1,35 @@
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import AppText from "../src/components/app-text";
 import OnboardingHeader from "../src/components/onboarding/onboarding-header";
-import { Colors } from "../src/constants/theme";
+import { layout } from "../src/styles/layout";
 
 export default function PrivacyPolicy() {
   return (
-    <View style={styles.container}>
+    <View style={layout.containerWithLoadingBar}>
       
       {/* Header */}
-      <OnboardingHeader showProgress={false} style={{ marginBottom: 20 }} />
+      <OnboardingHeader showProgress={false} />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={layout.contentPolicyTerms}
+        showsVerticalScrollIndicator={false}
+      >
 
-        <AppText style={styles.paragraph}>
+        <AppText style={layout.paragraph}>
           Última actualización: Enero 2025
         </AppText>
 
-        <AppText style={styles.sectionTitle}>1. Introducción</AppText>
-        <AppText style={styles.paragraph}>
+        <AppText style={layout.sectionTitle}>1. Introducción</AppText>
+        <AppText style={layout.paragraph}>
           En PuffZero, tu privacidad es una prioridad. Esta Política de Privacidad describe 
           cómo recopilamos, utilizamos, protegemos y compartimos tu información al utilizar 
           nuestra aplicación diseñada para ayudarte a dejar el consumo de vapeo y nicotina.
         </AppText>
 
-        <AppText style={styles.sectionTitle}>2. Información que recopilamos</AppText>
+        <AppText style={layout.sectionTitle}>2. Información que recopilamos</AppText>
         
-        <AppText style={styles.subsectionTitle}>2.1 Información que proporcionás</AppText>
-        <AppText style={styles.paragraph}>
+        <AppText style={layout.subsectionTitle}>2.1 Información que proporcionás</AppText>
+        <AppText style={layout.paragraph}>
           • Correo electrónico  
           • Contraseña en formato cifrado  
           • Nombre de usuario  
@@ -34,16 +37,16 @@ export default function PrivacyPolicy() {
           • Datos voluntarios sobre hábitos (p. ej., puffs diarios, preocupaciones, objetivos)
         </AppText>
 
-        <AppText style={styles.subsectionTitle}>2.2 Información recopilada automáticamente</AppText>
-        <AppText style={styles.paragraph}>
+        <AppText style={layout.subsectionTitle}>2.2 Información recopilada automáticamente</AppText>
+        <AppText style={layout.paragraph}>
           • Identificador del dispositivo  
           • Versión del sistema operativo  
           • Estadísticas de uso dentro de la app  
           • Información técnica necesaria para su funcionamiento
         </AppText>
 
-        <AppText style={styles.sectionTitle}>3. Cómo utilizamos tu información</AppText>
-        <AppText style={styles.paragraph}>
+        <AppText style={layout.sectionTitle}>3. Cómo utilizamos tu información</AppText>
+        <AppText style={layout.paragraph}>
           Utilizamos tus datos para:  
           • Personalizar tu experiencia y recomendaciones dentro de la app  
           • Mostrar tu progreso y estadísticas  
@@ -52,23 +55,23 @@ export default function PrivacyPolicy() {
           • Garantizar un uso seguro del sistema
         </AppText>
 
-        <AppText style={styles.sectionTitle}>4. Base legal para el tratamiento</AppText>
-        <AppText style={styles.paragraph}>
+        <AppText style={layout.sectionTitle}>4. Base legal para el tratamiento</AppText>
+        <AppText style={layout.paragraph}>
           Procesamos tus datos en base a:  
           • Tu consentimiento  
           • La necesidad de proveer el servicio  
           • Cumplimiento de obligaciones legales
         </AppText>
 
-        <AppText style={styles.sectionTitle}>5. Cómo protegemos tu información</AppText>
-        <AppText style={styles.paragraph}>
+        <AppText style={layout.sectionTitle}>5. Cómo protegemos tu información</AppText>
+        <AppText style={layout.paragraph}>
           PuffZero utiliza cifrado, controles de acceso y medidas técnicas modernas para 
           proteger tu información. Aunque ningún sistema es 100% infalible, tomamos medidas 
           razonables para asegurar su integridad.
         </AppText>
 
-        <AppText style={styles.sectionTitle}>6. Compartición de datos</AppText>
-        <AppText style={styles.paragraph}>
+        <AppText style={layout.sectionTitle}>6. Compartición de datos</AppText>
+        <AppText style={layout.paragraph}>
           No vendemos tu información.  
           Podemos compartir datos únicamente con:  
           • Proveedores necesarios para operar la app (como Supabase para autenticación)  
@@ -76,8 +79,8 @@ export default function PrivacyPolicy() {
           • Servicios analíticos para mejorar la aplicación  
         </AppText>
 
-        <AppText style={styles.sectionTitle}>7. Tus derechos</AppText>
-        <AppText style={styles.paragraph}>
+        <AppText style={layout.sectionTitle}>7. Tus derechos</AppText>
+        <AppText style={layout.paragraph}>
           Como usuario tenés derecho a:  
           • Acceder a tu información  
           • Rectificar datos incorrectos  
@@ -86,20 +89,20 @@ export default function PrivacyPolicy() {
           • Solicitar copia de tu información  
         </AppText>
 
-        <AppText style={styles.sectionTitle}>8. Conservación de los datos</AppText>
-        <AppText style={styles.paragraph}>
+        <AppText style={layout.sectionTitle}>8. Conservación de los datos</AppText>
+        <AppText style={layout.paragraph}>
           Conservamos tus datos mientras tengas una cuenta activa. Podés solicitar su 
           eliminación en cualquier momento.
         </AppText>
 
-        <AppText style={styles.sectionTitle}>9. Cambios a esta política</AppText>
-        <AppText style={styles.paragraph}>
+        <AppText style={layout.sectionTitle}>9. Cambios a esta política</AppText>
+        <AppText style={layout.paragraph}>
           Podemos actualizar esta Política de Privacidad para reflejar mejoras, 
           cambios legales o ajustes de funcionamiento. Notificaremos cambios importantes.
         </AppText>
 
-        <AppText style={styles.sectionTitle}>10. Contacto</AppText>
-        <AppText style={styles.paragraph}>
+        <AppText style={layout.sectionTitle}>10. Contacto</AppText>
+        <AppText style={layout.paragraph}>
           Si tenés dudas o querés ejercer tus derechos, podés contactarnos en:  
           soporte@puffzero.app
         </AppText>
@@ -111,41 +114,3 @@ export default function PrivacyPolicy() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-    gap: 12,
-  },
-  title: {
-    fontSize: 22,
-    color: Colors.light.text,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    color: Colors.light.text,
-    fontWeight: "bold",
-    marginTop: 20,
-    marginBottom: 6,
-  },
-  subsectionTitle: {
-    fontSize: 16,
-    color: Colors.light.text,
-    fontWeight: "600",
-    marginTop: 10,
-    marginBottom: 4,
-  },
-  paragraph: {
-    fontSize: 15,
-    color: Colors.light.textMuted,
-    lineHeight: 22,
-  },
-});

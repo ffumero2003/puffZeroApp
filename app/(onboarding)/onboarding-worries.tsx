@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ScrollView, View } from "react-native";
 
 import ContinueButton from "../../src/components/onboarding/continue-button";
-import OnboardingMultiSelectButton from "../../src/components/onboarding/multi-select-button";
+import MultiSelectButton from "../../src/components/onboarding/multi-select-button";
 import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
 import TitleBlock from "../../src/components/onboarding/title-block";
 import { useOnboarding } from "../../src/providers/onboarding-provider";
@@ -25,18 +25,20 @@ export default function OnboardingWorries() {
   const { setWorries } = useOnboarding();
 
   const toggleSelect = (id: string) => {
-    setSelected((prev) =>
+    setSelected(prev =>
       prev.includes(id)
-        ? prev.filter((item) => item !== id)
+        ? prev.filter(item => item !== id)
         : [...prev, id]
     );
   };
 
   return (
-    <View style={layout.containerWithLoadingBar}>
+    <View style={layout.screenContainer}>
+
+      {/* 🔵 HEADER FIJO ARRIBA */}
       <OnboardingHeader step={11} total={11} />
 
-      {/* 🔵 TitleBlock — NO SCROLL */}
+      {/* 🟣 TITLEBLOCK (NO SCROLL) */}
       <View style={layout.content}>
         <TitleBlock
           title="¿Qué te preocupa al dejar el vape?"
@@ -44,22 +46,24 @@ export default function OnboardingWorries() {
         />
       </View>
 
-      {/* 🟣 OPTIONS — SOLO ESTO HACE SCROLL */}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 40 }}
-      >
-        {CONCERNS.map((item) => (
-          <OnboardingMultiSelectButton
-            key={item.id}
-            title={item.title}
-            selected={selected.includes(item.id)}
-            onPress={() => toggleSelect(item.id)}
-          />
-        ))}
-      </ScrollView>
+      {/* 🟡 SCROLL SOLO PARA LAS OPCIONES */}
+      <View style={{ flex: 1 }}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
+          {CONCERNS.map(item => (
+            <MultiSelectButton
+              key={item.id}
+              title={item.title}
+              selected={selected.includes(item.id)}
+              onPress={() => toggleSelect(item.id)}
+            />
+          ))}
+        </ScrollView>
+      </View>
 
-      {/* 🟢 BOTÓN ABAJO FIJO */}
+      {/* 🟢 BOTÓN SIEMPRE AL FONDO */}
       <ContinueButton
         text="Continuar"
         disabled={selected.length === 0}
@@ -68,10 +72,9 @@ export default function OnboardingWorries() {
           console.log("Preocupaciones guardadas:", selected);
           router.push("/(auth)/registrarse");
         }}
-        style={{ paddingBottom: 30 }}   // igual que tu otro continue button
+        style={layout.bottomButtonContainer}
       />
 
     </View>
   );
 }
-

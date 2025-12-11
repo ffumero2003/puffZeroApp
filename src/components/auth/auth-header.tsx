@@ -1,7 +1,7 @@
-import { Image, StyleSheet, View } from "react-native";
+import { Image, View } from "react-native";
 import Logo from "../../../assets/images/logo-puff-zero.png";
-import { Colors } from "../../constants/theme";
-import TitleBlock from "../onboarding/title-block";
+import { layout } from "../../../src/styles/layout";
+import TitleBlockAuth from "./title-block-auth";
 
 interface AuthHeaderProps {
   title: string;
@@ -10,9 +10,9 @@ interface AuthHeaderProps {
 
 export default function AuthHeader({ title, subtitle }: AuthHeaderProps) {
   return (
-    <View style={styles.headerRow}>
-      <View style={styles.headerTextContainer}>
-        <TitleBlock
+    <View style={layout.headerRow}>
+      <View style={layout.headerTextContainer}>
+        <TitleBlockAuth
           title={title}
           subtitle={subtitle}
         />
@@ -20,40 +20,10 @@ export default function AuthHeader({ title, subtitle }: AuthHeaderProps) {
 
       <Image
         source={Logo}
-        style={styles.headerLogo}
+        style={layout.headerLogo}
         resizeMode="contain"
       />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-
-  headerTextContainer: {
-    flex: 1,
-    paddingRight: 10,
-  },
-
-  title: {
-    fontSize: 30,
-    color: Colors.light.text,
-    marginBottom: 10,
-  },
-
-  subtitle: {
-    fontSize: 18,
-    color: Colors.light.textSecondary,
-    opacity: 0.5,
-  },
-
-  headerLogo: {
-    width: 85,
-    height: 85,
-  },
-});

@@ -4,20 +4,19 @@ import {
   Alert,
   Keyboard,
   ScrollView,
-  StyleSheet,
   TouchableWithoutFeedback,
-  View,
+  View
 } from "react-native";
 
 import AppText from "../../src/components/app-text";
 import AuthHeader from "../../src/components/auth/auth-header";
-import ContinueButton from "../../src/components/onboarding/continue-button";
+import ContinueButtonAuth from "../../src/components/auth/continueButtonAuth";
 import GoogleButton from "../../src/components/onboarding/google-button";
 import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
 import SeparatorRow from "../../src/components/onboarding/separator-row";
 import UnderlineInput from "../../src/components/onboarding/underline-input";
-import { Colors } from "../../src/constants/theme";
 
+import { layout } from "@/src/styles/layout";
 import { createProfile } from "../../src/lib/profile";
 import { useAuth } from "../../src/providers/auth-provider";
 import { useOnboarding } from "../../src/providers/onboarding-provider"; // 👈 ESTA es la correcta
@@ -30,6 +29,10 @@ export default function Register() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [nombreError, setNombreError] = useState("");
+
+  const [confirm, setConfirm] = useState("");
+  const [confirmError, setConfirmError] = useState("");
+
 
   // Supabase Auth
   const { signUp } = useAuth();
@@ -176,16 +179,43 @@ export default function Register() {
       return;
     }
 
+
     setPasswordError("");
+
+    if (confirm && value !== confirm) {
+      setConfirmError("Las contraseñas no coinciden.");
+    } else {
+      setConfirmError("");
+    }
   };
 
+  const validateConfirm = (value: string) => {
+    setConfirm(value);
+
+    if (value !== password) {
+      setConfirmError("Las contraseñas no coinciden.");
+    } else {
+      setConfirmError("");
+    }
+  };
+
+
   const isInvalid =
-    !email || !password || !nombre || emailError || passwordError || nombreError;
+    !email ||
+    !password ||
+    !confirm ||
+    !nombre ||
+    emailError ||
+    passwordError ||
+    nombreError ||
+    confirmError;
+
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
-        <OnboardingHeader showProgress={false} style={{ marginBottom: 20 }} />
+      <View style={layout.containerAuth}>
+
+        <OnboardingHeader showProgress={false} style={{ marginBottom: 30 }} />
 
         <AuthHeader
           title="Crear Cuenta"
@@ -193,6 +223,8 @@ export default function Register() {
         />
 
         <ScrollView showsVerticalScrollIndicator={false}>
+
+          {/* Nombre */}
           <UnderlineInput
             placeholder="Nombre Completo"
             value={nombre}
@@ -201,9 +233,12 @@ export default function Register() {
             keyboardType="default"
           />
           {nombreError ? (
-            <AppText style={styles.errorText} weight="extrabold">{nombreError}</AppText>
+            <AppText style={layout.errorText} weight="extrabold">
+              {nombreError}
+            </AppText>
           ) : null}
 
+          {/* Email */}
           <UnderlineInput
             placeholder="Correo"
             value={email}
@@ -212,9 +247,12 @@ export default function Register() {
             keyboardType="email-address"
           />
           {emailError ? (
-            <AppText style={styles.errorText} weight="extrabold">{emailError}</AppText>
+            <AppText style={layout.errorText} weight="extrabold">
+              {emailError}
+            </AppText>
           ) : null}
 
+          {/* Contraseña */}
           <UnderlineInput
             placeholder="Contraseña"
             value={password}
@@ -223,10 +261,28 @@ export default function Register() {
             secureTextEntry
           />
           {passwordError ? (
-            <AppText style={styles.errorText} weight="extrabold">{passwordError}</AppText>
+            <AppText style={layout.errorText} weight="extrabold">
+              {passwordError}
+            </AppText>
           ) : null}
 
-          <ContinueButton
+          {/* Confirmar contraseña — NUEVO 🔥 */}
+          <UnderlineInput
+            placeholder="Confirmar contraseña"
+            value={confirm}
+            onChangeText={validateConfirm}
+            autoCapitalize="none"
+            secureTextEntry
+            style={{ marginTop: 16 }}
+          />
+          {confirmError ? (
+            <AppText style={layout.errorText} weight="extrabold">
+              {confirmError}
+            </AppText>
+          ) : null}
+
+          {/* Botón de registro */}
+          <ContinueButtonAuth
             text="Registrarse"
             disabled={isInvalid}
             onPress={handleRegister}
@@ -236,23 +292,12 @@ export default function Register() {
           <SeparatorRow />
 
           <GoogleButton />
+
         </ScrollView>
       </View>
     </TouchableWithoutFeedback>
   );
+
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-    paddingHorizontal: 24,
-    paddingTop: 20,
-  },
-  errorText: {
-    color: Colors.light.danger,
-    fontSize: 16,
-    marginTop: 4,
-    marginLeft: 4,
-  },
-});
+

@@ -1,21 +1,30 @@
+import { layout } from "@/src/styles/layout";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import {
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+
+import OnboardingHeader from "@/src/components/onboarding/onboarding-header";
 import AppText from "../src/components/app-text";
-import KeepGoingButton from "../src/components/onboarding/keep-going-button";
+import ContinueButton from "../src/components/onboarding/continue-button";
 import UnderlineInput from "../src/components/onboarding/underline-input";
-import { Colors } from "../src/constants/theme";
 import { supabase } from "../src/lib/supabase";
 
 export default function ResetPasswordScreen() {
   const { token: rawToken } = useLocalSearchParams();
   const token = Array.isArray(rawToken) ? rawToken[0] : rawToken;
-  
+
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ❗ Activar sesión de recuperación
+  /* 🔥 Activar sesión de recuperación */
   useEffect(() => {
     const activateRecovery = async () => {
       if (!token) return;
@@ -35,7 +44,7 @@ export default function ResetPasswordScreen() {
     activateRecovery();
   }, [token]);
 
-
+  /* 🔥 Manejo de submit */
   const handleSubmit = async () => {
     if (!token) {
       Alert.alert("Error", "Token inválido.");
@@ -54,7 +63,6 @@ export default function ResetPasswordScreen() {
 
     setLoading(true);
 
-    // 🔥 Ahora ya podés actualizar la contraseña
     const { error } = await supabase.auth.updateUser({ password });
 
     setLoading(false);
@@ -69,46 +77,57 @@ export default function ResetPasswordScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <AppText weight="bold" style={styles.title}>
-        Crear nueva contraseña
-      </AppText>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={layout.screenContainer}>
 
-      <UnderlineInput
-        placeholder="Nueva contraseña"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+          {/* 🔵 HEADER SOLO PARA ESPACIO (sin back, sin progress) */}
+          <OnboardingHeader
+            step={0}
+            total={11}
+            showBack={false}
+            showProgress={false}
+          />
 
-      <UnderlineInput
-        placeholder="Confirmar contraseña"
-        value={confirm}
-        onChangeText={setConfirm}
-        secureTextEntry
-        style={{ marginTop: 16 }}
-      />
+          {/* 🔵 TÍTULO */}
+          <AppText weight="bold" style={layout.title}>
+            Crear nueva contraseña
+          </AppText>
 
-      <View style={{ marginTop: 40 }}>
-        <KeepGoingButton
-          text={loading ? "Actualizando..." : "Actualizar contraseña"}
-          onPress={handleSubmit}
-        />
-      </View>
-    </View>
+          {/* 🟣 INPUTS */}
+          <View style={{ width: "100%", marginTop: 30 }}>
+            <UnderlineInput
+              placeholder="Nueva contraseña"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+
+            <UnderlineInput
+              placeholder="Confirmar contraseña"
+              value={confirm}
+              onChangeText={setConfirm}
+              secureTextEntry
+              style={{ marginTop: 16 }}
+            />
+          </View>
+
+          {/* 🟢 BOTÓN ABAJO (sube con teclado) */}
+          <View style={{ width: "100%", marginTop: "auto" }}>
+            <ContinueButton
+              text={loading ? "Actualizando..." : "Actualizar contraseña"}
+              onPress={handleSubmit}
+              disabled={loading}
+              style={layout.bottomButtonContainer}
+            />
+          </View>
+
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
-}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-    paddingHorizontal: 24,
-    paddingTop: 80,
-  },
-  title: {
-    fontSize: 28,
-    color: Colors.light.text,
-    marginBottom: 40,
-  },
-});
+}

@@ -26,43 +26,44 @@ export default function OnboardingGoal() {
   const [selected, setSelected] = useState<string | null>(null);
   const { setGoal } = useOnboarding();
 
-
   return (
     <View style={layout.screenContainer}>
-      <OnboardingHeader step={8} total={11} />
+      
+      {/* GROUP 1 — everything above the button */}
+      <View>
+        <OnboardingHeader step={8} total={11} />
 
-      <View style={layout.content}>
-        <TitleBlock
-          title="¿Cuál es tu meta?"
-          subtitle="Tu meta puede ajustarse en cualquier momento durante tu proceso."
-        />
-
-        {GOAL_OPTIONS.map((opt) => (
-          <OnboardingOptionCard
-            key={opt.id}
-            id={opt.id}
-            title={opt.badge}
-            description={opt.text}
-            selected={selected === opt.id}
-            onPress={() => setSelected(opt.id)}
+        <View style={layout.content}>
+          <TitleBlock
+            title="¿Cuál es tu meta?"
+            subtitle="Tu meta puede ajustarse en cualquier momento durante tu proceso."
           />
-        ))}
+
+          {GOAL_OPTIONS.map((opt) => (
+            <OnboardingOptionCard
+              key={opt.id}
+              id={opt.id}
+              title={opt.badge}
+              description={opt.text}
+              selected={selected === opt.id}
+              onPress={() => setSelected(opt.id)}
+            />
+          ))}
+        </View>
       </View>
 
-     
+      {/* GROUP 2 — button at bottom */}
       <ContinueButton
         text="Continuar"
         disabled={selected === null}
         onPress={() => {
-          setGoal(selected!);  // 💾 Guarda la meta
-          console.log("🎯 Meta seleccionada:", selected);
+          setGoal(selected!);
           router.push("/onboarding-speed-plan");
         }}
-        style={{ paddingBottom: 30 }}
+        style={layout.bottomButtonSpacing}
       />
 
     </View>
   );
 }
-
 

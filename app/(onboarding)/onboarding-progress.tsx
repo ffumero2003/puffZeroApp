@@ -10,11 +10,13 @@ import ProgressScreen from "../../assets/images/onboarding/onboarding-progress-p
 
 export default function OnboardingProgress() {
   return (
-    <>
-      <View style={layout.headerContainer}>
-        <OnboardingHeader  step={1} total={11}/>
-      </View>
-      <View style={layout.container}>
+    <View style={layout.screenContainer}>
+
+      {/* 🔵 HEADER ARRIBA FIJO */}
+      <OnboardingHeader step={1} total={11} />
+
+      {/* 🟣 TODO EL RESTO INICIA DESDE ABAJO */}
+      <View style={{ width: "100%", alignItems: "center" }}>
         
         <Image
           source={ProgressScreen}
@@ -29,12 +31,12 @@ export default function OnboardingProgress() {
         <ContinueButton
           text="Continuar"
           onPress={() => router.push("/onboarding-zuffy")}
+          style={layout.bottomButtonContainer}
         />
-
 
         <LoginText />
       </View>
-    </>
+
+    </View>
   );
 }
-

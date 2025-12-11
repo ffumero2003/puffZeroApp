@@ -42,10 +42,12 @@ export default function OnboardingSpeedPlan() {
   const { setGoalSpeed } = useOnboarding();
 
   return (
-    <View style={layout.containerWithLoadingBar}>
+    <View style={layout.screenContainer}>
+
+      {/* 🔵 HEADER ARRIBA */}
       <OnboardingHeader step={9} total={11} />
 
-      {/* 🔵 TitleBlock estático, NO scroll */}
+      {/* 🟣 CONTENIDO SUPERIOR (NO SCROLL) */}
       <View style={layout.content}>
         <TitleBlock
           title="¿Qué tan rápido querés alcanzar tu meta?"
@@ -53,25 +55,26 @@ export default function OnboardingSpeedPlan() {
         />
       </View>
 
-      {/* 🟣 Scroll solo para las opciones */}
-      <ScrollView
-        
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 40 }}
-      >
-        {OPTIONS.map((opt) => (
-          <OnboardingOptionCard
-            key={opt.id}
-            id={opt.id}
-            title={opt.title}
-            description={opt.description}
-            selected={selected === opt.id}
-            onPress={() => setSelected(opt.id)}
-          />
-        ))}
-      </ScrollView>
+      {/* 🟡 SCROLL SOLO PARA LAS OPCIONES */}
+      <View style={{ flex: 1 }}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
+          {OPTIONS.map((opt) => (
+            <OnboardingOptionCard
+              key={opt.id}
+              id={opt.id}
+              title={opt.title}
+              description={opt.description}
+              selected={selected === opt.id}
+              onPress={() => setSelected(opt.id)}
+            />
+          ))}
+        </ScrollView>
+      </View>
 
-      {/* 🟢 Botón fuera del scroll */}
+      {/* 🟢 BOTÓN AL FONDO SIEMPRE */}
       <ContinueButton
         text="Continuar"
         disabled={selected === null}
@@ -80,8 +83,9 @@ export default function OnboardingSpeedPlan() {
           console.log("🚀 Velocidad seleccionada:", selected);
           router.push("/onboarding-motivation");
         }}
-        style={{ paddingBottom: 30 }}
+        style={layout.bottomButtonContainer}
       />
+
     </View>
   );
 }

@@ -60,41 +60,43 @@ export default function OnboardingPuffs() {
   }));
 
   return (
-    <View style={layout.containerWithLoadingBar}>
-      <OnboardingHeader step={5} total={11} />
+    <View style={layout.screenContainer}>
+      <View >
+        <OnboardingHeader step={5} total={11} />
 
       <View style={layout.content}>
-        <TitleBlock
-          title="¿Cuántos puffs consumís por día?"
-          subtitle="No tiene que ser exacto. Si en los primeros días notamos que el límite es muy bajo, lo ajustamos sin problema."
-        />
+          <TitleBlock
+            title="¿Cuántos puffs consumís por día?"
+            subtitle="No tiene que ser exacto. Si en los primeros días notamos que el límite es muy bajo, lo ajustamos sin problema."
+          />
 
-        {/* Slider */}
-        <Slider
-          style={styles.slider}
-          value={value}
-          onValueChange={setValue}
-          minimumValue={0}
-          maximumValue={400}
-          step={1}
-          minimumTrackTintColor={Colors.light.primary}
-          maximumTrackTintColor="#CFCBFF"
-          thumbTintColor={Colors.light.primary}
-        />
+          {/* Slider */}
+          <Slider
+            style={styles.slider}
+            value={value}
+            onValueChange={setValue}
+            minimumValue={0}
+            maximumValue={400}
+            step={1}
+            minimumTrackTintColor={Colors.light.primary}
+            maximumTrackTintColor="#CFCBFF"
+            thumbTintColor={Colors.light.primary}
+          />
 
-        {/* Counter animado */}
-        <AnimatedTextInput
-          style={styles.input}
-          editable={false}
-          animatedProps={animatedProps}
-        />
+          {/* Counter animado */}
+          <AnimatedTextInput
+            style={styles.input}
+            editable={false}
+            animatedProps={animatedProps}
+          />
 
-        {/* 🔥 Label animado */}
-        <Animated.View style={labelStyle}>
-          <AppText weight="semibold" style={styles.classification}>
-            {addiction}
-          </AppText>
-        </Animated.View>
+          {/* 🔥 Label animado */}
+          <Animated.View style={labelStyle}>
+            <AppText weight="semibold" style={styles.classification}>
+              {addiction}
+            </AppText>
+          </Animated.View>
+        </View>
       </View>
 
       <ContinueButton
@@ -105,7 +107,7 @@ export default function OnboardingPuffs() {
           console.log("Puffs guardados en provider:", value);   // 👈 prueba
           router.push("/onboarding-money-spent");
         }}
-        style={{ paddingBottom: 30 }}
+        
       />
 
     </View>

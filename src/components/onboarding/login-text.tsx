@@ -1,14 +1,14 @@
 import { router } from "expo-router";
-import { layout } from "../../../src/styles/layout";
+import { components } from "../../../src/styles/components";
 import AppText from "../app-text";
 
 export default function LoginText(){
   return(
-    <AppText style={layout.footer}>
+    <AppText style={components.footer}>
           ¿Ya tienes cuenta?{" "}
           <AppText
           weight="extrabold"
-          style={layout.link}
+          style={components.link}
           onPress={() => router.push("/(auth)/login")}
           >
           Ingresar

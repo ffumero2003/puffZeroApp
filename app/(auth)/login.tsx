@@ -1,14 +1,14 @@
 import SeparatorRow from "@/src/components/onboarding/separator-row";
+import { layout } from "@/src/styles/layout";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, Keyboard, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Alert, Keyboard, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import AppText from "../../src/components/app-text";
 import AuthHeader from "../../src/components/auth/auth-header";
-import ContinueButton from "../../src/components/onboarding/continue-button";
+import ContinueButtonAuth from "../../src/components/auth/continueButtonAuth";
 import GoogleButton from "../../src/components/onboarding/google-button";
 import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
 import UnderlineInput from "../../src/components/onboarding/underline-input";
-import { Colors } from "../../src/constants/theme";
 import { useAuth } from "../../src/providers/auth-provider";
 
 export default function Login() {
@@ -30,7 +30,7 @@ export default function Login() {
       return;
     }
 
-    router.replace("/login-success"); // o la vista real de home que usás
+    router.replace("/home"); // o la vista real de home que usás
   }
 
 
@@ -67,8 +67,8 @@ export default function Login() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
-        <OnboardingHeader showProgress={false} style={{ marginBottom: 20 }} />
+      <View style={layout.containerAuth}>
+        <OnboardingHeader showProgress={false} style={{ marginBottom: 30 }} />
 
         <AuthHeader
           title="Iniciar Sesión"
@@ -84,7 +84,7 @@ export default function Login() {
           keyboardType="email-address"
         />
         {emailError ? (
-          <AppText style={styles.errorText} weight="extrabold">
+          <AppText style={layout.errorText} weight="extrabold">
             {emailError}
           </AppText>
         ) : null}
@@ -98,7 +98,7 @@ export default function Login() {
           secureTextEntry
         />
         {passwordError ? (
-          <AppText style={styles.errorText} weight="extrabold">
+          <AppText style={layout.errorText} weight="extrabold">
             {passwordError}
           </AppText>
         ) : null}
@@ -106,30 +106,31 @@ export default function Login() {
         {/* Forgot Password */}
         <TouchableOpacity
           onPress={() => router.push("/(auth)/forgot-password")}
-          style={styles.forgotContainer}
+          style={layout.forgotContainer}
         >
-          <AppText weight="bold" style={styles.forgotLink}>
+          <AppText weight="bold" style={ layout.forgotLink }>
             Recuperar
           </AppText>
         </TouchableOpacity>
 
-        <ContinueButton
+        <ContinueButtonAuth
           text="Iniciar Sesión"
           onPress={handleLogin}
           disabled={isInvalid}
         />
+        
 
 
         <SeparatorRow />
 
         <GoogleButton />
 
-        <View style={styles.bottomContainer}>
-          <AppText style={styles.text}>
+        <View style={layout.bottomContainer}>
+          <AppText style={layout.text}>
             Al iniciar sesión, confirmás que leíste y aceptás la{" "}
             <AppText
               weight="bold"
-              style={styles.link}
+              style={layout.linkLogin}
               onPress={() => router.push("/privacy-policy")}
             >
               Política de Privacidad
@@ -137,7 +138,7 @@ export default function Login() {
             y los{" "}
             <AppText
               weight="bold"
-              style={styles.link}
+              style={layout.linkLogin}
               onPress={() => router.push("/terms-of-use")}
             >
               Términos de Uso
@@ -152,45 +153,4 @@ export default function Login() {
 
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-    paddingHorizontal: 24,
-    paddingTop: 20,
-  },
 
-  forgotContainer: {
-    marginTop: 10,
-    alignSelf: "flex-start",
-  },
-
-  forgotLink: {
-    color: Colors.light.primary,
-    fontSize: 18,
-  },
-
-  errorText: {
-    color: Colors.light.danger,
-    fontSize: 16,
-    marginTop: 4,
-    marginLeft: 4,
-  },
-  bottomContainer: {
-    flex: 1,
-    justifyContent: "flex-end",
-    marginBottom: 30, // ajustá según tu diseño
-  },
-
-  text: {
-    textAlign: "center",
-    fontSize: 14,
-    color: Colors.light.textMuted,
-    lineHeight: 20,
-  },
-
-  link: {
-    color: Colors.light.primary,
-  },
-
-});

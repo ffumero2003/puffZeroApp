@@ -37,20 +37,26 @@ function RootNavigation() {
     if (isLoading) return;
 
     const group = segments[0];
+    const firstSegment = segments[segments.length - 1];
+
     const inAuth = group === "(auth)";
     const inOnboarding = group === "(onboarding)";
     const inApp = group === "(app)";
 
+    const isPublic = ["privacy-policy", "terms-of-use", "reset-password"].includes(
+      firstSegment ?? ""
+    );
+
     if (!user) {
-      if (!inOnboarding && !inAuth) {
-        router.replace("/(onboarding)/onboarding");
+      if (!inAuth && !isPublic) {
+        router.replace("/(auth)/login");
       }
       return;
     }
 
     if (!onboardingCompleted) {
       if (!inOnboarding) {
-        router.replace("/(onboarding)/post-signup/step1");
+        router.replace("/(onboarding)/onboarding");
       }
       return;
     }

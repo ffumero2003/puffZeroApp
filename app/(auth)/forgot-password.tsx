@@ -1,18 +1,18 @@
-import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
   Keyboard,
-  StyleSheet,
-  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
   TouchableWithoutFeedback,
   View
 } from "react-native";
 import AppText from "../../src/components/app-text";
-import KeepGoingButton from "../../src/components/onboarding/keep-going-button";
+import ContinueButton from "../../src/components/onboarding/continue-button";
+import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
 import UnderlineInput from "../../src/components/onboarding/underline-input";
-import { Colors } from "../../src/constants/theme";
 import { resetPassword } from "../../src/services/auth-services";
+import { layout } from "../../src/styles/layout";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -64,79 +64,56 @@ export default function ForgotPassword() {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
-        
-        {/* Back Button */}
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name="arrow-back-outline" size={28} color={Colors.light.text} />
-        </TouchableOpacity>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={layout.screenContainer}>
+          <View>
+            {/* 🚫 Header sin back ni progress, solo espacio */}
+            <OnboardingHeader step={0} total={11} showBack={true} showProgress={false} />
 
-        {/* Title */}
-        <AppText weight="bold" style={styles.title}>
-          ¿Olvidaste tu contraseña?
-        </AppText>
+            {/* 🔵 TÍTULO */}
+            <View style={layout.content}>
+              <AppText weight="bold" style={layout.title}>
+                ¿Olvidaste tu contraseña?
+              </AppText>
 
-        {/* Subtitle */}
-        <AppText style={styles.subtitle}>
-          Ingresá tu correo y te enviaremos un enlace{"\n"}para restablecerla.
-        </AppText>
+              <AppText style={layout.subtitle}>
+                Ingresá tu correo y te enviaremos un enlace para restablecerla.
+              </AppText>
+            </View>
 
-        {/* Email Input */}
-        <UnderlineInput
-          placeholder="Correo"
-          value={email}
-          onChangeText={validateEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
+            {/* 🟣 INPUT */}
+            <UnderlineInput
+              placeholder="Correo"
+              value={email}
+              onChangeText={validateEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
 
-        {/* Error Text */}
-        {emailError ? (
-          <AppText style={styles.errorText} weight="extrabold">{emailError}</AppText>
-        ) : null}
+            {/* 🔥 ERROR */}
+            {emailError ? (
+              <AppText style={layout.errorText} weight="extrabold">
+                {emailError}
+              </AppText>
+            ) : null}
+          </View>
 
-        {/* Button */}
-        <View style={{ marginTop: "auto", marginBottom: 40 }}>
-          <KeepGoingButton
+          {/* 🟢 BOTÓN ABAJO */}
+          <ContinueButton
             text={loading ? "Enviando..." : "Restablecer contraseña"}
             onPress={handleReset}
+            disabled={loading}
+            style={layout.bottomButtonContainer}
           />
+
         </View>
-      </View>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
+
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-    paddingHorizontal: 24,
-    paddingTop: 50,
-  },
-
-  backBtn: {
-    marginBottom: 20,
-  },
-
-  title: {
-    fontSize: 32,
-    color: Colors.light.text,
-    marginBottom: 10,
-  },
-
-  subtitle: {
-    fontSize: 16,
-    color: Colors.light.textMuted,
-    marginBottom: 30,
-    lineHeight: 22,
-  },
-
-  errorText: {
-    color: Colors.light.danger,
-    fontSize: 16,
-    marginTop: 4,
-    marginLeft: 4,
-  },
-});

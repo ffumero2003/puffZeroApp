@@ -1,5 +1,5 @@
-import { StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
-import { Colors } from "../../constants/theme";
+import { TouchableOpacity, ViewStyle } from "react-native";
+import { components } from "../../../src/styles/components";
 import AppText from "../app-text";
 
 interface Props {
@@ -12,29 +12,14 @@ export default function KeepGoingButton({ text, onPress, style }: Props) {
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={[styles.button, style]}
+      style={[components.button, style]}
       activeOpacity={0.7}
     >
-      <AppText weight="bold" style={styles.buttonText}>
+      <AppText weight="bold" style={components.buttonText}>
         {text}
       </AppText>
     </TouchableOpacity>
   );
 }
 
-const styles = StyleSheet.create({
-  button: {
-    marginTop: 30,
-    backgroundColor: Colors.light.primary,
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 20,
-    width: "100%",
-    
-  },
-  buttonText: {
-    textAlign: "center",
-    fontSize: 22,
-    color: "#fff",
-  },
-});
+
