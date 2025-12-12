@@ -218,7 +218,7 @@ export const layout = StyleSheet.create({
       color: Colors.light.text,
       fontWeight: "bold",
       marginTop: 20,
-      marginBottom: 6,
+      marginBottom: 8,
     },
     subsectionTitle: {
       fontSize: 16,

@@ -123,7 +123,7 @@ export default function Login() {
 
         <SeparatorRow />
 
-        <GoogleButton />
+        <GoogleButton mode="login"/>
 
         <View style={layout.bottomContainer}>
           <AppText style={layout.text}>

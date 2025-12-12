@@ -51,7 +51,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [initializing, setInitializing] = useState(true);
   const [loading, setLoading] = useState(false); // loading de acciones (signin/signup)
   const [authInProgress, setAuthInProgress] = useState(false);
-  const [authFlow, setAuthFlow] = useState<"login" | "register" | null>(null);
+  const [authFlow, setAuthFlow] =
+  useState<"login" | "register" | null>(null);
+
 
 
   // 🔥 Auto-login + recuperación de sesión
@@ -111,6 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             event === "TOKEN_REFRESHED"
           ) {
             setAuthInProgress(false);
+            setAuthFlow(null)
           }
         }
       );

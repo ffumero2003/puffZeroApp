@@ -16,19 +16,19 @@ export default function NotificationsStep() {
       const { status } = await Notifications.requestPermissionsAsync();
 
       // status puede ser: "granted", "denied", "undetermined"
-      console.log("Notification status:", status);
+      // console.log("Notification status:", status);
 
       // Independientemente del resultado → ir a step2
-      router.push("/(onboarding)/post-signup/step2");
+      router.push("/(onboarding)/post-signup/step-percentage");
     } catch (err) {
-      console.log("Error requesting notifications:", err);
-      router.push("/(onboarding)/post-signup/step2");
+      // console.log("Error requesting notifications:", err);
+      router.push("/(onboarding)/post-signup/step-percentage");
     }
   }, []);
 
   // 👉 "Don't Allow" (NO se pide permiso)
   const skipPermission = () => {
-    router.push("/(onboarding)/post-signup/step2");
+    router.push("/(onboarding)/post-signup/step-percentage");
   };
 
   return (
@@ -134,29 +134,36 @@ export default function NotificationsStep() {
     },
 
     mockCard: {
-      backgroundColor: "#fff",
-      borderRadius: 16,
-      padding: 20,
-      width: "92%",
+      backgroundColor: "#FFFFFF",
+      borderRadius: 26,
+      padding: 32,
+      width: "96%",
       alignSelf: "center",
+      marginVertical: 28,
+
+      borderWidth: 1,
+      borderColor: "rgba(0,0,0,0.08)",
 
       shadowColor: "#000",
-      shadowOpacity: 0.08,
-      shadowRadius: 10,
-      shadowOffset: { width: 0, height: 3 },
-      elevation: 3,
+      shadowOpacity: 0.18,
+      shadowRadius: 24,
+      shadowOffset: { width: 0, height: 14 },
+
+      elevation: 14,
     },
+  
+
 
     appName: {
-      fontSize: 16,
+      fontSize: 18,
       marginBottom: 8,
       color: Colors.light.text,
     },
 
     mockDescription: {
-      fontSize: 14,
+      fontSize: 16,
       color: Colors.light.textSecondary,
-      lineHeight: 18,
+      lineHeight: 22,
       marginBottom: 20,
     },
 
@@ -165,12 +172,13 @@ export default function NotificationsStep() {
       justifyContent: "space-between",
     },
 
-    btnOption: {
-      paddingVertical: 10,
+   btnOption: {
+      paddingVertical: 12,
       paddingHorizontal: 18,
-      borderRadius: 10,
+      borderRadius: 14,
       width: "48%",
       alignItems: "center",
+      backgroundColor: "#E5E0FF",
     },
 
     btnText: {
@@ -178,12 +186,14 @@ export default function NotificationsStep() {
       
     },
 
+    
     btnOptionAllow: {
-      paddingVertical: 10,
+      paddingVertical: 12,
       paddingHorizontal: 18,
-      borderRadius: 0,
+      
       width: "48%",
       alignItems: "center",
+      backgroundColor: Colors.light.primary,
     },
 
     btnTextAllow: {

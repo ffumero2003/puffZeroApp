@@ -70,8 +70,8 @@ export default function Register() {
 
     // 2) Crear perfil en Supabase con datos reales del onboarding
     const { error: profileError } = await createProfile({
-      user_id,
-      full_name: nombre,
+      user_id,              // ✅ YA EXISTE
+      full_name: nombre,    // ✅ nombre → full_name
       puffs_per_day,
       money_per_month,
       currency,
@@ -85,6 +85,7 @@ export default function Register() {
       Alert.alert("Error creando perfil", profileError.message);
       return;
     }
+
 
     // 3) Limpiar estado del onboarding
     resetAll();
@@ -291,7 +292,7 @@ export default function Register() {
 
           <SeparatorRow />
 
-          <GoogleButton />
+          <GoogleButton mode="register"/>
 
         </ScrollView>
       </View>

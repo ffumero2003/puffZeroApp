@@ -1,7 +1,8 @@
 export const DEV_MODE = false;
 
 // Pantalla a la que querés entrar DIRECTO
-export const DEV_SCREEN = "/login";
+export const DEV_SCREEN = "/(onboarding)/post-signup/step-personalized-plan";
+
 
 // Opciones: 
 // "/(onboarding)/post-signup/step1"

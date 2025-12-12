@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { ActivityIndicator, TouchableOpacity } from "react-native";
 
@@ -7,18 +8,22 @@ import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../providers/auth-provider";
 import AppText from "../app-text";
 
-export default function GoogleButton() {
-  const { authInProgress, setAuthInProgress } = useAuth();
+type GoogleButtonProps = {
+  mode: "login" | "register";
+};
+
+export default function GoogleButton({ mode }: GoogleButtonProps) {
+  const { authInProgress, setAuthInProgress, setAuthFlow } = useAuth();
 
   const signInWithGoogle = async () => {
     if (authInProgress) return;
 
+    setAuthFlow(mode);          // 🔥 CLAVE
     setAuthInProgress(true);
 
-    const redirectTo = "puffzero://auth/callback"; // solo para cerrar browser
+    const redirectTo = "puffzero://auth/callback";
 
     try {
-
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -38,13 +43,11 @@ export default function GoogleButton() {
         redirectTo
       );
 
-
       if (result.type !== "success" || !result.url) {
         setAuthInProgress(false);
         return;
       }
 
-      // 🔥 EXTRAER TOKENS DEL HASH
       const hash = new URL(result.url).hash;
 
       const access_token = hash.match(/access_token=([^&]+)/)?.[1];
@@ -54,7 +57,6 @@ export default function GoogleButton() {
         throw new Error("Tokens no encontrados");
       }
 
-      // 🔥 SETEAR SESIÓN
       const { error: sessionError } = await supabase.auth.setSession({
         access_token,
         refresh_token,
@@ -62,9 +64,13 @@ export default function GoogleButton() {
 
       if (sessionError) throw sessionError;
 
+      // 🔥 NAVEGACIÓN EXPLÍCITA SEGÚN CONTEXTO
+      if (mode === "register") {
+        router.replace("/(onboarding)/post-signup/step-review");
+      } else {
+        router.replace("/(app)/home");
+      }
 
-      // ❗ NO navegás acá
-      // _layout.tsx decide
     } catch (err) {
       console.error("❌ Google OAuth error:", err);
       setAuthInProgress(false);
