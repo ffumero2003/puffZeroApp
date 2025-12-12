@@ -18,7 +18,6 @@ export default function GoogleButton() {
     const redirectTo = "puffzero://auth/callback"; // solo para cerrar browser
 
     try {
-      console.log("🚀 Iniciando Google OAuth");
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -39,7 +38,6 @@ export default function GoogleButton() {
         redirectTo
       );
 
-      console.log("🌐 OAuth browser result:", result);
 
       if (result.type !== "success" || !result.url) {
         setAuthInProgress(false);
@@ -64,7 +62,6 @@ export default function GoogleButton() {
 
       if (sessionError) throw sessionError;
 
-      console.log("🔥 Sesión establecida correctamente");
 
       // ❗ NO navegás acá
       // _layout.tsx decide

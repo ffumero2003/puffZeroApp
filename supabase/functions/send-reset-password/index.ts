@@ -43,10 +43,9 @@ serve(async (req: Request): Promise<Response> => {
     });
 
 
-    // console.log("GENERATED LINK DATA:", JSON.stringify(data, null, 2));
 
     if (error) {
-      // console.log("GENERATE LINK ERROR:", error);
+
       return new Response(JSON.stringify({ error: error.message }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
@@ -67,7 +66,7 @@ serve(async (req: Request): Promise<Response> => {
         url.searchParams.get("token_hash");
     }
 
-    // console.log("TOKEN FINAL:", token);
+   
 
     if (!token) {
       return new Response(JSON.stringify({ error: "Token not found" }), {
@@ -93,7 +92,6 @@ serve(async (req: Request): Promise<Response> => {
 
     const resend = new Resend(resendApiKey);
 
-    // console.log("SENDING EMAIL...");
 
     try {
       const result = await resend.emails.send({
@@ -168,7 +166,6 @@ serve(async (req: Request): Promise<Response> => {
     });
 
 
-      // console.log("EMAIL SENT RESULT:", JSON.stringify(result, null, 2));
     } catch (err) {
       // console.log("EMAIL SEND ERROR:", err);
     }

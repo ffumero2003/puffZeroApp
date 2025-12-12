@@ -61,7 +61,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   //       data: { session },
   //     } = await supabase.auth.getSession();
 
-  //     console.log("🔥 SESSION INICIAL:", session);
 
   //     setSession(session);
   //     setUser(session?.user ?? null);
@@ -73,8 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   //   // 🔥 Escuchar cambios de sesión (login, logout, recovery)
   //   const { data: subscription } = supabase.auth.onAuthStateChange(
   //     (event, session) => {
-  //       console.log("🔥 AUTH EVENT:", event);
-  //       console.log("🔥 NUEVA SESION:", session);
+  //      
 
   //       setSession(session);
   //       setUser(session?.user ?? null);
@@ -90,7 +88,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           data: { session },
         } = await supabase.auth.getSession();
 
-        console.log("🔥 SESSION INICIAL:", session);
 
         // ⚡ Sesión real
         setSession(session);
@@ -104,8 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // 🔥 Escuchar cambios de sesión
       const { data: subscription } = supabase.auth.onAuthStateChange(
         (event, session) => {
-          console.log("🔥 AUTH EVENT:", event);
-          console.log("🔥 NUEVA SESION:", session);
+         
 
           setSession(session);
           setUser(session?.user ?? null);
