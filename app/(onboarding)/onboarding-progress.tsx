@@ -1,4 +1,6 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
+import { useEffect, useState } from "react";
 import { Image, View } from "react-native";
 import AppText from "../../src/components/app-text";
 import ContinueButton from "../../src/components/onboarding/continue-button";
@@ -6,9 +8,23 @@ import LoginText from "../../src/components/onboarding/login-text";
 import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
 import { layout } from "../../src/styles/layout";
 
+
 import ProgressScreen from "../../assets/images/onboarding/onboarding-progress-page.png";
 
 export default function OnboardingProgress() {
+  const [showLogin, setShowLogin] = useState(false);
+
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      const hasSeen = await AsyncStorage.getItem("hasSeenOnboarding");
+      if (hasSeen === "true") {
+        setShowLogin(true);
+      }
+    };
+
+    checkOnboarding();
+  }, []);
+
   return (
     <View style={layout.screenContainer}>
 
@@ -34,7 +50,7 @@ export default function OnboardingProgress() {
           style={layout.bottomButtonContainer}
         />
 
-        <LoginText />
+        {showLogin && <LoginText />}
       </View>
 
     </View>

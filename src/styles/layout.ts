@@ -142,7 +142,7 @@ export const layout = StyleSheet.create({
   },
   bigImage: {
     width: "100%",
-    height: 430,
+    height: 480,
   },
 
 
@@ -277,6 +277,12 @@ export const layout = StyleSheet.create({
     height: 200,   // ajustá según tu imagen real
     marginBottom: 20,
   },
+
+  bottomButtonContainer: {
+      width: "100%",
+      paddingBottom: 25,
+      justifyContent: "flex-end",
+    },
 
   });
 

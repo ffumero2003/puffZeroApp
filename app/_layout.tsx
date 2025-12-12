@@ -8,7 +8,6 @@ import {
   useFonts,
 } from "@expo-google-fonts/manrope";
 
-import * as Linking from "expo-linking";
 import { Stack, router, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as WebBrowser from "expo-web-browser";
@@ -22,8 +21,8 @@ import Splash from "../src/screens/splash";
 WebBrowser.maybeCompleteAuthSession();
 
 function RootNavigation() {
-  const { user, initializing } = useAuth();
-  const { onboardingCompleted, loading } = useOnboarding();
+  const { user, initializing, authInProgress, authFlow } = useAuth();
+  const { loading } = useOnboarding();
   const segments = useSegments();
 
   // 🟣 Importar DEV_MODE
@@ -31,77 +30,28 @@ function RootNavigation() {
 
   const isLoading = initializing || loading;
 
-  useEffect(() => {
-    console.log("📡 RootNavigation mounted — setting up deep link listener…");
-
-    // 🔗 Escuchar deep links mientras la app está abierta
-    const sub = Linking.addEventListener("url", ({ url }) => {
-      console.log("🔗 Deep link received:", url);
-
-      if (url.startsWith("puffzero://auth/callback")) {
-        console.log("🚀 Navigating to /auth/callback (live listener)");
-        router.replace("/(auth)/callback");
-      }
-    });
-
-    // 🔍 Revisar si la app se abrió inicialmente por un deep link
-    const checkInitialUrl = async () => {
-      const initial = await Linking.getInitialURL();
-      if (initial) {
-        console.log("🔗 Initial URL:", initial);
-
-        if (initial.startsWith("puffzero://auth/callback")) {
-          console.log("🚀 Navigating to /auth/callback (initial URL)");
-          router.replace("/(auth)/callback");
-        }
-      }
-    };
-    checkInitialUrl();
-
-    return () => sub.remove();
-  }, []);
 
   // ---------------------------------------
   // 🔥 Lógica de navegación existente
   // ---------------------------------------
   useEffect(() => {
-    // 🚀 BYPASS ABSOLUTO — si estoy en dev, voy directo a una pantalla
-    if (DEV_MODE) {
-      router.replace(DEV_SCREEN);
-      return;
-    }
+    if (authInProgress || isLoading) return;
 
-    if (isLoading) return;
-
-    const group = segments[0];
-    const firstSegment = segments[segments.length - 1];
-
-    const inAuth = group === "(auth)";
-    const inOnboarding = group === "(onboarding)";
-    const inApp = group === "(app)";
-
-    const isPublic = ["privacy-policy", "terms-of-use", "reset-password"].includes(
-      firstSegment ?? ""
-    );
-
+    // ❌ No hay sesión → onboarding
     if (!user) {
-      if (!inAuth && !isPublic) {
-        router.replace("/(auth)/login");
-      }
+      router.replace("/(onboarding)/onboarding");
       return;
     }
 
-    if (!onboardingCompleted) {
-      if (!inOnboarding) {
-        router.replace("/(onboarding)/onboarding");
-      }
-      return;
-    }
+    // ✅ Hay sesión → home
+    router.replace("/(app)/home");
+  }, [isLoading, user]);
 
-    if (!inApp) {
-      router.replace("/(app)/home");
-    }
-  }, [isLoading, user, onboardingCompleted, segments]);
+
+
+
+
+
 
   if (isLoading && !DEV_MODE) return <Splash />;
 

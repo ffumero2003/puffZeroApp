@@ -1,4 +1,6 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
+import { useEffect, useState } from "react";
 import { Image, View } from "react-native";
 
 import AppText from "../../src/components/app-text";
@@ -10,9 +12,21 @@ import { layout } from "../../src/styles/layout";
 import MoneySaved from "../../assets/images/onboarding/onboarding-money-saved.png";
 
 export default function OnboardingMoneySaved() {
+  const [showLogin, setShowLogin] = useState(false);
+
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      const hasSeen = await AsyncStorage.getItem("hasSeenOnboarding");
+      if (hasSeen === "true") {
+        setShowLogin(true);
+      }
+    };
+
+    checkOnboarding();
+  }, []);
+
   return (
     <View style={layout.screenContainer}>
-
       {/* 🔵 GROUP 1 — Header + Imagen + Título */}
       <View>
         <OnboardingHeader step={3} total={11} />
@@ -38,9 +52,8 @@ export default function OnboardingMoneySaved() {
           style={layout.bottomButtonContainer}
         />
 
-        <LoginText />
+        {showLogin && <LoginText />}
       </View>
-
     </View>
   );
 }

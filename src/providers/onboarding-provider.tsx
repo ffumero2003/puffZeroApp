@@ -55,16 +55,20 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         const stored = await AsyncStorage.getItem("onboardingCompleted");
         let completed = stored === "true";
 
+       
+        // 🔥 SIMULACIÓN DE ESTADO (DEBUG CONTROLADO)
         // -------------------------------------
-        // 🔥 DEBUG: Forzar estados
-        // -------------------------------------
-        if (DEBUG.forceOnboardingCompleted !== null) {
-          console.log(
-            "⚠️ DEBUG: Forzando onboardingCompleted =",
-            DEBUG.forceOnboardingCompleted
-          );
-          completed = DEBUG.forceOnboardingCompleted;
+        if (DEBUG.simulateUserState === "NEW") {
+          completed = false;
         }
+
+        if (DEBUG.simulateUserState === "LOGGED") {
+          completed = true;
+        }
+
+        // REAL → usar AsyncStorage real
+
+
 
         setOnboardingCompleted(completed);
         setLoading(false);
