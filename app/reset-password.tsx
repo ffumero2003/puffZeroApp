@@ -1,5 +1,6 @@
 import { layout } from "@/src/styles/layout";
-import { router, useLocalSearchParams } from "expo-router";
+import * as Linking from "expo-linking";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Alert,
@@ -17,40 +18,50 @@ import UnderlineInput from "../src/components/onboarding/underline-input";
 import { supabase } from "../src/lib/supabase";
 
 export default function ResetPasswordScreen() {
-  const { token: rawToken } = useLocalSearchParams();
-  const token = Array.isArray(rawToken) ? rawToken[0] : rawToken;
-
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  /* 🔥 Activar sesión de recuperación */
   useEffect(() => {
-    const activateRecovery = async () => {
-      if (!token) return;
+    const init = async () => {
+      const url = await Linking.getInitialURL();
+      console.log("🔗 INITIAL URL:", url);
+
+      if (!url) {
+        Alert.alert(
+          "Enlace inválido",
+          "Pedí un nuevo correo para restablecer tu contraseña."
+        );
+        return;
+      }
+
+      const parsed = Linking.parse(url);
+      console.log("🧩 Parsed URL:", parsed);
+
+      const access_token = parsed.queryParams?.access_token;
+      const refresh_token = parsed.queryParams?.refresh_token;
+
+      if (!access_token || !refresh_token) {
+        Alert.alert("Error", "Tokens no encontrados.");
+        return;
+      }
 
       const { error } = await supabase.auth.setSession({
-        access_token: token,
-        refresh_token: token,
+        access_token,
+        refresh_token,
       });
 
       if (error) {
-        console.log("Error al activar sesión de recuperación:", error);
+        Alert.alert("Error", "El enlace expiró o ya fue usado.");
       } else {
-        console.log("Sesión de recuperación activada.");
+        console.log("✅ Recovery session activa");
       }
     };
 
-    activateRecovery();
-  }, [token]);
+    init();
+  }, []);
 
-  /* 🔥 Manejo de submit */
   const handleSubmit = async () => {
-    if (!token) {
-      Alert.alert("Error", "Token inválido.");
-      return;
-    }
-
     if (!password || !confirm) {
       Alert.alert("Error", "Completá ambos campos.");
       return;
@@ -62,9 +73,7 @@ export default function ResetPasswordScreen() {
     }
 
     setLoading(true);
-
     const { error } = await supabase.auth.updateUser({ password });
-
     setLoading(false);
 
     if (error) {
@@ -83,8 +92,6 @@ export default function ResetPasswordScreen() {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={layout.screenContainer}>
-
-          {/* 🔵 HEADER SOLO PARA ESPACIO (sin back, sin progress) */}
           <OnboardingHeader
             step={0}
             total={11}
@@ -92,12 +99,10 @@ export default function ResetPasswordScreen() {
             showProgress={false}
           />
 
-          {/* 🔵 TÍTULO */}
           <AppText weight="bold" style={layout.title}>
             Crear nueva contraseña
           </AppText>
 
-          {/* 🟣 INPUTS */}
           <View style={{ width: "100%", marginTop: 30 }}>
             <UnderlineInput
               placeholder="Nueva contraseña"
@@ -115,7 +120,6 @@ export default function ResetPasswordScreen() {
             />
           </View>
 
-          {/* 🟢 BOTÓN ABAJO (sube con teclado) */}
           <View style={{ width: "100%", marginTop: "auto" }}>
             <ContinueButton
               text={loading ? "Actualizando..." : "Actualizar contraseña"}
@@ -124,10 +128,8 @@ export default function ResetPasswordScreen() {
               style={layout.bottomButtonContainer}
             />
           </View>
-
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
-
 }

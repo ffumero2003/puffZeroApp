@@ -1,17 +1,24 @@
 /// <reference types="jsr:@supabase/functions-js/edge-runtime.d.ts" />
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-interface ResetRequest {
-  email: string;
-}
-
 serve(async (req: Request): Promise<Response> => {
+  // 🔐 SEGURIDAD MÍNIMA (OBLIGATORIA)
+  const internalKey = req.headers.get("x-internal-key");
+  if (internalKey !== Deno.env.get("INTERNAL_SECRET")) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  console.log("🔥 Function hit");
+
   try {
-    const { email } = (await req.json()) as ResetRequest;
+    console.log("➡️ Headers:", Object.fromEntries(req.headers.entries()));
+
+    const body = await req.json();
+    console.log("➡️ Body:", body);
+
+    const { email } = body;
 
     if (!email) {
       return new Response(JSON.stringify({ error: "Email is required" }), {
@@ -20,166 +27,82 @@ serve(async (req: Request): Promise<Response> => {
       });
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    // 🔑 ENV VARS
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
-    if (!supabaseUrl || !serviceRoleKey) {
-      return new Response(
-        JSON.stringify({
-          error: "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY",
-        }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    const supabase = createClient(supabaseUrl, serviceRoleKey);
-
-    const { data, error } = await supabase.auth.admin.generateLink({
-      type: "recovery",
-      email,
-      options: {
-        redirectTo: "puffzero://reset-password",
-      },
-    });
-
-
-
-    if (error) {
-
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    const props = data?.properties;
-
-    let token =
-      props?.recovery_token ??
-      props?.hashed_token ??
-      null;
-
-    if (!token && props?.action_link) {
-      const url = new URL(props.action_link);
-      token =
-        url.searchParams.get("token") ??
-        url.searchParams.get("token_hash");
-    }
-
-   
-
-    if (!token) {
-      return new Response(JSON.stringify({ error: "Token not found" }), {
+    if (!SUPABASE_URL || !SERVICE_ROLE_KEY || !RESEND_API_KEY) {
+      return new Response(JSON.stringify({ error: "Missing env vars" }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    const deepLink = `https://cdn.puffzero.lat/reset.html?token=${token}`;
+    const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
+    // 🔄 GENERAR LINK DE RECOVERY
+    const { data, error } = await supabase.auth.admin.generateLink({
+      type: "recovery",
+      email,
+      options: {
+        redirectTo: "https://reset.puffzero.lat",
+      },
+    });
 
-    // ------------------------------
-    // SEND EMAIL (WITH LOGS)
-    // ------------------------------
-
-    const resendApiKey = Deno.env.get("RESEND_API_KEY");
-    if (!resendApiKey) {
-      return new Response(
-        JSON.stringify({ error: "Missing RESEND_API_KEY" }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
+    if (error || !data?.properties?.action_link) {
+      return new Response(JSON.stringify({ error: "Failed to generate link" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
-    const resend = new Resend(resendApiKey);
+    const actionLink = data.properties.action_link;
+    console.log("🔗 Action link:", actionLink);
 
+    // 📨 ENVIAR EMAIL CON RESEND
+    const resend = new Resend(RESEND_API_KEY);
 
-    try {
-      const result = await resend.emails.send({
+    const emailResult = await resend.emails.send({
       from: "Soporte PuffZero <soporte@puffzero.lat>",
       to: email,
       subject: "Restablecer tu contraseña",
       html: `
-        <div style="
-          font-family: Arial, sans-serif;
-          max-width: 480px;
-          margin: 0 auto;
-          padding: 24px;
-          background: #F6F3FF;
-          border-radius: 12px;
-        ">
-
-          <!-- LOGO -->
+        <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; background: #F6F3FF; border-radius: 12px;">
           <div style="text-align:center; margin-bottom: 20px;">
-            <img 
-              src="https://cdn.puffzero.lat/logo-puff-zero.png"
-              alt="PuffZero Logo"
-              style="width: 80px; height: auto;"
-            />
+            <img src="https://ifjbatvmxeujewbrfjzg.supabase.co/storage/v1/object/public/assets/logo.png" alt="PuffZero Logo" style="width: 80px;" />
           </div>
 
-          <h2 style="
-            text-align:center;
-            color:#1F2859;
-            font-weight:700;
-            margin-bottom: 16px;
-          ">
-            Restablecer contraseña
-          </h2>
+          <h2 style="text-align:center; color:#1F2859;">Restablecer contraseña</h2>
 
-          <p style="
-            color:#1F2859;
-            font-size:16px;
-            margin-bottom: 24px;
-            text-align:center;
-          ">
+          <p style="color:#1F2859; font-size:16px; text-align:center;">
             Usá el siguiente enlace para crear una nueva contraseña:
           </p>
 
           <div style="text-align:center; margin: 24px 0;">
-            <a 
-              href="${deepLink}"
-              style="
-                background:#5974FF;
-                color:#ffffff;
-                padding:12px 24px;
-                border-radius:8px;
-                text-decoration:none;
-                font-weight:600;
-                display:inline-block;
-              "
-            >
+            <a href="${actionLink}" style="background:#5974FF; color:#ffffff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
               Restablecer contraseña
             </a>
           </div>
 
-          <p style="
-            margin-top: 24px;
-            color:#828DBD;
-            font-size: 14px;
-            text-align:center;
-          ">
+          <p style="margin-top: 24px; color:#828DBD; font-size: 14px; text-align:center;">
             PuffZero — Sigamos adelante, un paso a la vez.
           </p>
-
         </div>
-      `
+      `,
     });
 
-
-    } catch (err) {
-      // console.log("EMAIL SEND ERROR:", err);
-    }
+    console.log("✅ Resend result:", emailResult);
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
 
-  } catch (err: unknown) {
+  } catch (err) {
+    console.error("🔥 CATCH ERROR:", err);
     return new Response(
-      JSON.stringify({
-        error: err instanceof Error ? err.message : "Unknown error",
-      }),
+      JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }

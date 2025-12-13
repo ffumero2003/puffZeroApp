@@ -18,13 +18,19 @@
       "bundleIdentifier": "com.anonymous.puffzero"
     },
     "android": {
-      "package": "com.anonymous.puffzero",
-      "adaptiveIcon": {
-        "backgroundColor": "#F6F3FF",
-        "foregroundImage": "./assets/images/logo-puff-zero-circle.png"
+        "package": "com.anonymous.puffzero",
+        "intentFilters": [
+          {
+            "action": "VIEW",
+            "data": [
+              {
+                "scheme": "puffzero"
+              }
+            ],
+            "category": ["BROWSABLE", "DEFAULT"]
+          }
+        ]
       },
-      "edgeToEdgeEnabled": true
-    },
 
     "web": {
       "output": "static",
