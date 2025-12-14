@@ -34,31 +34,32 @@ function RootNavigation() {
   // ---------------------------------------
   // 🔥 Lógica de navegación existente
   // ---------------------------------------
-  useEffect(() => {
-    if (DEV_MODE) {
-      router.replace(DEV_SCREEN);
-      return;
-    }
-
-    if (authInProgress || isLoading) return;
-
-    const [group] = segments;
-
-    // ❌ Sin sesión → onboarding (solo si no estás ya ahí)
-    if (!user) {
-      if (group !== "(auth)" && group !== "(onboarding)") {
-        router.replace("/(onboarding)/onboarding");
+    useEffect(() => {
+      if (DEV_MODE) {
+        router.replace(DEV_SCREEN);
+        return;
       }
-      return;
-    }
 
-    // ✅ Con sesión → home, SOLO si ya saliste de auth/onboarding
-    if (group === "(auth)" || group === "(onboarding)") {
-      return;
-    }
+      if (authInProgress || isLoading) return;
 
-    router.replace("/(app)/home");
-  }, [authInProgress, isLoading, user, segments]);
+      const [group] = segments;
+
+      // ✅ BYPASS para reset-password (debe funcionar sin sesión)
+      if (group === "reset-password") return;
+
+      if (!user) {
+        if (group !== "(auth)" && group !== "(onboarding)") {
+          router.replace("/(onboarding)/onboarding");
+        }
+        return;
+      }
+
+      if (group === "(auth)" || group === "(onboarding)") {
+        return;
+      }
+
+      router.replace("/(app)/home");
+    }, [authInProgress, isLoading, user, segments]);
 
 
   if (isLoading && !DEV_MODE) return <Splash />;
