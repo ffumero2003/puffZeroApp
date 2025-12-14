@@ -1,16 +1,20 @@
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Image, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 
 import AppText from "../../../src/components/app-text";
 import ContinueButton from "../../../src/components/onboarding/continue-button";
+import OnboardingHeader from "../../../src/components/onboarding/onboarding-header";
 import { Colors } from "../../../src/constants/theme";
 import { layout } from "../../../src/styles/layout";
 
-import { useAuth } from "../../../src/providers/auth-provider";
+import { useOnboarding } from "../../../src/providers/onboarding-provider";
 
 import CheckIcon from "../../../assets/images/onboarding/check-onboarding.png";
-import { supabase } from "../../../src/lib/supabase";
+
+/* -------------------------------
+   Utils
+--------------------------------*/
 
 function getTargetDate(createdAt: string, goalSpeed: number): Date {
   const start = new Date(createdAt);
@@ -27,47 +31,55 @@ function formatDate(date: Date): string {
   });
 }
 
+/* -------------------------------
+   Screen
+--------------------------------*/
 
 export default function StepPersonalizedPlan() {
+  const {
+    goal_speed,
+    profile_created_at,
+    resetAll,
+  } = useOnboarding();
+
   const [targetDate, setTargetDate] = useState<string | null>(null);
-  const { user, initializing } = useAuth();
 
   useEffect(() => {
-    if (initializing || !user) return;
+    // 🛑 GUARD DURO — si algo falta, el flujo está roto
+    if (!goal_speed || !profile_created_at) {
+      console.warn("❌ Datos incompletos para plan personalizado");
+      router.replace("/(onboarding)/post-signup/step-review");
+      return;
+    }
 
-    const loadProfileAndCalculate = async () => {
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .select("created_at, goal_speed")
-        .eq("user_id", user.id)
-        .single();
+    const days = Number(goal_speed);
+    if (Number.isNaN(days)) {
+      console.warn("❌ goal_speed inválido:", goal_speed);
+      router.replace("/(onboarding)/post-signup/step-review");
+      return;
+    }
 
-      if (error || !profile?.created_at || !profile.goal_speed) {
-        console.log("❌ Profile incompleto", error);
-        return;
-      }
-
-      const days = Number(profile.goal_speed);
-      if (Number.isNaN(days)) return;
-
-      const date = getTargetDate(profile.created_at, days);
-      setTargetDate(formatDate(date));
-    };
-
-    loadProfileAndCalculate();
-  }, [initializing, user]);
-
+    const date = getTargetDate(profile_created_at, days);
+    setTargetDate(formatDate(date));
+  }, [goal_speed, profile_created_at]);
 
   return (
     <View style={layout.screenContainer}>
       <View style={layout.content}>
+        <OnboardingHeader
+          step={0}
+          total={11}
+          showBack={false}
+          showProgress={false}
+        />
+
         <Image
           source={CheckIcon}
-          style={layout.headerImage}
+          style={styles.checkImage}
           resizeMode="contain"
         />
 
-        <AppText weight="bold" style={layout.titleCenterNoMargin}>
+        <AppText weight="extrabold" style={layout.titleCenterNoMargin}>
           ¡Felicidades! Tu plan personalizado está listo.
         </AppText>
 
@@ -78,11 +90,7 @@ export default function StepPersonalizedPlan() {
 
           <AppText
             weight="extrabold"
-            style={{
-              color: Colors.light.primary,
-              fontSize: 18,
-              marginTop: 4,
-            }}
+            style={styles.dateText}
           >
             {targetDate ? `📅 ${targetDate}` : "Calculando…"}
           </AppText>
@@ -92,9 +100,29 @@ export default function StepPersonalizedPlan() {
       <ContinueButton
         text="Continuar"
         onPress={() => {
+          // ✅ RESET SOLO AL FINAL REAL
+          resetAll();
           router.push("/(onboarding)/post-signup/step4");
         }}
       />
     </View>
   );
 }
+
+/* -------------------------------
+   Styles
+--------------------------------*/
+
+const styles = StyleSheet.create({
+  checkImage: {
+    width: "100%",
+    height: 150,
+    marginBottom: 30,
+  },
+  dateText: {
+    color: Colors.light.primary,
+    fontSize: 24,
+    marginTop: 4,
+    textAlign: "center"
+  }
+});

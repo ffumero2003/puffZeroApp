@@ -11,6 +11,9 @@ interface OnboardingData {
   why_stopped: string[];
   worries: string[];
 
+  profile_created_at: string | null;
+  setProfileCreatedAt: (d: string) => Promise<void>;
+
   onboardingCompleted: boolean;        // 🔥 NUEVO
   loading: boolean;                    // 🔥 NUEVO
 
@@ -39,6 +42,8 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   const [goal_speed, setGoalSpeedState] = useState<string | null>(null);
   const [why_stopped, setWhyStoppedState] = useState<string[]>([]);
   const [worries, setWorriesState] = useState<string[]>([]);
+  const [profile_created_at, setProfileCreatedAtState] = useState<string | null>(null);
+
 
   // 🔥 Cargar el estado guardado (persistencia)
   // useEffect(() => {
@@ -51,31 +56,32 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   // }, []);
 
     useEffect(() => {
-      const loadFlag = async () => {
-        const stored = await AsyncStorage.getItem("onboardingCompleted");
-        let completed = stored === "true";
+      const loadData = async () => {
+        const storedCompleted = await AsyncStorage.getItem("onboardingCompleted");
+        const storedCreatedAt = await AsyncStorage.getItem("profile_created_at");
 
-       
-        // 🔥 SIMULACIÓN DE ESTADO (DEBUG CONTROLADO)
-        // -------------------------------------
-        if (DEBUG.simulateUserState === "NEW") {
-          completed = false;
+        let completed = storedCompleted === "true";
+
+        if (DEBUG.simulateUserState === "NEW") completed = false;
+        if (DEBUG.simulateUserState === "LOGGED") completed = true;
+
+        if (storedCreatedAt) {
+          setProfileCreatedAtState(storedCreatedAt);
         }
-
-        if (DEBUG.simulateUserState === "LOGGED") {
-          completed = true;
-        }
-
-        // REAL → usar AsyncStorage real
-
-
 
         setOnboardingCompleted(completed);
         setLoading(false);
       };
 
-      loadFlag();
+      loadData();
     }, []);
+
+
+    async function setProfileCreatedAt(d: string) {
+      setProfileCreatedAtState(d);
+      await AsyncStorage.setItem("profile_created_at", d);
+    }
+
 
 
 
@@ -94,8 +100,13 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     setGoalSpeedState(null);
     setWhyStoppedState([]);
     setWorriesState([]);
+    setProfileCreatedAtState(null)
     setOnboardingCompleted(false);
-    AsyncStorage.removeItem("onboardingCompleted");
+    AsyncStorage.multiRemove([
+      "onboardingCompleted",
+      "profile_created_at",
+    ]);
+
   }
 
   return (
@@ -108,6 +119,9 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         goal_speed,
         why_stopped,
         worries,
+
+        profile_created_at,
+        setProfileCreatedAt,
 
         onboardingCompleted,
         loading,

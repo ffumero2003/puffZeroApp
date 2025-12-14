@@ -5,7 +5,7 @@ import {
   Keyboard,
   ScrollView,
   TouchableWithoutFeedback,
-  View
+  View,
 } from "react-native";
 
 import AppText from "../../src/components/app-text";
@@ -16,10 +16,10 @@ import OnboardingHeader from "../../src/components/onboarding/onboarding-header"
 import SeparatorRow from "../../src/components/onboarding/separator-row";
 import UnderlineInput from "../../src/components/onboarding/underline-input";
 
-import { layout } from "@/src/styles/layout";
 import { createProfile } from "../../src/lib/profile";
 import { useAuth } from "../../src/providers/auth-provider";
-import { useOnboarding } from "../../src/providers/onboarding-provider"; // 👈 ESTA es la correcta
+import { useOnboarding } from "../../src/providers/onboarding-provider";
+import { layout } from "../../src/styles/layout";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -29,15 +29,10 @@ export default function Register() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [nombreError, setNombreError] = useState("");
-
   const [confirm, setConfirm] = useState("");
   const [confirmError, setConfirmError] = useState("");
 
-
-  // Supabase Auth
-  const { signUp } = useAuth();
-
-  // 🔥 Onboarding context — SE USA AQUÍ, NO DENTRO DE LA FUNCIÓN
+  // 🔥 UN SOLO hook de onboarding (CORRECTO)
   const {
     puffs_per_day,
     money_per_month,
@@ -46,8 +41,11 @@ export default function Register() {
     goal_speed,
     why_stopped,
     worries,
-    resetAll,
+    setProfileCreatedAt,
   } = useOnboarding();
+
+  // Supabase Auth
+  const { signUp } = useAuth();
 
   // ---------------------------
   //   HANDLE REGISTER
@@ -68,10 +66,10 @@ export default function Register() {
       return;
     }
 
-    // 2) Crear perfil en Supabase con datos reales del onboarding
-    const { error: profileError } = await createProfile({
-      user_id,              // ✅ YA EXISTE
-      full_name: nombre,    // ✅ nombre → full_name
+    // 2) Crear perfil en Supabase
+    const { data: profile, error: profileError } = await createProfile({
+      user_id,
+      full_name: nombre,
       puffs_per_day,
       money_per_month,
       currency,
@@ -86,12 +84,20 @@ export default function Register() {
       return;
     }
 
+    if (!profile?.created_at) {
+      Alert.alert(
+        "Error crítico",
+        "El perfil se creó, pero no se pudo obtener la fecha."
+      );
+      return;
+    }
 
-    // 3) Limpiar estado del onboarding
-    resetAll();
+    // 🔥 Guardar created_at en onboarding store
+    setProfileCreatedAt(profile.created_at);
 
     Alert.alert("Cuenta creada", "Revisá tu correo para confirmar tu cuenta.");
-    // Redirige al paso de review dentro del grupo de onboarding
+
+    // 3) Ir al flujo post-signup
     router.push("/(onboarding)/post-signup/step-review");
   }
 
@@ -101,105 +107,60 @@ export default function Register() {
 
   const validateNombre = (value: string) => {
     setNombre(value);
-
     const trimmed = value.trim();
 
-    if (!trimmed) {
-      setNombreError("Este campo es obligatorio.");
-      return;
-    }
-
-    if (!/^[A-Za-zÁÉÍÓÚáéíóúñÑ ]+$/.test(trimmed)) {
-      setNombreError("Solo se permiten letras.");
-      return;
-    }
+    if (!trimmed) return setNombreError("Este campo es obligatorio.");
+    if (!/^[A-Za-zÁÉÍÓÚáéíóúñÑ ]+$/.test(trimmed))
+      return setNombreError("Solo se permiten letras.");
 
     const partes = trimmed.split(" ");
-
-    if (partes.length < 2) {
-      setNombreError("Incluí nombre y apellido.");
-      return;
-    }
-
-    if (partes.some((p) => p.length < 2)) {
-      setNombreError("Cada nombre/apellido debe tener al menos 2 letras.");
-      return;
-    }
+    if (partes.length < 2)
+      return setNombreError("Incluí nombre y apellido.");
+    if (partes.some((p) => p.length < 2))
+      return setNombreError(
+        "Cada nombre/apellido debe tener al menos 2 letras."
+      );
 
     setNombreError("");
   };
 
   const validateEmail = (value: string) => {
     setEmail(value.trim());
-
-    if (!value.trim()) {
-      setEmailError("Este campo es obligatorio.");
-      return;
-    }
-
-    if (/\s/.test(value)) {
-      setEmailError("El correo no puede tener espacios.");
-      return;
-    }
+    if (!value.trim()) return setEmailError("Este campo es obligatorio.");
+    if (/\s/.test(value))
+      return setEmailError("El correo no puede tener espacios.");
 
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!regex.test(value)) {
-      setEmailError("Correo inválido.");
-      return;
-    }
+    if (!regex.test(value)) return setEmailError("Correo inválido.");
 
     setEmailError("");
   };
 
   const validatePassword = (value: string) => {
     setPassword(value);
-
-    if (!value.trim()) {
-      setPasswordError("Este campo es obligatorio.");
-      return;
-    }
-
-    if (/\s/.test(value)) {
-      setPasswordError("La contraseña no puede contener espacios.");
-      return;
-    }
-
-    if (value.length < 6) {
-      setPasswordError("Mínimo 6 caracteres.");
-      return;
-    }
-
-    if (!/[0-9]/.test(value)) {
-      setPasswordError("Debe incluir al menos un número.");
-      return;
-    }
-
-    if (!/[A-Za-z]/.test(value)) {
-      setPasswordError("Debe incluir al menos una letra.");
-      return;
-    }
-
+    if (!value.trim())
+      return setPasswordError("Este campo es obligatorio.");
+    if (/\s/.test(value))
+      return setPasswordError("La contraseña no puede contener espacios.");
+    if (value.length < 6)
+      return setPasswordError("Mínimo 6 caracteres.");
+    if (!/[0-9]/.test(value))
+      return setPasswordError("Debe incluir al menos un número.");
+    if (!/[A-Za-z]/.test(value))
+      return setPasswordError("Debe incluir al menos una letra.");
 
     setPasswordError("");
-
-    if (confirm && value !== confirm) {
+    if (confirm && value !== confirm)
       setConfirmError("Las contraseñas no coinciden.");
-    } else {
-      setConfirmError("");
-    }
+    else setConfirmError("");
   };
 
   const validateConfirm = (value: string) => {
     setConfirm(value);
-
-    if (value !== password) {
+    if (value !== password)
       setConfirmError("Las contraseñas no coinciden.");
-    } else {
-      setConfirmError("");
-    }
+    else setConfirmError("");
   };
-
 
   const isInvalid =
     !email ||
@@ -210,7 +171,6 @@ export default function Register() {
     passwordError ||
     nombreError ||
     confirmError;
-
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

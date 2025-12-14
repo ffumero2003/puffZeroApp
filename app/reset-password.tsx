@@ -27,10 +27,10 @@ export default function ResetPasswordScreen() {
     const didInit = useRef(false);
 
     const hydrateSessionFromUrl = async (url: string) => {
-      console.log("🔗 URL RECEIVED:", url);
+      // console.log("🔗 URL RECEIVED:", url);
 
       const parsed = Linking.parse(url);
-      console.log("🧩 Parsed URL:", parsed);
+      // console.log("🧩 Parsed URL:", parsed);
 
       // ✅ Ya no depende de hash. Debe venir en query.
       const access_token = parsed.queryParams?.access_token as string | undefined;
@@ -44,12 +44,12 @@ export default function ResetPasswordScreen() {
       const { error } = await supabase.auth.setSession({ access_token, refresh_token });
 
       if (error) {
-        console.log("❌ setSession error:", error);
+        // console.log("❌ setSession error:", error);
         Alert.alert("Error", "El enlace expiró o ya fue usado.");
         return;
       }
 
-      console.log("✅ Recovery session activa");
+      // console.log("✅ Recovery session activa");
     };
 
     useEffect(() => {
@@ -66,7 +66,7 @@ export default function ResetPasswordScreen() {
       } else {
         // 2) Cold start
         Linking.getInitialURL().then((url) => {
-          console.log("🔗 INITIAL URL:", url);
+          // console.log("🔗 INITIAL URL:", url);
           if (url) hydrateSessionFromUrl(url);
         });
       }
