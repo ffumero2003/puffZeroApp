@@ -1,68 +1,18 @@
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import CheckIcon from "@/assets/images/onboarding/check-onboarding.png";
+import AppText from "@/src/components/AppText";
+import ContinueButton from "@/src/components/onboarding/ContinueButton";
+import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
+import PuffsPlanChart from "@/src/components/onboarding/PuffPlanChart";
+import { Colors } from "@/src/constants/theme";
+import { layout } from "@/src/styles/layout";
+import { usePersonalizedPlanViewModel } from "@/src/viewmodels/onboarding/usePersonalizedPlanViewModel";
 import { Image, StyleSheet, View } from "react-native";
 
-import AppText from "../../../src/components/app-text";
-import ContinueButton from "../../../src/components/onboarding/continue-button";
-import OnboardingHeader from "../../../src/components/onboarding/onboarding-header";
-import { Colors } from "../../../src/constants/theme";
-import { layout } from "../../../src/styles/layout";
-
-import { useOnboarding } from "../../../src/providers/onboarding-provider";
-
-import CheckIcon from "../../../assets/images/onboarding/check-onboarding.png";
-
-/* -------------------------------
-   Utils
---------------------------------*/
-
-function getTargetDate(createdAt: string, goalSpeed: number): Date {
-  const start = new Date(createdAt);
-  const target = new Date(start);
-  target.setDate(start.getDate() + goalSpeed);
-  return target;
-}
-
-function formatDate(date: Date): string {
-  return date.toLocaleDateString("es-CR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-/* -------------------------------
-   Screen
---------------------------------*/
-
 export default function StepPersonalizedPlan() {
-  const {
-    goal_speed,
-    profile_created_at,
-    resetAll,
-  } = useOnboarding();
 
-  const [targetDate, setTargetDate] = useState<string | null>(null);
-
-  useEffect(() => {
-    // 🛑 GUARD DURO — si algo falta, el flujo está roto
-    if (!goal_speed || !profile_created_at) {
-      console.warn("❌ Datos incompletos para plan personalizado");
-      router.replace("/(onboarding)/post-signup/step-review");
-      return;
-    }
-
-    const days = Number(goal_speed);
-    if (Number.isNaN(days)) {
-      console.warn("❌ goal_speed inválido:", goal_speed);
-      router.replace("/(onboarding)/post-signup/step-review");
-      return;
-    }
-
-    const date = getTargetDate(profile_created_at, days);
-    setTargetDate(formatDate(date));
-  }, [goal_speed, profile_created_at]);
-
+  const { targetDate, puffsChart, continueFlow } =
+    usePersonalizedPlanViewModel();
+  
   return (
     <View style={layout.screenContainer}>
       <View style={layout.content}>
@@ -95,16 +45,45 @@ export default function StepPersonalizedPlan() {
             {targetDate ? `📅 ${targetDate}` : "Calculando…"}
           </AppText>
         </View>
+          <View style={{ marginTop: 32 }}>
+            <AppText
+              weight="extrabold"
+              style={styles.planText}
+            >
+              Tu plan personalizado
+            </AppText>
+
+            {puffsChart.length > 0 ? (
+              <PuffsPlanChart 
+              data={puffsChart} 
+              startLabel={`${puffsChart[0]} puffs/día`}
+              endLabel="0" />
+            ) : (
+              <AppText
+                style={{
+                  textAlign: "center",
+                  opacity: 0.6,
+                  marginTop: 16,
+                }}
+              >
+                Este plan se basa en las respuestas que ingresaste durante el onboarding.
+              </AppText>
+            )}
+
+          </View>
+          <AppText style={{ fontSize: 16, textAlign: "center", marginTop: 5}}>
+              Puff
+              <AppText
+              weight="extrabold"
+              style={{ color: Colors.light.primary }}
+              >
+              Zero
+            </AppText>{" "}
+            te acompaña, te motiva y te ayuda a mantenerte constante.
+          </AppText>
       </View>
 
-      <ContinueButton
-        text="Continuar"
-        onPress={() => {
-          // ✅ RESET SOLO AL FINAL REAL
-          resetAll();
-          router.push("/(onboarding)/post-signup/step4");
-        }}
-      />
+      <ContinueButton text="Continuar" onPress={continueFlow} />
     </View>
   );
 }
@@ -116,13 +95,18 @@ export default function StepPersonalizedPlan() {
 const styles = StyleSheet.create({
   checkImage: {
     width: "100%",
-    height: 150,
-    marginBottom: 30,
+    height: 100,
+    marginBottom: 20,
   },
   dateText: {
     color: Colors.light.primary,
     fontSize: 24,
     marginTop: 4,
     textAlign: "center"
+  },
+  planText: {
+    fontSize: 16,
+    color: Colors.light.text,
+    opacity: 0.6
   }
 });

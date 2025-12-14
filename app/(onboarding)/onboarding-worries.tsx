@@ -1,13 +1,13 @@
-import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
 
-import ContinueButton from "../../src/components/onboarding/continue-button";
-import MultiSelectButton from "../../src/components/onboarding/multi-select-button";
-import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
-import TitleBlock from "../../src/components/onboarding/title-block";
-import { useOnboarding } from "../../src/providers/onboarding-provider";
-import { layout } from "../../src/styles/layout";
+import ContinueButton from "@/src/components/onboarding/ContinueButton";
+import MultiSelectButton from "@/src/components/onboarding/MultiSelectButton";
+import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
+import TitleBlock from "@/src/components/onboarding/TitleBlock";
+import { layout } from "@/src/styles/layout";
+
+import { useWorriesViewModel } from "@/src/viewmodels/onboarding/useWorriesViewModel";
 
 const CONCERNS = [
   { id: "ansiedad", title: "Ansiedad 🧊" },
@@ -22,7 +22,7 @@ const CONCERNS = [
 
 export default function OnboardingWorries() {
   const [selected, setSelected] = useState<string[]>([]);
-  const { setWorries } = useOnboarding();
+  const { continueWithWorries } = useWorriesViewModel();
 
   const toggleSelect = (id: string) => {
     setSelected(prev =>
@@ -34,11 +34,8 @@ export default function OnboardingWorries() {
 
   return (
     <View style={layout.screenContainer}>
-
-      {/* 🔵 HEADER FIJO ARRIBA */}
       <OnboardingHeader step={11} total={11} />
 
-      {/* 🟣 TITLEBLOCK (NO SCROLL) */}
       <View style={layout.content}>
         <TitleBlock
           title="¿Qué te preocupa al dejar el vape?"
@@ -46,7 +43,6 @@ export default function OnboardingWorries() {
         />
       </View>
 
-      {/* 🟡 SCROLL SOLO PARA LAS OPCIONES */}
       <View style={{ flex: 1 }}>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -63,18 +59,12 @@ export default function OnboardingWorries() {
         </ScrollView>
       </View>
 
-      {/* 🟢 BOTÓN SIEMPRE AL FONDO */}
       <ContinueButton
         text="Continuar"
         disabled={selected.length === 0}
-        onPress={() => {
-          setWorries(selected);
-          console.log("Preocupaciones guardadas:", selected);
-          router.push("/(auth)/registrarse");
-        }}
+        onPress={() => continueWithWorries(selected)}
         style={layout.bottomButtonContainer}
       />
-
     </View>
   );
 }

@@ -1,7 +1,7 @@
 import { Href, router } from "expo-router";
 import { Vibration, View, ViewStyle } from "react-native";
-import { components } from "../../../src/styles/components";
-import KeepGoingButton from "../onboarding/keep-going-button";
+import { components } from "../../styles/components";
+import KeepGoingButton from "../onboarding/KeepGoingButton";
 
 interface ContinueButtonProps {
   text?: string;

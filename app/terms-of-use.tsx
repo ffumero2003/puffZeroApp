@@ -1,8 +1,8 @@
 
+import AppText from "@/src/components/AppText";
+import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
+import { layout } from "@/src/styles/layout";
 import { ScrollView, View } from "react-native";
-import AppText from "../src/components/app-text";
-import OnboardingHeader from "../src/components/onboarding/onboarding-header";
-import { layout } from "../src/styles/layout";
 
 export default function TermsOfUse() {
   return (

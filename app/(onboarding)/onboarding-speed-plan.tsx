@@ -1,13 +1,13 @@
-import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
 
-import ContinueButton from "../../src/components/onboarding/continue-button";
-import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
-import OnboardingOptionCard from "../../src/components/onboarding/onboarding-option-card";
-import TitleBlock from "../../src/components/onboarding/title-block";
-import { useOnboarding } from "../../src/providers/onboarding-provider";
-import { layout } from "../../src/styles/layout";
+import ContinueButton from "@/src/components/onboarding/ContinueButton";
+import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
+import OnboardingOptionCard from "@/src/components/onboarding/OnboardingOptionCard";
+import TitleBlock from "@/src/components/onboarding/TitleBlock";
+import { layout } from "@/src/styles/layout";
+
+import { useSpeedPlanViewModel } from "@/src/viewmodels/onboarding/useSpeedPlanViewModel";
 
 const OPTIONS = [
   {
@@ -39,15 +39,12 @@ const OPTIONS = [
 
 export default function OnboardingSpeedPlan() {
   const [selected, setSelected] = useState<string | null>(null);
-  const { setGoalSpeed } = useOnboarding();
+  const { continueWithSpeed } = useSpeedPlanViewModel();
 
   return (
     <View style={layout.screenContainer}>
-
-      {/* 🔵 HEADER ARRIBA */}
       <OnboardingHeader step={9} total={11} />
 
-      {/* 🟣 CONTENIDO SUPERIOR (NO SCROLL) */}
       <View style={layout.content}>
         <TitleBlock
           title="¿Qué tan rápido querés alcanzar tu meta?"
@@ -55,7 +52,6 @@ export default function OnboardingSpeedPlan() {
         />
       </View>
 
-      {/* 🟡 SCROLL SOLO PARA LAS OPCIONES */}
       <View style={{ flex: 1 }}>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -74,18 +70,12 @@ export default function OnboardingSpeedPlan() {
         </ScrollView>
       </View>
 
-      {/* 🟢 BOTÓN AL FONDO SIEMPRE */}
       <ContinueButton
         text="Continuar"
         disabled={selected === null}
-        onPress={() => {
-          setGoalSpeed(selected!);
-          console.log("🚀 Velocidad seleccionada:", selected);
-          router.push("/onboarding-motivation");
-        }}
+        onPress={() => continueWithSpeed(selected!)}
         style={layout.bottomButtonContainer}
       />
-
     </View>
   );
 }

@@ -1,10 +1,11 @@
-import { router } from "expo-router";
 import { ScrollView, View } from "react-native";
-import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
-import OnboardingWhiteButton from "../../src/components/onboarding/onboarding-white-button";
-import TitleBlock from "../../src/components/onboarding/title-block";
-import { useOnboarding } from "../../src/providers/onboarding-provider";
-import { layout } from "../../src/styles/layout";
+
+import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
+import OnboardingWhiteButton from "@/src/components/onboarding/OnboardingWhiteButton";
+import TitleBlock from "@/src/components/onboarding/TitleBlock";
+import { layout } from "@/src/styles/layout";
+
+import { useMotivationViewModel } from "@/src/viewmodels/onboarding/useMotivationViewModel";
 
 const MOTIVATION_OPTIONS = [
   { id: "salud", title: "Salud ❤️" },
@@ -17,13 +18,12 @@ const MOTIVATION_OPTIONS = [
 ];
 
 export default function OnboardingMotivation() {
-  const { setWhyStopped } = useOnboarding();
+  const { selectMotivation } = useMotivationViewModel();
 
   return (
     <View style={layout.containerWithLoadingBar}>
       <OnboardingHeader step={10} total={11} />
 
-      {/* 🔵 TitleBlock fuera del Scroll para que NO se desplace */}
       <View style={layout.content}>
         <TitleBlock
           title="¿Por qué querés dejar de vapear?"
@@ -31,9 +31,7 @@ export default function OnboardingMotivation() {
         />
       </View>
 
-      {/* 🟣 Scroll exclusivo para las opciones */}
       <ScrollView
-        
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
       >
@@ -41,15 +39,10 @@ export default function OnboardingMotivation() {
           <OnboardingWhiteButton
             key={opt.id}
             title={opt.title}
-            onPress={() => {
-              setWhyStopped([opt.id]);
-              router.push("/onboarding-worries");
-            }}
+            onPress={() => selectMotivation(opt.id)}
           />
         ))}
       </ScrollView>
     </View>
   );
 }
-
-

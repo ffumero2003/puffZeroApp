@@ -1,7 +1,7 @@
+import Logo from "@/assets/images/logo-puff-zero.png";
+import { components } from "@/src/styles/components";
 import { Image, View } from "react-native";
-import Logo from "../../../assets/images/logo-puff-zero.png";
-import { components } from "../../../src/styles/components";
-import TitleBlockAuth from "./title-block-auth";
+import TitleBlockAuth from "./TitleBlockAuth";
 
 interface AuthHeaderProps {
   title: string;

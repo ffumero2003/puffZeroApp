@@ -6,7 +6,7 @@ import { ActivityIndicator, TouchableOpacity } from "react-native";
 import { components } from "../../../src/styles/components";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../providers/auth-provider";
-import AppText from "../app-text";
+import AppText from "../AppText";
 
 type GoogleButtonProps = {
   mode: "login" | "register";

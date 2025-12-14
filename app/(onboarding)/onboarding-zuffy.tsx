@@ -1,31 +1,15 @@
-import ContinueButton from "@/src/components/onboarding/continue-button";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import AppText from "@/src/components/AppText";
+import ContinueButton from "@/src/components/onboarding/ContinueButton";
+import LoginText from "@/src/components/onboarding/LoginText";
+import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
+import { layout } from "@/src/styles/layout";
 import { Image, View } from "react-native";
 
-import AppText from "../../src/components/app-text";
-import LoginText from "../../src/components/onboarding/login-text";
-import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
-import { layout } from "../../src/styles/layout";
-
-import ZuffyImage from "../../assets/images/onboarding/onboarding-zuffy-page.png";
+import ZuffyImage from "@/assets/images/onboarding/onboarding-zuffy-page.png";
+import { useOnboardingViewModel } from "@/src/viewmodels/onboarding/useOnboardingViewModel";
 
 export default function OnboardingZuffy() {
-  const [showLogin, setShowLogin] = useState(false);
-
-  useEffect(() => {
-    const checkOnboarding = async () => {
-      const hasSeen = await AsyncStorage.getItem("hasSeenOnboarding");
-      if (hasSeen === "true") {
-        setShowLogin(true);
-      }
-    };
-
-    checkOnboarding();
-  }, []);
-
-
+  const { showLogin, goToMoneySaved } = useOnboardingViewModel();
 
   return (
     <View style={layout.screenContainer}>
@@ -44,7 +28,7 @@ export default function OnboardingZuffy() {
 
         <ContinueButton
           text="Continuar"
-          onPress={() => router.push("/onboarding-money-saved")}
+          onPress={goToMoneySaved}
           style={layout.bottomButtonContainer}
         />
 

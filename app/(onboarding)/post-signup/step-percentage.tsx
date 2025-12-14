@@ -1,42 +1,15 @@
-import { router } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import AppText from "@/src/components/AppText";
+import CheckItem from "@/src/components/onboarding/CheckItem";
+import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
+import { Colors } from "@/src/constants/theme";
+import { layout } from "@/src/styles/layout";
+import { useStepPercentageViewModel } from "@/src/viewmodels/onboarding/useStepPercentageViewModel";
+import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 
-import AppText from "../../../src/components/app-text";
-import CheckItem from "../../../src/components/onboarding/check-item";
-import OnboardingHeader from "../../../src/components/onboarding/onboarding-header";
-import { Colors } from "../../../src/constants/theme";
-import { layout } from "../../../src/styles/layout";
-
-const INTERVAL_MS = 60;
-const COMPLETE_DELAY = 900;
-
 export default function StepPercentage() {
-  const [progress, setProgress] = useState(0);
+  const { progress, getStatusText } = useStepPercentageViewModel();
   const animatedWidth = useRef(new Animated.Value(0)).current;
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-
-          timeoutRef.current = setTimeout(() => {
-            router.push("/(onboarding)/post-signup/step-personalized-plan");
-          }, COMPLETE_DELAY);
-
-          return 100;
-        }
-        return prev + 1;
-      });
-    }, INTERVAL_MS);
-
-    return () => {
-      clearInterval(interval);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, []);
 
   useEffect(() => {
     Animated.timing(animatedWidth, {
@@ -51,13 +24,6 @@ export default function StepPercentage() {
     outputRange: ["0%", "100%"],
   });
 
-  const getStatusText = () => {
-    if (progress < 20) return "Analizando tu perfil…";
-    if (progress < 45) return "Ajustando tus recomendaciones…";
-    if (progress < 75) return "Construyendo tu plan diario…";
-    return "Todo listo 🚀";
-  };
-
   return (
     <View style={layout.screenContainer}>
       <OnboardingHeader showBack={false} showProgress={false} />
@@ -65,10 +31,6 @@ export default function StepPercentage() {
       <View style={styles.center}>
         <AppText weight="extrabold" style={styles.percentage}>
           {progress}%
-        </AppText>
-
-        <AppText weight="bold" style={styles.title}>
-          Estamos preparando todo para vos
         </AppText>
 
         <View style={styles.progressTrack}>

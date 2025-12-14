@@ -1,12 +1,13 @@
-import { router } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
-import ContinueButton from "../../src/components/onboarding/continue-button";
-import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
-import OnboardingOptionCard from "../../src/components/onboarding/onboarding-option-card";
-import TitleBlock from "../../src/components/onboarding/title-block";
-import { useOnboarding } from "../../src/providers/onboarding-provider";
-import { layout } from "../../src/styles/layout";
+
+import ContinueButton from "@/src/components/onboarding/ContinueButton";
+import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
+import OnboardingOptionCard from "@/src/components/onboarding/OnboardingOptionCard";
+import TitleBlock from "@/src/components/onboarding/TitleBlock";
+import { layout } from "@/src/styles/layout";
+
+import { useGoalViewModel } from "@/src/viewmodels/onboarding/useGoalViewModel";
 
 const GOAL_OPTIONS = [
   {
@@ -19,17 +20,14 @@ const GOAL_OPTIONS = [
     badge: "DEJAR POR COMPLETO  🔥",
     text: "Quiero dejar el vape definitivamente y no volver a depender de él",
   },
-
 ];
 
 export default function OnboardingGoal() {
   const [selected, setSelected] = useState<string | null>(null);
-  const { setGoal } = useOnboarding();
+  const { continueWithGoal } = useGoalViewModel();
 
   return (
     <View style={layout.screenContainer}>
-      
-      {/* GROUP 1 — everything above the button */}
       <View>
         <OnboardingHeader step={8} total={11} />
 
@@ -52,18 +50,12 @@ export default function OnboardingGoal() {
         </View>
       </View>
 
-      {/* GROUP 2 — button at bottom */}
       <ContinueButton
         text="Continuar"
         disabled={selected === null}
-        onPress={() => {
-          setGoal(selected!);
-          router.push("/onboarding-speed-plan");
-        }}
+        onPress={() => continueWithGoal(selected!)}
         style={layout.bottomButtonSpacing}
       />
-
     </View>
   );
 }
-

@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import { TouchableOpacity } from "react-native";
 import { components } from "../../../src/styles/components";
-import AppText from "../app-text";
+import AppText from "../AppText";
 
 export default function RegisterText(){
   return(

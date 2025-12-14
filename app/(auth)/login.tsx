@@ -1,69 +1,29 @@
-import SeparatorRow from "@/src/components/onboarding/separator-row";
-import { layout } from "@/src/styles/layout";
 import { router } from "expo-router";
-import { useState } from "react";
-import { Alert, Keyboard, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
-import AppText from "../../src/components/app-text";
-import AuthHeader from "../../src/components/auth/auth-header";
-import ContinueButtonAuth from "../../src/components/auth/continueButtonAuth";
-import GoogleButton from "../../src/components/onboarding/google-button";
-import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
-import UnderlineInput from "../../src/components/onboarding/underline-input";
-import { useAuth } from "../../src/providers/auth-provider";
+import { Keyboard, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+
+import AppText from "@/src/components/AppText";
+import AuthHeader from "@/src/components/auth/AuthHeader";
+import ContinueButtonAuth from "@/src/components/auth/ContinueButtonAuth";
+import GoogleButton from "@/src/components/onboarding/GoogleButton";
+import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
+import SeparatorRow from "@/src/components/onboarding/SeparatorRow";
+import UnderlineInput from "@/src/components/onboarding/UnderlineInput";
+
+import { layout } from "@/src/styles/layout";
+import { useLoginViewModel } from "@/src/viewmodels/auth/useLoginViewModel";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-
-  // Supabase login
-
-  const { signIn } = useAuth();
-
-  async function handleLogin() {
-    const { data, error } = await signIn(email, password);
-
-    if (error) {
-      Alert.alert("Error al iniciar sesión", error.message);
-      return;
-    }
-
-    router.replace("/home"); // o la vista real de home que usás
-  }
-
-
-  /** --------------------------
-   * VALIDACIONES
-   -----------------------------*/
-  const validateEmail = (value: string) => {
-    setEmail(value);
-
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!value) {
-      setEmailError("Este campo es obligatorio.");
-    } else if (!regex.test(value)) {
-      setEmailError("Correo inválido.");
-    } else {
-      setEmailError("");
-    }
-  };
-
-  const validatePassword = (value: string) => {
-    setPassword(value);
-
-    if (!value) {
-      setPasswordError("Este campo es obligatorio.");
-    } else if (value.length < 6) {
-      setPasswordError("Mínimo 6 caracteres.");
-    } else {
-      setPasswordError("");
-    }
-  };
-
-  /** BOTÓN DESHABILITADO SI HAY ERRORES */
-  const isInvalid = !email || !password || emailError || passwordError;
+  const {
+    email,
+    password,
+    emailError,
+    passwordError,
+    isInvalid,
+    loading,
+    onEmailChange,
+    onPasswordChange,
+    submit,
+  } = useLoginViewModel();
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -75,11 +35,11 @@ export default function Login() {
           subtitle="Vuelve a tomar control de tu vida"
         />
 
-        {/* CORREO */}
+        {/* Email */}
         <UnderlineInput
           placeholder="Correo"
           value={email}
-          onChangeText={validateEmail}
+          onChangeText={onEmailChange}
           autoCapitalize="none"
           keyboardType="email-address"
         />
@@ -89,11 +49,11 @@ export default function Login() {
           </AppText>
         ) : null}
 
-        {/* CONTRASEÑA */}
+        {/* Password */}
         <UnderlineInput
           placeholder="Contraseña"
           value={password}
-          onChangeText={validatePassword}
+          onChangeText={onPasswordChange}
           autoCapitalize="none"
           secureTextEntry
         />
@@ -103,31 +63,29 @@ export default function Login() {
           </AppText>
         ) : null}
 
-        {/* Forgot Password */}
+        {/* Forgot password */}
         <TouchableOpacity
           onPress={() => router.push("/(auth)/forgot-password")}
           style={layout.forgotContainer}
         >
-          <AppText weight="bold" style={ layout.forgotLink }>
+          <AppText weight="bold" style={layout.forgotLink}>
             Recuperar
           </AppText>
         </TouchableOpacity>
 
         <ContinueButtonAuth
-          text="Iniciar Sesión"
-          onPress={handleLogin}
+          text={loading ? "Ingresando..." : "Iniciar Sesión"}
+          onPress={submit}
           disabled={isInvalid}
         />
-        
-
 
         <SeparatorRow />
 
-        <GoogleButton mode="login"/>
+        <GoogleButton mode="login" />
 
         <View style={layout.bottomContainer}>
           <AppText style={layout.text}>
-            Al iniciar sesión, confirmás que leíste y aceptás la{" "}
+            Al iniciar sesión, confirmás que aceptás la{" "}
             <AppText
               weight="bold"
               style={layout.linkLogin}
@@ -149,8 +107,4 @@ export default function Login() {
       </View>
     </TouchableWithoutFeedback>
   );
-
-
 }
-
-

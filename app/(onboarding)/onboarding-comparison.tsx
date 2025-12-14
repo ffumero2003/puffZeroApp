@@ -1,17 +1,20 @@
 import { Image, View } from "react-native";
 
-import AppText from "../../src/components/app-text";
-import ContinueButton from "../../src/components/onboarding/continue-button";
-import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
-import TitleBlock from "../../src/components/onboarding/title-block";
-import { Colors } from "../../src/constants/theme";
+import AppText from "@/src/components/AppText";
+import ContinueButton from "@/src/components/onboarding/ContinueButton";
+import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
+import TitleBlock from "@/src/components/onboarding/TitleBlock";
+import { Colors } from "@/src/constants/theme";
 
 import { layout } from "@/src/styles/layout";
+import { useOnboardingViewModel } from "@/src/viewmodels/onboarding/useOnboardingViewModel";
 
-
-import ComparisonImage from "../../assets/images/onboarding/con-puff-zero.png";
+import ComparisonImage from "@/assets/images/onboarding/con-puff-zero.png";
 
 export default function OnboardingComparison() {
+
+  const { goToGoal } = useOnboardingViewModel();
+  
   return (
     <View style={layout.screenContainer}>
       <View>
@@ -46,10 +49,10 @@ export default function OnboardingComparison() {
         </View>
       </View>
       <ContinueButton
-          text="Continuar"
-          route="/onboarding-goal"
-          style={{ paddingBottom: 30 }}
-        />
+        text="Continuar"
+        onPress={goToGoal}
+        style={layout.bottomButtonContainer}
+      />
     </View>
   );
 }

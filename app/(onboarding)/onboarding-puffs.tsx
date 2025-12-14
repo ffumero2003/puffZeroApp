@@ -1,15 +1,5 @@
 import Slider from "@react-native-community/slider";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
-import { StyleSheet, TextInput, View } from "react-native";
-import AppText from "../../src/components/app-text";
-import ContinueButton from "../../src/components/onboarding/continue-button";
-import OnboardingHeader from "../../src/components/onboarding/onboarding-header";
-import TitleBlock from "../../src/components/onboarding/title-block";
-import { Colors } from "../../src/constants/theme";
-import { useOnboarding } from "../../src/providers/onboarding-provider";
-import { layout } from "../../src/styles/layout";
-
+import { View } from "react-native";
 import Animated, {
   useAnimatedProps,
   useAnimatedStyle,
@@ -17,48 +7,48 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+import AppText from "@/src/components/AppText";
+import ContinueButton from "@/src/components/onboarding/ContinueButton";
+import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
+import TitleBlock from "@/src/components/onboarding/TitleBlock";
+import { Colors } from "@/src/constants/theme";
+import { layout } from "@/src/styles/layout";
+import { getAddictionLevel } from "@/src/utils/addiction";
+import { usePuffsViewModel } from "@/src/viewmodels/onboarding/usePuffsViewModel";
+
+import { useEffect, useState } from "react";
+import { StyleSheet, TextInput } from "react-native";
+
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 export default function OnboardingPuffs() {
   const [value, setValue] = useState(0);
+  const { continueWithPuffs, isValidPuffs } = usePuffsViewModel();
 
-  const { setPuffs } = useOnboarding();
-
-  // Counter animado
+  // 🔥 Animaciones (UI PURA)
   const animatedValue = useSharedValue(0);
+  const labelAnim = useSharedValue(0);
+
+  useEffect(() => {
+    animatedValue.value = withTiming(value, { duration: 250 });
+    labelAnim.value = 0;
+    labelAnim.value = withTiming(1, { duration: 250 });
+  }, [value]);
+
   const animatedProps = useAnimatedProps(() => ({
     text: Math.round(animatedValue.value).toString(),
   }));
 
-  useEffect(() => {
-    animatedValue.value = withTiming(value, { duration: 250 });
-  }, [value]);
-
-  function getAddictionLevel(n: number) {
-    if (n > 300) return "Super Pesada";
-    if (n > 175) return "Pesada";
-    if (n >= 75) return "Normal";
-    return "Suave";
-  }
-
-  const addiction = getAddictionLevel(value);
-
-  // 🔥 Animación del label
-  const labelAnim = useSharedValue(0);
-
-  useEffect(() => {
-    labelAnim.value = 0;
-    labelAnim.value = withTiming(1, { duration: 250 });
-  }, [addiction]);
-
   const labelStyle = useAnimatedStyle(() => ({
     opacity: labelAnim.value,
     transform: [
-      { scale: 0.9 + labelAnim.value * 0.1 },     // zoom sutil
-      { translateY: (1 - labelAnim.value) * 6 },  // baja → sube
+      { scale: 0.9 + labelAnim.value * 0.1 },
+      { translateY: (1 - labelAnim.value) * 6 },
     ],
   }));
 
+  const addiction = getAddictionLevel(value);
+  
   return (
     <View style={layout.screenContainer}>
       <View >
@@ -101,13 +91,8 @@ export default function OnboardingPuffs() {
 
       <ContinueButton
         text="Continuar"
-        disabled={value < 20}
-        onPress={() => {
-          setPuffs(value);
-          console.log("Puffs guardados en provider:", value);   // 👈 prueba
-          router.push("/onboarding-money-spent");
-        }}
-        
+        disabled={!isValidPuffs(value)}
+        onPress={() => continueWithPuffs(value)}
       />
 
     </View>
