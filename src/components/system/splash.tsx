@@ -1,6 +1,6 @@
 import { ActivityIndicator, Image, Text, View } from "react-native";
-import Logo from "../../assets/images/logo-puff-zero-circle.png";
-import { Colors } from "../constants/theme";
+import Logo from "../../../assets/images/logo-puff-zero-circle.png";
+import { Colors } from "../../constants/theme";
 
 export default function Splash() {
   return (

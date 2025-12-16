@@ -13,9 +13,9 @@ import { StatusBar } from "expo-status-bar";
 import * as WebBrowser from "expo-web-browser";
 import { useEffect } from "react";
 
+import Splash from "../src/components/system/splash";
 import { AuthProvider, useAuth } from "../src/providers/auth-provider";
 import { OnboardingProvider, useOnboarding } from "../src/providers/onboarding-provider";
-import Splash from "../src/screens/splash";
 
 // 👉 NECESARIO para PKCE + expo-web-browser
 WebBrowser.maybeCompleteAuthSession();
