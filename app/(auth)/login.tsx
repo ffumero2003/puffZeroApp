@@ -12,18 +12,27 @@ import UnderlineInput from "@/src/components/onboarding/UnderlineInput";
 import { layout } from "@/src/styles/layout";
 import { useLoginViewModel } from "@/src/viewmodels/auth/useLoginViewModel";
 
+import { ROUTES } from "@/src/constants/routes";
+
 export default function Login() {
   const {
     email,
     password,
     emailError,
     passwordError,
-    isInvalid,
     loading,
+    isInvalid,
     onEmailChange,
     onPasswordChange,
     submit,
   } = useLoginViewModel();
+
+  const handleLogin = async () => {
+    const ok = await submit();
+    if (ok) {
+      router.replace(ROUTES.HOME);
+    }
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -75,7 +84,7 @@ export default function Login() {
 
         <ContinueButtonAuth
           text={loading ? "Ingresando..." : "Iniciar Sesión"}
-          onPress={submit}
+          onPress={handleLogin}
           disabled={isInvalid}
         />
 

@@ -6,10 +6,17 @@ import { layout } from "@/src/styles/layout";
 import { Image, View } from "react-native";
 
 import ProgressScreen from "@/assets/images/onboarding/onboarding-progress-page.png";
+import { ROUTES } from "@/src/constants/routes";
 import { useOnboardingViewModel } from "@/src/viewmodels/onboarding/useOnboardingViewModel";
+import { router } from "expo-router";
 
 export default function OnboardingProgress() {
-  const { showLogin, goToZuffy } = useOnboardingViewModel();
+  const { showLogin } = useOnboardingViewModel();
+
+  //onboarding progress
+  function goToZuffy() {
+    router.push(ROUTES.ONBOARDING_ZUFFY);
+  }
 
   return (
     <View style={layout.screenContainer}>

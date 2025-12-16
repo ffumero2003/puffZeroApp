@@ -1,12 +1,12 @@
+// usePuffsViewModel.ts
 import { useOnboarding } from "@/src/providers/onboarding-provider";
-import { router } from "expo-router";
 
 export function usePuffsViewModel() {
   const { setPuffs } = useOnboarding();
 
-  function continueWithPuffs(value: number) {
+  function submitPuffs(value: number) {
     setPuffs(value);
-    router.push("/onboarding-money-spent");
+    return true;
   }
 
   function isValidPuffs(value: number) {
@@ -14,7 +14,7 @@ export function usePuffsViewModel() {
   }
 
   return {
-    continueWithPuffs,
+    submitPuffs,
     isValidPuffs,
   };
 }

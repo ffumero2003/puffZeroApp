@@ -27,15 +27,15 @@ import { LATAM_CURRENCIES } from "@/src/constants/currency";
 import { formatCurrency } from "@/src/utils/currency";
 import { useMoneySpentViewModel } from "@/src/viewmodels/onboarding/useMoneySpentViewModel";
 
-
+import { router } from "expo-router";
 
 
 export default function OnboardingMoneySpent() {
   const [amount, setAmount] = useState("");
   const [localCurrency, setLocalCurrency] = useState("CRC");
   const [pickerOpen, setPickerOpen] = useState(false);
-  const { isValidAmount, continueWithMoney } = useMoneySpentViewModel();
 
+  const { isValidAmount, submitMoney } = useMoneySpentViewModel();
 
   const formatted = useMemo(
     () => formatCurrency(amount, localCurrency),
@@ -44,7 +44,6 @@ export default function OnboardingMoneySpent() {
 
   const amountNumber = Number(amount);
 
-  /* 🔥 Animaciones */
   const overlayOpacity = useSharedValue(0);
   const modalTranslate = useSharedValue(50);
   const modalOpacity = useSharedValue(0);
@@ -60,14 +59,19 @@ export default function OnboardingMoneySpent() {
 
   const modalRef = useRef<View>(null);
 
+  const handleContinue = () => {
+    const ok = submitMoney(amountNumber, localCurrency);
+    if (ok) {
+      router.push("/onboarding-comparison");
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View style={layout.screenContainer}>
-
-        {/* 🔵 GROUP 1 — Header + contenido scroll */}
         <View style={{ flex: 1 }}>
           <OnboardingHeader step={6} total={11} />
 
@@ -97,12 +101,10 @@ export default function OnboardingMoneySpent() {
               </AppText>
             ) : null}
 
-            {/* Picker */}
             <TouchableOpacity
               style={styles.currencyPicker}
               onPress={() => {
                 setPickerOpen(true);
-
                 overlayOpacity.value = withTiming(1, { duration: 200 });
                 modalTranslate.value = withTiming(0, {
                   duration: 260,
@@ -119,18 +121,14 @@ export default function OnboardingMoneySpent() {
           </ScrollView>
         </View>
 
-        {/* 🟢 GROUP 2 — Botón siempre abajo */}
         <ContinueButton
           text="Continuar"
           disabled={!isValidAmount(amountNumber, localCurrency)}
-          onPress={() => continueWithMoney(amountNumber, localCurrency)}
+          onPress={handleContinue}
           style={layout.bottomButtonContainer}
         />
-
-
       </View>
 
-      {/* 🟣 MODAL (fuera del layout para overlay full-screen) */}
       {pickerOpen && (
         <Animated.View
           style={[styles.modalOverlay, overlayStyle]}
@@ -150,7 +148,6 @@ export default function OnboardingMoneySpent() {
                 overlayOpacity.value = withTiming(0, { duration: 150 });
                 modalOpacity.value = withTiming(0, { duration: 150 });
                 modalTranslate.value = withTiming(50, { duration: 150 });
-
                 setTimeout(() => setPickerOpen(false), 150);
               }
             });
@@ -174,10 +171,11 @@ export default function OnboardingMoneySpent() {
           </Animated.View>
         </Animated.View>
       )}
-
     </KeyboardAvoidingView>
   );
 }
+
+
 
 
 const styles = StyleSheet.create({

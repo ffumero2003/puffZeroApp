@@ -6,10 +6,17 @@ import { layout } from "@/src/styles/layout";
 import { Image, View } from "react-native";
 
 import ZuffyImage from "@/assets/images/onboarding/onboarding-zuffy-page.png";
+import { ROUTES } from "@/src/constants/routes";
 import { useOnboardingViewModel } from "@/src/viewmodels/onboarding/useOnboardingViewModel";
+import { router } from "expo-router";
 
 export default function OnboardingZuffy() {
-  const { showLogin, goToMoneySaved } = useOnboardingViewModel();
+  const { showLogin } = useOnboardingViewModel();
+
+  //onboarding zuffy
+  function goToMoneySaved() {
+    router.push(ROUTES.ONBOARDING_MONEY_SAVED);
+  }
 
   return (
     <View style={layout.screenContainer}>

@@ -1,9 +1,9 @@
+import BackArrow from "@/assets/images/icons/back.png";
+import { Colors } from "@/src/constants/theme";
+import { components } from "@/src/styles/components";
 import { router } from "expo-router";
 import { useEffect, useRef } from "react";
 import { Animated, Image, TouchableOpacity, View } from "react-native";
-import BackArrow from "../../../assets/images/icons/back.png";
-import { components } from "../../../src/styles/components";
-import { Colors } from "../../constants/theme";
 
 interface Props {
   step?: number;        // opcional para login

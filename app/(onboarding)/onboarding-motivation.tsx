@@ -1,3 +1,5 @@
+// onboarding-motivation.tsx
+import { router } from "expo-router";
 import { ScrollView, View } from "react-native";
 
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
@@ -18,7 +20,14 @@ const MOTIVATION_OPTIONS = [
 ];
 
 export default function OnboardingMotivation() {
-  const { selectMotivation } = useMotivationViewModel();
+  const { submitMotivation } = useMotivationViewModel();
+
+  const handleSelect = (id: string) => {
+    const ok = submitMotivation(id);
+    if (ok) {
+      router.push("/onboarding-worries");
+    }
+  };
 
   return (
     <View style={layout.containerWithLoadingBar}>
@@ -39,7 +48,7 @@ export default function OnboardingMotivation() {
           <OnboardingWhiteButton
             key={opt.id}
             title={opt.title}
-            onPress={() => selectMotivation(opt.id)}
+            onPress={() => handleSelect(opt.id)}
           />
         ))}
       </ScrollView>

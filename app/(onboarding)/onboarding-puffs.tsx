@@ -1,5 +1,8 @@
+// onboarding-puffs.tsx
 import Slider from "@react-native-community/slider";
-import { View } from "react-native";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { StyleSheet, TextInput, View } from "react-native";
 import Animated, {
   useAnimatedProps,
   useAnimatedStyle,
@@ -11,21 +14,18 @@ import AppText from "@/src/components/AppText";
 import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import TitleBlock from "@/src/components/onboarding/TitleBlock";
+import { ROUTES } from "@/src/constants/routes";
 import { Colors } from "@/src/constants/theme";
 import { layout } from "@/src/styles/layout";
 import { getAddictionLevel } from "@/src/utils/addiction";
 import { usePuffsViewModel } from "@/src/viewmodels/onboarding/usePuffsViewModel";
 
-import { useEffect, useState } from "react";
-import { StyleSheet, TextInput } from "react-native";
-
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 export default function OnboardingPuffs() {
   const [value, setValue] = useState(0);
-  const { continueWithPuffs, isValidPuffs } = usePuffsViewModel();
+  const { submitPuffs, isValidPuffs } = usePuffsViewModel();
 
-  // 🔥 Animaciones (UI PURA)
   const animatedValue = useSharedValue(0);
   const labelAnim = useSharedValue(0);
 
@@ -48,19 +48,25 @@ export default function OnboardingPuffs() {
   }));
 
   const addiction = getAddictionLevel(value);
-  
+
+  const handleContinue = () => {
+    const ok = submitPuffs(value);
+    if (ok) {
+      router.push(ROUTES.ONBOARDING_MONEY_SPENT);
+    }
+  };
+
   return (
     <View style={layout.screenContainer}>
-      <View >
+      <View>
         <OnboardingHeader step={5} total={11} />
 
-      <View style={layout.content}>
+        <View style={layout.content}>
           <TitleBlock
             title="¿Cuántos puffs consumís por día?"
             subtitle="No tiene que ser exacto. Si en los primeros días notamos que el límite es muy bajo, lo ajustamos sin problema."
           />
 
-          {/* Slider */}
           <Slider
             style={styles.slider}
             value={value}
@@ -73,14 +79,12 @@ export default function OnboardingPuffs() {
             thumbTintColor={Colors.light.primary}
           />
 
-          {/* Counter animado */}
           <AnimatedTextInput
             style={styles.input}
             editable={false}
             animatedProps={animatedProps}
           />
 
-          {/* 🔥 Label animado */}
           <Animated.View style={labelStyle}>
             <AppText weight="semibold" style={styles.classification}>
               {addiction}
@@ -92,15 +96,13 @@ export default function OnboardingPuffs() {
       <ContinueButton
         text="Continuar"
         disabled={!isValidPuffs(value)}
-        onPress={() => continueWithPuffs(value)}
+        onPress={handleContinue}
       />
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  
   slider: {
     width: "100%",
     height: 50,

@@ -1,7 +1,7 @@
+import AppText from "@/src/components/AppText";
+import { Colors } from "@/src/constants/theme";
 import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
-import { Colors } from "../../constants/theme";
-import AppText from "../AppText";
 
 export default function CheckItem({
   text,

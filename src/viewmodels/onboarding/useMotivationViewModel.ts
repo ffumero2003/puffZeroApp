@@ -1,15 +1,15 @@
+// useMotivationViewModel.ts
 import { useOnboarding } from "@/src/providers/onboarding-provider";
-import { router } from "expo-router";
 
 export function useMotivationViewModel() {
   const { setWhyStopped } = useOnboarding();
 
-  function selectMotivation(id: string) {
+  function submitMotivation(id: string) {
     setWhyStopped([id]);
-    router.push("/onboarding-worries");
+    return true;
   }
 
   return {
-    selectMotivation,
+    submitMotivation,
   };
 }

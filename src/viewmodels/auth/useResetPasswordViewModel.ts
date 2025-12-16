@@ -1,6 +1,7 @@
+// useResetPasswordViewModel.ts
 import { supabase } from "@/src/lib/supabase";
 import * as Linking from "expo-linking";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Alert } from "react-native";
 
@@ -15,12 +16,16 @@ export function useResetPasswordViewModel() {
   async function hydrateSessionFromUrl(url: string) {
     const parsed = Linking.parse(url);
 
-    const access_token = parsed.queryParams?.access_token as string | undefined;
-    const refresh_token = parsed.queryParams?.refresh_token as string | undefined;
+    const access_token = parsed.queryParams?.access_token as
+      | string
+      | undefined;
+    const refresh_token = parsed.queryParams?.refresh_token as
+      | string
+      | undefined;
 
     if (!access_token || !refresh_token) {
       Alert.alert("Error", "El enlace no es válido.");
-      return;
+      return false;
     }
 
     const { error } = await supabase.auth.setSession({
@@ -30,7 +35,10 @@ export function useResetPasswordViewModel() {
 
     if (error) {
       Alert.alert("Error", "El enlace expiró o ya fue usado.");
+      return false;
     }
+
+    return true;
   }
 
   useEffect(() => {
@@ -60,12 +68,12 @@ export function useResetPasswordViewModel() {
   async function submit() {
     if (!password || !confirm) {
       Alert.alert("Error", "Completá ambos campos.");
-      return;
+      return false;
     }
 
     if (password !== confirm) {
       Alert.alert("Error", "Las contraseñas no coinciden.");
-      return;
+      return false;
     }
 
     setLoading(true);
@@ -74,11 +82,11 @@ export function useResetPasswordViewModel() {
 
     if (error) {
       Alert.alert("Error", error.message);
-      return;
+      return false;
     }
 
     Alert.alert("Listo", "Tu contraseña fue actualizada.");
-    router.replace("/login");
+    return true;
   }
 
   return {

@@ -7,13 +7,18 @@ import TitleBlock from "@/src/components/onboarding/TitleBlock";
 import { Colors } from "@/src/constants/theme";
 
 import { layout } from "@/src/styles/layout";
-import { useOnboardingViewModel } from "@/src/viewmodels/onboarding/useOnboardingViewModel";
 
 import ComparisonImage from "@/assets/images/onboarding/con-puff-zero.png";
 
+import { ROUTES } from "@/src/constants/routes";
+import { router } from "expo-router";
+
 export default function OnboardingComparison() {
 
-  const { goToGoal } = useOnboardingViewModel();
+  //onboarding comparison
+  function goToGoal() {
+    router.push(ROUTES.ONBOARDING_GOAL)
+  }
   
   return (
     <View style={layout.screenContainer}>

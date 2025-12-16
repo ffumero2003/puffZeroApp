@@ -37,32 +37,38 @@ export const components = StyleSheet.create({
 
     googleBtn: {
       backgroundColor: "#000",
-      paddingVertical: 16,
+      height: 65,                 // 🔥 ALTURA FIJA
       paddingHorizontal: 32,
       borderRadius: 20,
       width: "100%",
+
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
     },
+
     googleText: {
       color: "#fff",
       marginLeft: 8,
-      fontSize: 22,
+      fontSize: 24,
     },
 
     button: {
       marginTop: 30,
       backgroundColor: Colors.light.primary,
-      paddingVertical: 16,
-      paddingHorizontal: 32,
+
+      height: 65,              // 🔥 ALTURA FIJA GLOBAL
+      paddingHorizontal: 32,   // OK
       borderRadius: 20,
       width: "100%",
-      
+
+      alignItems: "center",
+      justifyContent: "center",
     },
+
     buttonText: {
       textAlign: "center",
-      fontSize: 22,
+      fontSize: 24,
       color: "#fff",
     },
 

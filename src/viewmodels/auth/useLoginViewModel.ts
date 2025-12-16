@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+// useLoginViewModel.ts
 import { useState } from "react";
 import { Alert } from "react-native";
 
@@ -35,7 +35,7 @@ export function useLoginViewModel() {
     setEmailError(emailErr);
     setPasswordError(passErr);
 
-    if (emailErr || passErr) return;
+    if (emailErr || passErr) return false;
 
     setLoading(true);
     const { error } = await signIn(email, password);
@@ -43,10 +43,10 @@ export function useLoginViewModel() {
 
     if (error) {
       Alert.alert("Error al iniciar sesión", error.message);
-      return;
+      return false;
     }
 
-    router.replace("/home"); // ajusta si usas otra ruta
+    return true;
   };
 
   const isInvalid =

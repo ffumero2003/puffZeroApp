@@ -1,5 +1,5 @@
+import { Colors, Fonts } from "@/src/constants/theme";
 import { Text, TextProps } from "react-native";
-import { Colors, Fonts } from "../constants/theme";
 
 type FontWeightOption =
   | "light"

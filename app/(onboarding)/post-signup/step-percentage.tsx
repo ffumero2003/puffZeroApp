@@ -1,14 +1,16 @@
 import AppText from "@/src/components/AppText";
 import CheckItem from "@/src/components/onboarding/CheckItem";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
+import { ROUTES } from "@/src/constants/routes";
 import { Colors } from "@/src/constants/theme";
 import { layout } from "@/src/styles/layout";
 import { useStepPercentageViewModel } from "@/src/viewmodels/onboarding/useStepPercentageViewModel";
+import { router } from "expo-router";
 import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 
 export default function StepPercentage() {
-  const { progress, getStatusText } = useStepPercentageViewModel();
+  const { progress, getStatusText, completed } = useStepPercentageViewModel();
   const animatedWidth = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -23,6 +25,12 @@ export default function StepPercentage() {
     inputRange: [0, 100],
     outputRange: ["0%", "100%"],
   });
+
+  useEffect(() => {
+  if (completed) {
+    router.push(ROUTES.POST_SIGNUP_PLAN);
+  }
+}, [completed]);
 
   return (
     <View style={layout.screenContainer}>

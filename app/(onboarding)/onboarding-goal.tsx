@@ -6,6 +6,7 @@ import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import OnboardingOptionCard from "@/src/components/onboarding/OnboardingOptionCard";
 import TitleBlock from "@/src/components/onboarding/TitleBlock";
 import { layout } from "@/src/styles/layout";
+import { router } from "expo-router";
 
 import { useGoalViewModel } from "@/src/viewmodels/onboarding/useGoalViewModel";
 
@@ -22,9 +23,20 @@ const GOAL_OPTIONS = [
   },
 ];
 
+
 export default function OnboardingGoal() {
   const [selected, setSelected] = useState<string | null>(null);
-  const { continueWithGoal } = useGoalViewModel();
+  const { submitGoal } = useGoalViewModel();
+
+  const handleContinue = () => {
+    if (!selected) return;
+
+    const ok = submitGoal(selected);
+
+    if (ok) {
+      router.push("/onboarding-speed-plan");
+    }
+  };
 
   return (
     <View style={layout.screenContainer}>
@@ -52,9 +64,9 @@ export default function OnboardingGoal() {
 
       <ContinueButton
         text="Continuar"
-        disabled={selected === null}
-        onPress={() => continueWithGoal(selected!)}
-        style={layout.bottomButtonSpacing}
+        disabled={!selected}
+        onPress={handleContinue}
+        style={layout.bottomButtonContainer}
       />
     </View>
   );

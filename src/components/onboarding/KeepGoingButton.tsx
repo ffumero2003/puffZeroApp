@@ -1,6 +1,6 @@
+import AppText from "@/src/components/AppText";
+import { components } from "@/src/styles/components";
 import { TouchableOpacity, ViewStyle } from "react-native";
-import { components } from "../../../src/styles/components";
-import AppText from "../AppText";
 
 interface Props {
   text: string;

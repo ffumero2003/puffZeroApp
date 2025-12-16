@@ -1,6 +1,6 @@
+// useMoneySpentViewModel.ts
 import { MIN_BY_CURRENCY } from "@/src/constants/currency";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
-import { router } from "expo-router";
 
 export function useMoneySpentViewModel() {
   const { setMoney, setCurrency } = useOnboarding();
@@ -10,14 +10,14 @@ export function useMoneySpentViewModel() {
     return amount >= min;
   }
 
-  function continueWithMoney(amount: number, currency: string) {
+  function submitMoney(amount: number, currency: string) {
     setMoney(amount);
     setCurrency(currency);
-    router.push("/onboarding-comparison");
+    return true;
   }
 
   return {
     isValidAmount,
-    continueWithMoney,
+    submitMoney,
   };
 }

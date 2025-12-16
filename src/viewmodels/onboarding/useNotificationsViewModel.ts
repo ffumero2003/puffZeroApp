@@ -1,23 +1,22 @@
+// useNotificationsViewModel.ts
 import * as Notifications from "expo-notifications";
-import { router } from "expo-router";
 
 export function useNotificationsViewModel() {
-  async function requestPermissionAndContinue() {
+  async function requestPermission() {
     try {
       await Notifications.requestPermissionsAsync();
-    } catch (e) {
-      // no importa el error, seguimos
-    } finally {
-      router.push("/(onboarding)/post-signup/step-percentage");
+    } catch {
+      // ignore
     }
+    return true;
   }
 
   function skipPermission() {
-    router.push("/(onboarding)/post-signup/step-percentage");
+    return true;
   }
 
   return {
-    requestPermissionAndContinue,
+    requestPermission,
     skipPermission,
   };
 }

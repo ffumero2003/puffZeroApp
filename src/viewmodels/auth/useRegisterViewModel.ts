@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+// useRegisterViewModel.ts
 import { Alert } from "react-native";
 
 import { createProfile } from "@/src/lib/profile";
@@ -25,21 +25,19 @@ export function useRegisterViewModel() {
   } = useOnboarding();
 
   async function register({ email, password, nombre }: RegisterPayload) {
-    // 1) Crear usuario
     const { data, error } = await signUp(email, password, nombre);
 
     if (error) {
       Alert.alert("Error", error.message);
-      return;
+      return false;
     }
 
     const userId = data?.user?.id;
     if (!userId) {
       Alert.alert("Error", "No se pudo obtener el usuario.");
-      return;
+      return false;
     }
 
-    // 2) Crear perfil
     const { data: profile, error: profileError } = await createProfile({
       user_id: userId,
       full_name: nombre,
@@ -54,7 +52,7 @@ export function useRegisterViewModel() {
 
     if (profileError) {
       Alert.alert("Error creando perfil", profileError.message);
-      return;
+      return false;
     }
 
     if (!profile?.created_at) {
@@ -62,13 +60,13 @@ export function useRegisterViewModel() {
         "Error crítico",
         "El perfil se creó, pero no se pudo obtener la fecha."
       );
-      return;
+      return false;
     }
 
     setProfileCreatedAt(profile.created_at);
 
     Alert.alert("Cuenta creada", "Revisá tu correo para confirmar tu cuenta.");
-    router.push("/(onboarding)/post-signup/step-review");
+    return true;
   }
 
   return {

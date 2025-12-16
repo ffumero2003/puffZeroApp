@@ -7,7 +7,9 @@ import OnboardingOptionCard from "@/src/components/onboarding/OnboardingOptionCa
 import TitleBlock from "@/src/components/onboarding/TitleBlock";
 import { layout } from "@/src/styles/layout";
 
+import { ROUTES } from "@/src/constants/routes";
 import { useSpeedPlanViewModel } from "@/src/viewmodels/onboarding/useSpeedPlanViewModel";
+import { router } from "expo-router";
 
 const OPTIONS = [
   {
@@ -39,7 +41,14 @@ const OPTIONS = [
 
 export default function OnboardingSpeedPlan() {
   const [selected, setSelected] = useState<string | null>(null);
-  const { continueWithSpeed } = useSpeedPlanViewModel();
+  const { submitSpeed } = useSpeedPlanViewModel();
+
+  const handleContinue = (speed: string) => {
+  const ok = submitSpeed(speed);
+  if (ok) {
+    router.push(ROUTES.ONBOARDING_MOTIVATION);
+  }
+};
 
   return (
     <View style={layout.screenContainer}>
@@ -73,7 +82,7 @@ export default function OnboardingSpeedPlan() {
       <ContinueButton
         text="Continuar"
         disabled={selected === null}
-        onPress={() => continueWithSpeed(selected!)}
+        onPress={() => handleContinue(selected!)}
         style={layout.bottomButtonContainer}
       />
     </View>

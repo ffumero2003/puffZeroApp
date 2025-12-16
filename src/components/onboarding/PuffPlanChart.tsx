@@ -1,6 +1,7 @@
+import AppText from "@/src/components/AppText";
+import { Colors } from "@/src/constants/theme";
 import { StyleSheet, View } from "react-native";
-import { Colors } from "../../constants/theme";
-import AppText from "../AppText";
+
 
 interface Props {
   data: number[];

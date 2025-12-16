@@ -1,6 +1,6 @@
+import AppText from "@/src/components/AppText";
+import { Colors } from "@/src/constants/theme";
 import { Image, StyleSheet, View } from "react-native";
-import { Colors } from "../../constants/theme";
-import AppText from "../AppText";
 
 interface Props {
   icon: any; // imagen local

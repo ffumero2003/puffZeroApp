@@ -1,6 +1,7 @@
+import AppText from "@/src/components/AppText";
+import { layout } from "@/src/styles/layout";
 import { View } from "react-native";
-import { layout } from "../../../src/styles/layout";
-import AppText from "../AppText";
+
 
 interface Props {
   title: string;

@@ -1,6 +1,6 @@
+// usePersonalizedPlanViewModel.ts
 import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { buildPuffsPlan, sampleChartData } from "@/src/utils/charts";
-import { router } from "expo-router";
 import { useEffect, useState } from "react";
 
 function getTargetDate(createdAt: string, goalSpeed: number): Date {
@@ -18,6 +18,8 @@ function formatDate(date: Date): string {
   });
 }
 
+export type PersonalizedPlanStatus = "ok" | "invalid";
+
 export function usePersonalizedPlanViewModel() {
   const {
     goal_speed,
@@ -28,16 +30,17 @@ export function usePersonalizedPlanViewModel() {
 
   const [targetDate, setTargetDate] = useState<string | null>(null);
   const [puffsChart, setPuffsChart] = useState<number[]>([]);
+  const [status, setStatus] = useState<PersonalizedPlanStatus>("ok");
 
   useEffect(() => {
     if (!goal_speed || !profile_created_at) {
-      router.replace("/(onboarding)/post-signup/step-review");
+      setStatus("invalid");
       return;
     }
 
     const days = Number(goal_speed);
     if (Number.isNaN(days)) {
-      router.replace("/(onboarding)/post-signup/step-review");
+      setStatus("invalid");
       return;
     }
 
@@ -49,14 +52,15 @@ export function usePersonalizedPlanViewModel() {
     }
   }, []);
 
-  function continueFlow() {
+  function finishFlow() {
     resetAll();
-    router.push("/(onboarding)/post-signup/step-facts");
+    return true;
   }
 
   return {
     targetDate,
     puffsChart,
-    continueFlow,
+    status,
+    finishFlow,
   };
 }

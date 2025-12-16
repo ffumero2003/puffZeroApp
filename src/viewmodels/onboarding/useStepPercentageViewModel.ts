@@ -1,5 +1,4 @@
 // useStepPercentageViewModel.ts
-import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 
 const INTERVAL_MS = 60;
@@ -8,6 +7,7 @@ const COMPLETE_DELAY = 900;
 export function useStepPercentageViewModel() {
   const [progress, setProgress] = useState(0);
   const timeoutRef = useRef<number | null>(null);
+  const [completed, setCompleted] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -16,7 +16,7 @@ export function useStepPercentageViewModel() {
           clearInterval(interval);
 
           timeoutRef.current = setTimeout(() => {
-            router.push("/(onboarding)/post-signup/step-personalized-plan");
+            setCompleted(true);
           }, COMPLETE_DELAY);
 
           return 100;
@@ -42,6 +42,7 @@ export function useStepPercentageViewModel() {
 
   return {
     progress,
+    completed,
     getStatusText,
   };
 }

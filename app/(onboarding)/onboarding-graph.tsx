@@ -9,8 +9,17 @@ import { useOnboardingViewModel } from "@/src/viewmodels/onboarding/useOnboardin
 
 import Graph from "@/assets/images/onboarding/onboarding-graph.png";
 
+import { ROUTES } from "@/src/constants/routes";
+import { router } from "expo-router";
+
 export default function OnboardingGraph() {
-  const { showLogin, goToPuffCount } = useOnboardingViewModel();
+  const { showLogin } = useOnboardingViewModel();
+
+
+  //onboarding money saved
+  function goToPuffCount() {
+    router.push(ROUTES.ONBOARDING_PUFFS)
+  }
 
  
   return (

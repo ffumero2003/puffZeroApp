@@ -8,9 +8,17 @@ import { layout } from "@/src/styles/layout";
 import { useOnboardingViewModel } from "@/src/viewmodels/onboarding/useOnboardingViewModel";
 
 import MoneySaved from "@/assets/images/onboarding/onboarding-money-saved.png";
+import { ROUTES } from "@/src/constants/routes";
+import { router } from "expo-router";
 
 export default function OnboardingMoneySaved() {
-  const { showLogin, goToGraph } = useOnboardingViewModel()
+  const { showLogin } = useOnboardingViewModel()
+
+   //onboarding money saved
+    function goToGraph() {
+      router.push(ROUTES.ONBOARDING_GRAPH)
+    }
+  
 
   return (
     <View style={layout.screenContainer}>

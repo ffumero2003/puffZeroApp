@@ -1,7 +1,7 @@
+import { Colors } from "@/src/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { StyleSheet, TextInput, TextInputProps, TouchableOpacity, View } from "react-native";
-import { Colors } from "../../constants/theme";
 
 interface UnderlineInputProps extends TextInputProps {
   placeholder: string;

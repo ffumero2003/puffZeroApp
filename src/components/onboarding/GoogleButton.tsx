@@ -3,10 +3,10 @@ import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { ActivityIndicator, TouchableOpacity } from "react-native";
 
-import { components } from "../../../src/styles/components";
-import { supabase } from "../../lib/supabase";
-import { useAuth } from "../../providers/auth-provider";
-import AppText from "../AppText";
+import AppText from "@/src/components/AppText";
+import { supabase } from "@/src/lib/supabase";
+import { useAuth } from "@/src/providers/auth-provider";
+import { components } from "@/src/styles/components";
 
 type GoogleButtonProps = {
   mode: "login" | "register";

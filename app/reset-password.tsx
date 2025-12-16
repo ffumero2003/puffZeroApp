@@ -6,6 +6,9 @@ import { layout } from "@/src/styles/layout";
 import { useResetPasswordViewModel } from "@/src/viewmodels/auth/useResetPasswordViewModel";
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View } from "react-native";
 
+import { ROUTES } from "@/src/constants/routes";
+import { router } from "expo-router";
+
 export default function ResetPasswordScreen() {
   const {
     password,
@@ -15,6 +18,13 @@ export default function ResetPasswordScreen() {
     setConfirm,
     submit,
   } = useResetPasswordViewModel();
+
+  const handleSubmit = async () => {
+    const ok = await submit();
+    if (ok) {
+      router.replace(ROUTES.LOGIN);
+    }
+  };
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
@@ -51,7 +61,7 @@ export default function ResetPasswordScreen() {
 
           <ContinueButton
             text={loading ? "Actualizando..." : "Actualizar contraseña"}
-            onPress={submit}
+            onPress={handleSubmit}
             disabled={loading}
             style={layout.bottomButtonContainer}
           />

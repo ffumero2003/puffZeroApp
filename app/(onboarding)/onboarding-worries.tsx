@@ -5,7 +5,9 @@ import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import MultiSelectButton from "@/src/components/onboarding/MultiSelectButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import TitleBlock from "@/src/components/onboarding/TitleBlock";
+import { ROUTES } from "@/src/constants/routes";
 import { layout } from "@/src/styles/layout";
+import { router } from "expo-router";
 
 import { useWorriesViewModel } from "@/src/viewmodels/onboarding/useWorriesViewModel";
 
@@ -22,7 +24,7 @@ const CONCERNS = [
 
 export default function OnboardingWorries() {
   const [selected, setSelected] = useState<string[]>([]);
-  const { continueWithWorries } = useWorriesViewModel();
+  const { submitWorries } = useWorriesViewModel();
 
   const toggleSelect = (id: string) => {
     setSelected(prev =>
@@ -30,6 +32,13 @@ export default function OnboardingWorries() {
         ? prev.filter(item => item !== id)
         : [...prev, id]
     );
+  };
+
+  const handleContinue = (worries: string[]) => {
+    const ok = submitWorries(worries);
+    if (ok) {
+      router.push(ROUTES.REGISTER);
+    }
   };
 
   return (
@@ -62,7 +71,7 @@ export default function OnboardingWorries() {
       <ContinueButton
         text="Continuar"
         disabled={selected.length === 0}
-        onPress={() => continueWithWorries(selected)}
+        onPress={() => handleContinue(selected)}
         style={layout.bottomButtonContainer}
       />
     </View>

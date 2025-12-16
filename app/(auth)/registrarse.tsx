@@ -24,9 +24,12 @@ import UnderlineInput from "@/src/components/onboarding/UnderlineInput";
 import { layout } from "@/src/styles/layout";
 import { useRegisterViewModel } from "@/src/viewmodels/auth/useRegisterViewModel";
 
+import { ROUTES } from "@/src/constants/routes";
+import { router } from "expo-router";
+
 export default function Register() {
   /* ---------------------------
-     STATE
+     STATE 
   ------------------------------*/
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -68,13 +71,18 @@ export default function Register() {
     setNombreError(validateFullName(value));
   };
 
-  const handleRegister = () => {
-    register({
+  const handleRegister = async () => {
+    const ok = await register({
       email,
       password,
       nombre,
     });
+
+    if (ok) {
+      router.push(ROUTES.POST_SIGNUP_REVIEW);
+    }
   };
+
 
   /* ---------------------------
      VALID STATE

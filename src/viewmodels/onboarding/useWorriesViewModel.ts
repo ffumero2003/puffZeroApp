@@ -1,15 +1,15 @@
+// useWorriesViewModel.ts
 import { useOnboarding } from "@/src/providers/onboarding-provider";
-import { router } from "expo-router";
 
 export function useWorriesViewModel() {
   const { setWorries } = useOnboarding();
 
-  function continueWithWorries(worries: string[]) {
+  function submitWorries(worries: string[]) {
     setWorries(worries);
-    router.push("/(auth)/registrarse");
+    return true;
   }
 
   return {
-    continueWithWorries,
+    submitWorries,
   };
 }
