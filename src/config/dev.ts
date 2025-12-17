@@ -1,7 +1,7 @@
 export const DEV_MODE = false;
 
 // Pantalla a la que querés entrar DIRECTO
-export const DEV_SCREEN = "/(onboarding)/post-signup/step-percentage";
+export const DEV_SCREEN = "/(paywall)/paywall";
 
 // Opciones: 
 // "/(onboarding)/post-signup/step1"

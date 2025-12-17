@@ -3,13 +3,16 @@ import Fire from "@/assets/images/paywall/fire.png";
 import Statistics from "@/assets/images/paywall/statistics.png";
 import Target from "@/assets/images/paywall/target.png";
 import AppText from "@/src/components/AppText";
+import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
-import FeatureItem from "@/src/components/paywall/featureItem";
+import FeatureItem from "@/src/components/paywall/FeatureItem";
+import SubscriptionOption from "@/src/components/paywall/SubscriptionOption";
 import { Colors } from "@/src/constants/theme";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { layout } from "@/src/styles/layout";
 import { router } from "expo-router";
+import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 
@@ -27,6 +30,8 @@ export default function OnboardingPaywall() {
     resetAll
   } = useOnboarding();
   const { user } = useAuth();
+  
+  const [plan, setPlan] = useState<"weekly" | "yearly">("yearly");
 
   const displayName =
     name ||
@@ -117,7 +122,7 @@ export default function OnboardingPaywall() {
     
   return (
       <View style={layout.screenContainer}>
-        <View style={layout.content}>   
+        <View >   
             {/* Header */}
           <OnboardingHeader showProgress={false} showBack={false} />
 
@@ -145,8 +150,39 @@ export default function OnboardingPaywall() {
               <FeatureItem icon={Target} text={planText} /> 
               <FeatureItem icon={Fire} text={whyText} /> 
               <FeatureItem icon={Check} text={moneyText} /> 
-
           </View>
+
+
+          <View style={styles.featureContainer}>
+              <SubscriptionOption
+              title="Acceso semanal"
+              subtitle="3 días de prueba gratis"
+              price="₡5,000"
+              strikePrice={true}
+              highlight="Mejor oferta"
+              badge="GRATIS"
+              selected={plan === "weekly"}
+              onPress={() => setPlan("weekly")}
+            />
+
+            <SubscriptionOption
+              title="Acceso anual"
+              subtitle="3 días de prueba gratis"
+              price="₡700"
+              strikePrice={false}
+              badge="Ahorra 90%"
+      
+              selected={plan === "yearly"}
+              onPress={() => setPlan("yearly")}
+            />
+          </View>
+
+          <ContinueButton
+            text="Continuar"
+            onPress={grantAccess}
+            style={layout.bottomButtonContainer}
+          />
+
             
         </View> 
       

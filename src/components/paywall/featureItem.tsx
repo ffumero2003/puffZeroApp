@@ -28,14 +28,14 @@ const styles = StyleSheet.create({
   },
 
   icon: {
-    width: 65,
-    height: 65,
+    width: 50,
+    height: 50,
     marginRight: 14,
   },
 
   text: {
     flex: 1,
-    fontSize: 18,
+    fontSize: 16,
     lineHeight: 24,
     color: Colors.light.text,
   },
