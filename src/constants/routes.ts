@@ -24,6 +24,7 @@ export const ROUTES = {
   ONBOARDING_COMPARISON: "/onboarding-comparison",
   ONBOARDING_ZUFFY: "/onboarding-zuffy",
   ONBOARDING_PROGRESS: "/onboarding-progress",
+  ONBOARDING: "/onboarding",
 
   // Post signup
   POST_SIGNUP_REVIEW: "/(onboarding)/post-signup/step-review",

@@ -2,14 +2,22 @@ import AppText from "@/src/components/AppText";
 import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import UnderlineInput from "@/src/components/onboarding/UnderlineInput";
+import {
+  validateConfirmPassword,
+  validatePassword,
+} from "@/src/lib/auth/auth.validation";
 import { layout } from "@/src/styles/layout";
 import { useResetPasswordViewModel } from "@/src/viewmodels/auth/useResetPasswordViewModel";
+import { useState } from "react";
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View } from "react-native";
+
 
 import { ROUTES } from "@/src/constants/routes";
 import { router } from "expo-router";
 
 export default function ResetPasswordScreen() {
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmError, setConfirmError] = useState("");
   const {
     password,
     confirm,
@@ -18,13 +26,37 @@ export default function ResetPasswordScreen() {
     setConfirm,
     submit,
   } = useResetPasswordViewModel();
+  const canSubmit =
+  password.length > 0 &&
+  confirm.length > 0 &&
+  password === confirm &&
+  !loading;
+
 
   const handleSubmit = async () => {
     const ok = await submit();
     if (ok) {
-      router.replace(ROUTES.LOGIN);
+      router.replace(ROUTES.LOGIN); 
     }
   };
+
+  
+
+
+  const onPasswordChange = (value: string) => {
+    setPassword(value);
+    setPasswordError(validatePassword(value));
+
+    if (confirm) {
+      setConfirmError(validateConfirmPassword(value, confirm));
+    }
+  };
+
+  const onConfirmChange = (value: string) => {
+    setConfirm(value);
+    setConfirmError(validateConfirmPassword(password, value));
+  };
+
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
@@ -44,27 +76,44 @@ export default function ResetPasswordScreen() {
             </View>
 
             <UnderlineInput
-              placeholder="Nueva contraseña"
+              placeholder="Contraseña"
               value={password}
-              onChangeText={setPassword}
+              onChangeText={onPasswordChange}
+              fieldType="password"
               secureTextEntry
             />
+
+
+            {passwordError && (
+              <AppText style={layout.errorText} weight="extrabold">
+                {passwordError}
+              </AppText>
+            )}
+
 
             <UnderlineInput
               placeholder="Confirmar contraseña"
               value={confirm}
-              onChangeText={setConfirm}
+              onChangeText={onConfirmChange}
+              fieldType="confirmPassword"
               secureTextEntry
-              style={{ marginTop: 16 }}
             />
+            {confirmError && (
+              <AppText style={layout.errorText} weight="extrabold">
+                {confirmError}
+              </AppText>
+            )}
+
+
           </View>
 
           <ContinueButton
             text={loading ? "Actualizando..." : "Actualizar contraseña"}
             onPress={handleSubmit}
-            disabled={loading}
+            disabled={!canSubmit}
             style={layout.bottomButtonContainer}
           />
+
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

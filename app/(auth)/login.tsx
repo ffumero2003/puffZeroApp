@@ -49,8 +49,7 @@ export default function Login() {
           placeholder="Correo"
           value={email}
           onChangeText={onEmailChange}
-          autoCapitalize="none"
-          keyboardType="email-address"
+          fieldType="email"
         />
         {emailError ? (
           <AppText style={layout.errorText} weight="extrabold">
@@ -63,7 +62,7 @@ export default function Login() {
           placeholder="Contraseña"
           value={password}
           onChangeText={onPasswordChange}
-          autoCapitalize="none"
+          fieldType="password"
           secureTextEntry
         />
         {passwordError ? (

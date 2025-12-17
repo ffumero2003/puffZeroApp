@@ -1,7 +1,7 @@
 export const DEV_MODE = false;
 
 // Pantalla a la que querés entrar DIRECTO
-export const DEV_SCREEN = "/(onboarding)/onboarding-progress";
+export const DEV_SCREEN = "/reset-password";
 
 // Opciones: 
 // "/(onboarding)/post-signup/step1"

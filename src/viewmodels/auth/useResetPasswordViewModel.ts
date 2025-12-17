@@ -1,10 +1,10 @@
 // useResetPasswordViewModel.ts
+import { ROUTES } from "@/src/constants/routes";
 import { supabase } from "@/src/lib/supabase";
 import * as Linking from "expo-linking";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Alert } from "react-native";
-
 export function useResetPasswordViewModel() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -13,18 +13,23 @@ export function useResetPasswordViewModel() {
   const params = useLocalSearchParams();
   const didInit = useRef(false);
 
+  const recoveryUsed = useRef(false);
+
+
   async function hydrateSessionFromUrl(url: string) {
+    // 🔕 Recovery ya consumido → salir sin alertas
+    if (recoveryUsed.current) {
+      router.replace(ROUTES.ONBOARDING);
+      return false;
+    }
+
     const parsed = Linking.parse(url);
 
-    const access_token = parsed.queryParams?.access_token as
-      | string
-      | undefined;
-    const refresh_token = parsed.queryParams?.refresh_token as
-      | string
-      | undefined;
+    const access_token = parsed.queryParams?.access_token as string | undefined;
+    const refresh_token = parsed.queryParams?.refresh_token as string | undefined;
 
     if (!access_token || !refresh_token) {
-      Alert.alert("Error", "El enlace no es válido.");
+      router.replace(ROUTES.ONBOARDING);
       return false;
     }
 
@@ -34,12 +39,15 @@ export function useResetPasswordViewModel() {
     });
 
     if (error) {
-      Alert.alert("Error", "El enlace expiró o ya fue usado.");
+      router.replace(ROUTES.ONBOARDING);
       return false;
     }
 
     return true;
   }
+
+
+
 
   useEffect(() => {
     if (didInit.current) return;
@@ -48,15 +56,14 @@ export function useResetPasswordViewModel() {
     const access = params.access_token as string | undefined;
     const refresh = params.refresh_token as string | undefined;
 
-    if (access && refresh) {
-      hydrateSessionFromUrl(
-        `puffzero://reset-password?access_token=${access}&refresh_token=${refresh}`
-      );
-    } else {
-      Linking.getInitialURL().then((url) => {
-        if (url) hydrateSessionFromUrl(url);
-      });
+    if (!access || !refresh) {
+      router.replace(ROUTES.ONBOARDING);
+      return;
     }
+
+    hydrateSessionFromUrl(
+      `puffzero://reset-password?access_token=${access}&refresh_token=${refresh}`
+    );
 
     const sub = Linking.addEventListener("url", ({ url }) => {
       hydrateSessionFromUrl(url);
@@ -64,6 +71,7 @@ export function useResetPasswordViewModel() {
 
     return () => sub.remove();
   }, [params]);
+
 
   async function submit() {
     if (!password || !confirm) {
@@ -77,17 +85,38 @@ export function useResetPasswordViewModel() {
     }
 
     setLoading(true);
+
     const { error } = await supabase.auth.updateUser({ password });
+
     setLoading(false);
 
     if (error) {
-      Alert.alert("Error", error.message);
+      if (
+        error.message.toLowerCase().includes("different") ||
+        error.message.toLowerCase().includes("old password")
+      ) {
+        Alert.alert(
+          "Contraseña inválida",
+          "La nueva contraseña no puede ser igual a la anterior."
+        );
+      } else {
+        Alert.alert("Error", error.message);
+      }
       return false;
     }
+
+    // 🔒 SOLO SI TODO SALIÓ BIEN
+    recoveryUsed.current = true;
+
+    // 🔥 CERRAR SESIÓN DE RECOVERY
+    await supabase.auth.signOut();
+
 
     Alert.alert("Listo", "Tu contraseña fue actualizada.");
     return true;
   }
+
+
 
   return {
     password,

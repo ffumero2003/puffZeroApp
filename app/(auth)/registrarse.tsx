@@ -1,10 +1,13 @@
 import { useState } from "react";
 import {
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   TouchableWithoutFeedback,
-  View,
+  View
 } from "react-native";
+
 
 import {
   validateConfirmPassword,
@@ -102,84 +105,90 @@ export default function Register() {
   ------------------------------*/
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={layout.containerAuth}>
-        <OnboardingHeader showProgress={false} style={{ marginBottom: 30 }} />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
+      >
+        <View style={layout.containerAuth}>
+          <OnboardingHeader showProgress={false} style={{ marginBottom: 30 }} />
 
-        <AuthHeader
-          title="Crear Cuenta"
-          subtitle="Configurá tu cuenta y empezá tu proceso."
-        />
-
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {/* Nombre */}
-          <UnderlineInput
-            placeholder="Nombre Completo"
-            value={nombre}
-            onChangeText={onNameChange}
-            fieldType="name"
-            autoCapitalize="words"
-          />
-          {nombreError ? (
-            <AppText style={layout.errorText} weight="extrabold">
-              {nombreError}
-            </AppText>
-          ) : null}
-
-          {/* Email */}
-          <UnderlineInput
-            placeholder="Correo"
-            value={email}
-            onChangeText={onEmailChange}
-            fieldType="email"
-          />
-          {emailError ? (
-            <AppText style={layout.errorText} weight="extrabold">
-              {emailError}
-            </AppText>
-          ) : null}
-
-          {/* Contraseña */}
-          <UnderlineInput
-            placeholder="Contraseña"
-            value={password}
-            onChangeText={onPasswordChange}
-            fieldType="password"
-            secureTextEntry
-          />
-          {passwordError ? (
-            <AppText style={layout.errorText} weight="extrabold">
-              {passwordError}
-            </AppText>
-          ) : null}
-
-          {/* Confirmar contraseña */}
-          <UnderlineInput
-            placeholder="Confirmar contraseña"
-            value={confirm}
-            onChangeText={onConfirmChange}
-            fieldType="confirmPassword"
-            secureTextEntry
-          
-          />
-          {confirmError ? (
-            <AppText style={layout.errorText} weight="extrabold">
-              {confirmError}
-            </AppText>
-          ) : null}
-
-          {/* Botón */}
-          <ContinueButtonAuth
-            text="Registrarse"
-            disabled={isInvalid}
-            onPress={handleRegister}
-            style={{ marginTop: 30 }}
+          <AuthHeader
+            title="Crear Cuenta"
+            subtitle="Configurá tu cuenta y empezá tu proceso."
           />
 
-          <SeparatorRow />
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            >
+            {/* Nombre */}
+            <UnderlineInput
+              placeholder="Nombre Completo"
+              value={nombre}
+              onChangeText={onNameChange}
+              fieldType="name"
+            />
+            {nombreError && (
+              <AppText style={layout.errorText} weight="extrabold">
+                {nombreError}
+              </AppText>
+            )}
 
-          <GoogleButton mode="register" />
-        </ScrollView>
-      </View>
+            {/* Email */}
+            <UnderlineInput
+              placeholder="Correo"
+              value={email}
+              onChangeText={onEmailChange}
+              fieldType="email"
+            />
+            {emailError && (
+              <AppText style={layout.errorText} weight="extrabold">
+                {emailError}
+              </AppText>
+            )}
+
+            {/* Contraseña */}
+            <UnderlineInput
+              placeholder="Contraseña"
+              value={password}
+              onChangeText={onPasswordChange}
+              fieldType="password"
+              secureTextEntry
+            />
+            {passwordError && (
+              <AppText style={layout.errorText} weight="extrabold">
+                {passwordError}
+              </AppText>
+            )}
+
+            {/* Confirmar contraseña */}
+            <UnderlineInput
+              placeholder="Confirmar contraseña"
+              value={confirm}
+              onChangeText={onConfirmChange}
+              fieldType="confirmPassword"
+              secureTextEntry
+            />
+            {confirmError && (
+              <AppText style={layout.errorText} weight="extrabold">
+                {confirmError}
+              </AppText>
+            )}
+
+            {/* Botón */}
+            <ContinueButtonAuth
+              text="Registrarse"
+              disabled={isInvalid}
+              onPress={handleRegister}
+              
+            />
+
+            <SeparatorRow />
+            <GoogleButton mode="register" />
+          </ScrollView>
+        </View>
+      </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
+
 }

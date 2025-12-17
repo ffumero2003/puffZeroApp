@@ -31,35 +31,57 @@ function RootNavigation() {
   const isLoading = initializing || loading;
 
 
-  // ---------------------------------------
-  // 🔥 Lógica de navegación existente
-  // ---------------------------------------
-    useEffect(() => {
-      if (DEV_MODE) {
-        router.replace(DEV_SCREEN);
-        return;
-      }
+  useEffect(() => {
+    if (DEV_MODE) {
+      router.replace(DEV_SCREEN);
+      return;
+    }
 
-      if (authInProgress || isLoading) return;
+    if (authInProgress || isLoading) return;
 
-      const [group] = segments;
+    const [group] = segments;
 
-      // ✅ BYPASS para reset-password (debe funcionar sin sesión)
-      if (group === "reset-password") return;
-
+    /**
+     * 🔒 RESET PASSWORD RULE
+     * --------------------------------------------------
+     * reset-password SOLO es válido si existe sesión.
+     * Si no hay user, se expulsa inmediatamente.
+     * --------------------------------------------------
+     */
+    if (group === "reset-password") {
       if (!user) {
-        if (group !== "(auth)" && group !== "(onboarding)") {
-          router.replace("/(onboarding)/onboarding");
-        }
-        return;
+        router.replace("/(onboarding)/onboarding"); // o ROUTES.LOGIN
       }
+      return;
+    }
 
-      if (group === "(auth)" || group === "(onboarding)") {
-        return;
+    /**
+     * 🚪 USUARIO NO AUTENTICADO
+     * --------------------------------------------------
+     * Solo puede estar en (auth) o (onboarding)
+     * --------------------------------------------------
+     */
+    if (!user) {
+      if (group !== "(auth)" && group !== "(onboarding)") {
+        router.replace("/(onboarding)/onboarding");
       }
+      return;
+    }
 
+    /**
+     * 🏠 USUARIO AUTENTICADO
+     * --------------------------------------------------
+     * No debe volver a auth ni onboarding
+     * --------------------------------------------------
+     */
+    if (group === "(auth)" || group === "(onboarding)") {
       router.replace("/(app)/home");
-    }, [authInProgress, isLoading, user, segments]);
+      return;
+    }
+
+    // Usuario autenticado y ya en (app) → OK
+  }, [authInProgress, isLoading, user, segments]);
+
 
 
   if (isLoading && !DEV_MODE) return <Splash />;

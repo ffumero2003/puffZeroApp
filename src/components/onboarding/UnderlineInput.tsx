@@ -91,7 +91,7 @@ export default function UnderlineInput({
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginTop: 20,
+    marginTop: 16,
     borderBottomWidth: 10,
     borderBottomColor: "#E5E0FF",
     borderRadius: 12,
