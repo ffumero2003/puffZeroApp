@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { DEBUG } from "../config/debug";
 
 interface OnboardingData {
+  name: string | null;             
   puffs_per_day: number | null;
   money_per_month: number | null;
   currency: string | null;
@@ -17,6 +18,7 @@ interface OnboardingData {
   onboardingCompleted: boolean;        // 🔥 NUEVO
   loading: boolean;                    // 🔥 NUEVO
 
+  setName: (n: string) => void; 
   setPuffs: (n: number) => void;
   setMoney: (n: number) => void;
   setCurrency: (c: string) => void;
@@ -34,6 +36,8 @@ const OnboardingContext = createContext<OnboardingData | null>(null);
 export function OnboardingProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
+
+  const [name, setNameState] = useState<string | null>(null);
 
   const [puffs_per_day, setPuffs_per_day] = useState<number | null>(null);
   const [money_per_month, setMoney_per_month] = useState<number | null>(null);
@@ -59,6 +63,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       const loadData = async () => {
         const storedCompleted = await AsyncStorage.getItem("onboardingCompleted");
         const storedCreatedAt = await AsyncStorage.getItem("profile_created_at");
+        const storedName = await AsyncStorage.getItem("onboarding_name");
 
         let completed = storedCompleted === "true";
 
@@ -68,6 +73,9 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         if (storedCreatedAt) {
           setProfileCreatedAtState(storedCreatedAt);
         }
+        
+        if (storedName) setNameState(storedName);
+
 
         setOnboardingCompleted(completed);
         setLoading(false);
@@ -83,35 +91,47 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     }
 
 
+      function setName(n: string) {
+        setNameState(n);
+        AsyncStorage.setItem("onboarding_name", n);
+      }
 
 
-  // 🔥 Marcar onboarding como terminado
-  async function completeOnboarding() {
-    setOnboardingCompleted(true);
-    await AsyncStorage.setItem("onboardingCompleted", "true");
-  }
 
-  // 🔥 Reset (si el usuario quiere empezar onboarding de nuevo)
-  function resetAll() {
-    setPuffs_per_day(null);
-    setMoney_per_month(null);
-    setCurrencyState(null);
-    setGoalState(null);
-    setGoalSpeedState(null);
-    setWhyStoppedState([]);
-    setWorriesState([]);
-    setProfileCreatedAtState(null)
-    setOnboardingCompleted(false);
-    AsyncStorage.multiRemove([
-      "onboardingCompleted",
-      "profile_created_at",
-    ]);
+    // 🔥 Marcar onboarding como terminado
+    async function completeOnboarding() {
+      setOnboardingCompleted(true);
+      await AsyncStorage.setItem("onboardingCompleted", "true");
 
-  }
+      // 🔥 limpiar datos temporales
+      await AsyncStorage.removeItem("onboarding_name");
+    }
+
+
+    // 🔥 Reset (si el usuario quiere empezar onboarding de nuevo)
+    function resetAll() {
+      setNameState(null);
+      setPuffs_per_day(null);
+      setMoney_per_month(null);
+      setCurrencyState(null);
+      setGoalState(null);
+      setGoalSpeedState(null);
+      setWhyStoppedState([]);
+      setWorriesState([]);
+      setProfileCreatedAtState(null)
+      setOnboardingCompleted(false);
+      AsyncStorage.multiRemove([
+        "onboardingCompleted",
+        "profile_created_at",
+      ]);
+
+    }
 
   return (
     <OnboardingContext.Provider
       value={{
+        name,
+        setName,
         puffs_per_day,
         money_per_month,
         currency,
