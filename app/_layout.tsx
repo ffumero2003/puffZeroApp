@@ -24,6 +24,9 @@ function RootNavigation() {
   const { user, initializing, authInProgress, authFlow } = useAuth();
   const { loading } = useOnboarding();
   const segments = useSegments();
+  // 🔥 TEMPORAL – hasta implementar suscripciones reales
+  const isPremium = false;
+
 
   // 🟣 Importar DEV_MODE
   const { DEV_MODE, DEV_SCREEN } = require("../src/config/dev");
@@ -40,6 +43,9 @@ function RootNavigation() {
     if (authInProgress || isLoading) return;
 
     const [group] = segments;
+    const isPaywall = group === "(paywall)";
+    const isAuth = group === "(auth)";
+    const isOnboarding = group === "(onboarding)";
 
     /**
      * 🔒 RESET PASSWORD RULE
@@ -62,11 +68,12 @@ function RootNavigation() {
      * --------------------------------------------------
      */
     if (!user) {
-      if (group !== "(auth)" && group !== "(onboarding)") {
+      if (!isAuth && !isOnboarding && !isPaywall) {
         router.replace("/(onboarding)/onboarding");
       }
       return;
     }
+
 
     /**
      * 🏠 USUARIO AUTENTICADO
@@ -74,10 +81,25 @@ function RootNavigation() {
      * No debe volver a auth ni onboarding
      * --------------------------------------------------
      */
-    if (group === "(auth)" || group === "(onboarding)") {
-      router.replace("/(app)/home");
+    /**
+ * 🏠 USUARIO AUTENTICADO
+ */
+    if (user) {
+      // ❌ NO premium → solo puede estar en paywall
+      if (!isPremium) {
+        if (!isPaywall) {
+          router.replace("/(paywall)/paywall");
+        }
+        return;
+      }
+
+      // ✅ Premium → solo puede estar en app
+      if (group !== "(app)") {
+        router.replace("/(app)/home");
+      }
       return;
     }
+
 
     // Usuario autenticado y ya en (app) → OK
   }, [authInProgress, isLoading, user, segments]);

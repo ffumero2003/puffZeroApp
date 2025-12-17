@@ -25,7 +25,7 @@ export function usePersonalizedPlanViewModel() {
     goal_speed,
     profile_created_at,
     puffs_per_day,
-    resetAll,
+    
   } = useOnboarding();
 
   const [targetDate, setTargetDate] = useState<string | null>(null);
@@ -53,7 +53,7 @@ export function usePersonalizedPlanViewModel() {
   }, []);
 
   function finishFlow() {
-    resetAll();
+    
     return true;
   }
 

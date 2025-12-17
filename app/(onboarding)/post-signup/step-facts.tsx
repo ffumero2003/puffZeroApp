@@ -6,10 +6,15 @@ import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import FactItem from "@/src/components/onboarding/FactItem";
 import HowToFacts from "@/src/components/onboarding/HowToFacts";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
+import { ROUTES } from "@/src/constants/routes";
 import { FACTS, HOW_TO_FACTS } from "@/src/lib/onboarding/facts.library";
 import { layout } from "@/src/styles/layout";
 
 export default function StepFacts() {
+
+  const goPay = () => {
+    router.push(ROUTES.PAYWALL);
+  };
   return (
     <View style={layout.screenContainer}>
       <View style={layout.content}>
@@ -43,7 +48,7 @@ export default function StepFacts() {
 
       <ContinueButton
         text="¡Listo para empezar!"
-        onPress={() => router.push("/(app)/paywall")}
+        onPress={goPay}
       />
     </View>
   );

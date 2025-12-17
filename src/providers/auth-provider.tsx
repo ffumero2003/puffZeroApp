@@ -157,7 +157,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
     return result;
   };
-
+ 
 
   return (
     <AuthContext.Provider

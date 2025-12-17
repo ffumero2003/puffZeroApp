@@ -22,6 +22,7 @@ export function useRegisterViewModel() {
     why_stopped,
     worries,
     setProfileCreatedAt,
+    setName
   } = useOnboarding();
 
 
@@ -32,6 +33,10 @@ export function useRegisterViewModel() {
       Alert.alert("Error", error.message);
       return false;
     }
+
+    setName(nombre);
+    
+
 
     const userId = data?.user?.id;
     if (!userId) {

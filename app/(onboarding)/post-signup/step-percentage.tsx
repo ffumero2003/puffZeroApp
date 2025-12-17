@@ -96,7 +96,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   checklist: {
-    width: "100%",
-    paddingHorizontal: 8,
+    width: "100%",      // todos iguales
+    flexDirection: "column",
+    alignItems: "center",
   },
+
 });

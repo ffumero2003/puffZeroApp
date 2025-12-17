@@ -43,7 +43,6 @@ export default function Register() {
   const [passwordError, setPasswordError] = useState("");
   const [confirmError, setConfirmError] = useState("");
   const [nombreError, setNombreError] = useState("");
-
   const { register } = useRegisterViewModel();
 
   /* ---------------------------

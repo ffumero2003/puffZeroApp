@@ -1,0 +1,42 @@
+import AppText from "@/src/components/AppText";
+import { Colors } from "@/src/constants/theme";
+import { ReactNode } from "react";
+import { Image, StyleSheet, View } from "react-native";
+
+interface Props {
+  icon: any;
+  text: ReactNode;
+}
+
+export default function FeatureItem({ icon, text }: Props) {
+  return (
+    <View style={styles.container}>
+      <Image source={icon} style={styles.icon} resizeMode="contain" />
+
+      <AppText weight="semibold" style={styles.text}>
+        {text}
+      </AppText>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+
+  icon: {
+    width: 65,
+    height: 65,
+    marginRight: 14,
+  },
+
+  text: {
+    flex: 1,
+    fontSize: 18,
+    lineHeight: 24,
+    color: Colors.light.text,
+  },
+});

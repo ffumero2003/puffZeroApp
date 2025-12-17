@@ -46,7 +46,7 @@ export default function CheckItem({
         {active && <AppText style={styles.checkMark}>✓</AppText>}
       </Animated.View>
 
-      <AppText style={[styles.text, active && styles.textActive]}>
+      <AppText style={[styles.text, active && styles.textActive]} weight="bold">
         {text}
       </AppText>
     </View>
@@ -56,10 +56,14 @@ export default function CheckItem({
 
 const styles = StyleSheet.create({
   checkItem: {
+    width: "70%",            // 🔥 CLAVE
     flexDirection: "row",
     alignItems: "center",
+   
+  
     marginBottom: 14,
   },
+
 
   circle: {
     width: 22,
@@ -89,7 +93,7 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    fontSize: 15,
+    fontSize: 18,
     color: Colors.light.textSecondary,
   },
 
