@@ -4,6 +4,7 @@ import * as WebBrowser from "expo-web-browser";
 import { ActivityIndicator, TouchableOpacity } from "react-native";
 
 import AppText from "@/src/components/AppText";
+import { ROUTES } from "@/src/constants/routes";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
 import { components } from "@/src/styles/components";
@@ -66,9 +67,9 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
 
       // 🔥 NAVEGACIÓN EXPLÍCITA SEGÚN CONTEXTO
       if (mode === "register") {
-        router.replace("/(onboarding)/post-signup/step-review");
+        router.replace(ROUTES.POST_SIGNUP_REVIEW);
       } else {
-        router.replace("/(app)/home");
+        router.replace(ROUTES.HOME);
       }
 
     } catch (err) {

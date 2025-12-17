@@ -1,4 +1,5 @@
 import AppText from "@/src/components/AppText";
+import { ROUTES } from "@/src/constants/routes";
 import { components } from "@/src/styles/components";
 import { router } from "expo-router";
 import { TouchableOpacity } from "react-native";
@@ -7,7 +8,7 @@ import { TouchableOpacity } from "react-native";
 export default function RegisterText(){
   return(
     <TouchableOpacity
-      onPress={() => router.push("/(auth)/registrarse")}
+      onPress={() => router.push(ROUTES.REGISTER)}
       style={{ marginTop: 30 }}
       >
       <AppText style={components.register}>

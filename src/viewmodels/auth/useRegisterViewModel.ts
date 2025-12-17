@@ -24,6 +24,7 @@ export function useRegisterViewModel() {
     setProfileCreatedAt,
   } = useOnboarding();
 
+
   async function register({ email, password, nombre }: RegisterPayload) {
     const { data, error } = await signUp(email, password, nombre);
 
@@ -37,6 +38,7 @@ export function useRegisterViewModel() {
       Alert.alert("Error", "No se pudo obtener el usuario.");
       return false;
     }
+
 
     const { data: profile, error: profileError } = await createProfile({
       user_id: userId,
@@ -70,6 +72,7 @@ export function useRegisterViewModel() {
   }
 
   return {
-    register,
+    register
+    
   };
 }

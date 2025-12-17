@@ -3,7 +3,7 @@ import { Colors } from "@/src/constants/theme";
 import { components } from "@/src/styles/components";
 import { router } from "expo-router";
 import { useEffect, useRef } from "react";
-import { Animated, Image, TouchableOpacity, View } from "react-native";
+import { Animated, Image, TouchableOpacity, View, ViewStyle } from "react-native";
 
 interface Props {
   step?: number;        // opcional para login

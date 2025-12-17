@@ -8,7 +8,16 @@ interface UnderlineInputProps extends TextInputProps {
   value?: string;
   onChangeText?: (text: string) => void;
   style?: any;
+  fieldType: "name" | "email" | "password" | "confirmPassword";
+
 }
+
+function capitalizeWords(text: string) {
+      return text
+        .toLowerCase()
+        .replace(/\b\w/g, char => char.toUpperCase());
+  }
+
 
 export default function UnderlineInput({
   placeholder,
@@ -16,11 +25,31 @@ export default function UnderlineInput({
   onChangeText,
   secureTextEntry,
   style,
+  fieldType,
   ...props
 }: UnderlineInputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
-  const isPassword = secureTextEntry === true;
+  const isPassword =
+  fieldType === "password" || fieldType === "confirmPassword";
+
+  const textContentTypeMap = {
+    name: "name",
+    email: "emailAddress",
+    password: "newPassword",
+    confirmPassword: "newPassword",
+  } as const;
+
+  const autoCompleteMap = {
+    name: "name",
+    email: "email",
+    password: "password-new",
+    confirmPassword: "password-new",
+  } as const;
+
+  
+
+
 
   return (
     <View style={[styles.wrapper, style]}>
@@ -28,9 +57,18 @@ export default function UnderlineInput({
         placeholder={placeholder}
         placeholderTextColor={Colors.light.textMuted}
         value={value}
-        onChangeText={onChangeText}
+        onChangeText={(text) => {
+          if (fieldType === "name") {
+            onChangeText?.(capitalizeWords(text));
+          } else {
+            onChangeText?.(text);
+          }
+        }}
         secureTextEntry={isPassword && !showPassword}
         style={styles.input}
+        textContentType={textContentTypeMap[fieldType]}
+        autoComplete={autoCompleteMap[fieldType]}
+        autoCapitalize={fieldType === "name" ? "words" : "none"}
         {...props}
       />
 

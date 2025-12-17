@@ -116,8 +116,8 @@ export default function Register() {
             placeholder="Nombre Completo"
             value={nombre}
             onChangeText={onNameChange}
+            fieldType="name"
             autoCapitalize="words"
-            keyboardType="default"
           />
           {nombreError ? (
             <AppText style={layout.errorText} weight="extrabold">
@@ -130,8 +130,7 @@ export default function Register() {
             placeholder="Correo"
             value={email}
             onChangeText={onEmailChange}
-            autoCapitalize="none"
-            keyboardType="email-address"
+            fieldType="email"
           />
           {emailError ? (
             <AppText style={layout.errorText} weight="extrabold">
@@ -144,7 +143,7 @@ export default function Register() {
             placeholder="Contraseña"
             value={password}
             onChangeText={onPasswordChange}
-            autoCapitalize="none"
+            fieldType="password"
             secureTextEntry
           />
           {passwordError ? (
@@ -158,9 +157,9 @@ export default function Register() {
             placeholder="Confirmar contraseña"
             value={confirm}
             onChangeText={onConfirmChange}
-            autoCapitalize="none"
+            fieldType="confirmPassword"
             secureTextEntry
-            style={{ marginTop: 16 }}
+          
           />
           {confirmError ? (
             <AppText style={layout.errorText} weight="extrabold">
