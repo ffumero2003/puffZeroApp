@@ -12,7 +12,7 @@ export function buildPuffsPlan(
 
 export function sampleChartData(
   data: number[],
-  maxBars: number = 14
+  maxBars: number = 16
 ): number[] {
   if (data.length <= maxBars) return data;
 

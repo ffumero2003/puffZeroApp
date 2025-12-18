@@ -25,6 +25,7 @@ export default function StepPersonalizedPlan() {
 
   //   if (status === "invalid") return null;
 
+
   const handleContinue = () => {
     const ok = finishFlow();
     if (ok) {

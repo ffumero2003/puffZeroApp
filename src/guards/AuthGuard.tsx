@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useAuth } from "../providers/auth-provider";
 
 export function useAuthGuard() {
-  const { user, initializing } = useAuth();
+  const { user, initializing, authFlow } = useAuth();
   const segments = useSegments();
 
   // 🔥 VARIABLE DE PAYWALL (cambiá esto cuando tengas la lógica real)
@@ -17,13 +17,14 @@ export function useAuthGuard() {
     const inAuth = segments[0] === "(auth)";
     const inOnboarding = segments[0] === "(onboarding)";
     const inPaywall = segments[0] === "(paywall)";
+    const inPostSignup = segments[1] === "post-signup"; // 🔥 DETECTAR POST-SIGNUP
     
     // 🔓 RUTAS PÚBLICAS (siempre accesibles)
-    const publicRoutes = ["privacy-policy", "terms-of-use"];
+    const publicRoutes = ["privacy-policy", "terms-of-use", "reset-password"];
     const isPublicRoute = publicRoutes.includes(segments[0]);
 
     if (isPublicRoute) {
-      return; // ← Dejar pasar privacy-policy y terms-of-use
+      return; // ← Dejar pasar privacy-policy, terms-of-use, reset-password
     }
 
     // ════════════════════════════════════════════════════════
@@ -40,11 +41,24 @@ export function useAuthGuard() {
     }
 
     // ════════════════════════════════════════════════════════
-    // TIPO 2 y 3: Usuario CON sesión
+    // TIPO 2: Usuario CON sesión que acaba de REGISTRARSE
+    // ════════════════════════════════════════════════════════
+    if (user && authFlow === "register") {
+      // 🔥 Si viene del registro, DEBE estar en post-signup
+      if (!inPostSignup && !inOnboarding) {
+        router.replace("/(onboarding)/post-signup/step-review");
+        return;
+      }
+      // Si ya está en post-signup, dejarlo navegar libremente
+      return;
+    }
+
+    // ════════════════════════════════════════════════════════
+    // TIPO 3: Usuario CON sesión (login o ya completó onboarding)
     // ════════════════════════════════════════════════════════
     if (user) {
-      // Si está en (auth) o (onboarding), sacarlo de ahí
-      if (inAuth || inOnboarding) {
+      // Si está en (auth) o en onboarding (pero NO post-signup), sacarlo
+      if ((inAuth || inOnboarding) && !inPostSignup) {
         if (hasPremium) {
           router.replace("/(app)/home");
         } else {
@@ -53,8 +67,8 @@ export function useAuthGuard() {
         return;
       }
 
-      // Si NO tiene premium, bloquearlo en paywall
-      if (!hasPremium && !inPaywall) {
+      // Si NO tiene premium, bloquearlo en paywall (excepto si está en post-signup)
+      if (!hasPremium && !inPaywall && !inPostSignup) {
         router.replace("/(paywall)/paywall");
         return;
       }
@@ -65,5 +79,5 @@ export function useAuthGuard() {
         return;
       }
     }
-  }, [user, initializing, segments]);
+  }, [user, initializing, segments, authFlow]);
 }

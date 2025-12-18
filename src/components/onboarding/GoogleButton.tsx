@@ -5,9 +5,12 @@ import { ActivityIndicator, TouchableOpacity } from "react-native";
 
 import AppText from "@/src/components/AppText";
 import { ROUTES } from "@/src/constants/routes";
+import { createProfile } from "@/src/lib/profile";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
+import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { components } from "@/src/styles/components";
+
 
 type GoogleButtonProps = {
   mode: "login" | "register";
@@ -15,11 +18,22 @@ type GoogleButtonProps = {
 
 export default function GoogleButton({ mode }: GoogleButtonProps) {
   const { authInProgress, setAuthInProgress, setAuthFlow } = useAuth();
+  const { 
+    setName, 
+    puffs_per_day,
+    money_per_month,
+    currency,
+    goal,
+    goal_speed,
+    why_stopped,
+    worries,
+    setProfileCreatedAt  // 🔥 AGREGAR ESTO
+  } = useOnboarding();
 
   const signInWithGoogle = async () => {
     if (authInProgress) return;
 
-    setAuthFlow(mode);          // 🔥 CLAVE
+    setAuthFlow(mode);
     setAuthInProgress(true);
 
     const redirectTo = "puffzero://auth/callback";
@@ -58,12 +72,49 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
         throw new Error("Tokens no encontrados");
       }
 
-      const { error: sessionError } = await supabase.auth.setSession({
+      const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
         access_token,
         refresh_token,
       });
 
       if (sessionError) throw sessionError;
+
+      // 🔥 GUARDAR EL NOMBRE DEL USUARIO DE GOOGLE EN ONBOARDING
+      const full_name = sessionData?.user?.user_metadata?.full_name;
+      const userId = sessionData?.user?.id;
+
+      if (full_name && mode === "register") {
+        setName(full_name);
+      }
+
+      // 🔥 CREAR PERFIL EN LA BASE DE DATOS (SOLO SI ES REGISTER)
+      if (mode === "register" && userId) {
+        console.log("📝 Creando perfil para usuario de Google...");
+        
+        const { data: profile, error: profileError } = await createProfile({
+          user_id: userId,
+          full_name: full_name || "Usuario Google",
+          puffs_per_day,
+          money_per_month,
+          currency,
+          goal,
+          goal_speed,
+          why_stopped,
+          worries,
+        });
+
+        if (profileError) {
+          console.error("❌ Error creando perfil:", profileError);
+          Alert.alert("Error", "No pudimos crear tu perfil. Intentá de nuevo.");
+          setAuthInProgress(false);
+          return;
+        }
+
+        if (profile?.created_at) {
+          console.log("✅ Perfil creado con created_at:", profile.created_at);
+          setProfileCreatedAt(profile.created_at);
+        }
+      }
 
       // 🔥 NAVEGACIÓN EXPLÍCITA SEGÚN CONTEXTO
       if (mode === "register") {
@@ -77,6 +128,7 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
       setAuthInProgress(false);
     }
   };
+
 
   return (
     <TouchableOpacity

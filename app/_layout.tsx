@@ -13,8 +13,12 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as WebBrowser from "expo-web-browser";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
+import { useEffect } from "react";
 import Splash from "../src/components/system/splash";
-import { useAuthGuard } from "../src/guards/AuthGuard";
+import { supabase } from "../src/lib/supabase";
+// import { useAuthGuard } from "../src/guards/AuthGuard";
 import { AuthProvider, useAuth } from "../src/providers/auth-provider";
 import { OnboardingProvider } from "../src/providers/onboarding-provider";
 
@@ -24,7 +28,20 @@ function RootNavigation() {
   const { initializing } = useAuth();
   
   // 🔥 TODO EL FLUJO EN UN SOLO LUGAR
-  useAuthGuard();
+  // useAuthGuard();
+
+  useEffect(() => {
+    const resetAll = async () => {
+      console.log("🧨 Limpiando todo...");
+      await supabase.auth.signOut();
+      await AsyncStorage.clear();
+      router.replace("/(onboarding)/onboarding");
+    };
+    
+    // 🔥 DESCOMENTAR ESTA LÍNEA PARA HACER RESET:
+    resetAll();
+  }, []);
+
 
   if (initializing) return <Splash />;
 

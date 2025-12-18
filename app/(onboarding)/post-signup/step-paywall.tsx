@@ -33,10 +33,9 @@ export default function OnboardingPaywall() {
   
   const [plan, setPlan] = useState<"weekly" | "yearly">("yearly");
 
-  const displayName =
-    name ||
-    (user?.user_metadata?.full_name as string | undefined) ||
-    undefined;
+  const displayName = name || 
+                    (user?.user_metadata?.full_name as string | undefined) || 
+                    undefined;
 
   const firstName = displayName?.trim().split(" ")[0];
 
