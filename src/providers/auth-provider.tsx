@@ -1,18 +1,20 @@
+// src/providers/auth-provider.tsx
 import { Session, User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
+import { getDevUser, isDevMode } from "../config/dev";
 import { supabase } from "../lib/supabase";
 
 interface AuthContextProps {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  initializing: boolean; // nuevo: primera carga
+  initializing: boolean;
 
   authFlow: "login" | "register" | null;
   setAuthFlow: (flow: "login" | "register") => void;
 
-  authInProgress: boolean;               
-  setAuthInProgress: (v: boolean) => void; 
+  authInProgress: boolean;
+  setAuthInProgress: (v: boolean) => void;
 
   signUp: (
     email: string,
@@ -24,128 +26,150 @@ interface AuthContextProps {
     password: string
   ) => Promise<{ data: any; error: any }>;
   signOut: () => Promise<void>;
+
+  isDevUser: boolean;
 }
 
-  const AuthContext = createContext<AuthContextProps>({
-    user: null,
-    session: null,
-    loading: true,
-    initializing: true,
+const AuthContext = createContext<AuthContextProps>({
+  user: null,
+  session: null,
+  loading: true,
+  initializing: true,
 
-    authFlow: null,
-    setAuthFlow: () => {},
+  authFlow: null,
+  setAuthFlow: () => {},
 
-    authInProgress: false,
-    setAuthInProgress: () => {},
+  authInProgress: false,
+  setAuthInProgress: () => {},
 
-    signUp: async () => ({ data: null, error: null }),
-    signIn: async () => ({ data: null, error: null }),
-    signOut: async () => {},
-  });
+  signUp: async () => ({ data: null, error: null }),
+  signIn: async () => ({ data: null, error: null }),
+  signOut: async () => {},
 
-
+  isDevUser: false,
+});
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [initializing, setInitializing] = useState(true);
-  const [loading, setLoading] = useState(false); // loading de acciones (signin/signup)
+  const [loading, setLoading] = useState(false);
   const [authInProgress, setAuthInProgress] = useState(false);
-  const [authFlow, setAuthFlow] =
-  useState<"login" | "register" | null>(null);
+  const [authFlow, setAuthFlow] = useState<"login" | "register" | null>(null);
+  const [isDevUser, setIsDevUser] = useState(false);
 
+  useEffect(() => {
+    const loadSession = async () => {
+      // 🔧 DEV MODE: Cargar usuario mock
+      if (isDevMode()) {
+        console.log("🔧 DEV MODE - Usuario mock cargado");
+        const mockUser = getDevUser();
 
+        if (mockUser) {
+          const devUser = {
+            id: mockUser.id,
+            email: mockUser.email,
+            user_metadata: mockUser.user_metadata,
+            app_metadata: {},
+            aud: "authenticated",
+            created_at: new Date().toISOString(),
+          } as User;
 
-  // 🔥 Auto-login + recuperación de sesión
-  // useEffect(() => {
-  //   const loadSession = async () => {
-  //     const {
-  //       data: { session },
-  //     } = await supabase.auth.getSession();
+          setUser(devUser);
+          setIsDevUser(true);
+          setInitializing(false);
+          return;
+        }
+      }
 
+      // ⚡ Flujo normal
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-  //     setSession(session);
-  //     setUser(session?.user ?? null);
-  //     setInitializing(false); // YA cargó sesión inicial
-  //   };
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsDevUser(false);
+      setInitializing(false);
+    };
 
-  //   loadSession();
+    loadSession();
 
-  //   // 🔥 Escuchar cambios de sesión (login, logout, recovery)
-  //   const { data: subscription } = supabase.auth.onAuthStateChange(
-  //     (event, session) => {
-  //      
-
-  //       setSession(session);
-  //       setUser(session?.user ?? null);
-  //     }
-  //   );
-
-  //   return () => subscription.subscription.unsubscribe();
-  // }, []);
-
-    useEffect(() => {
-      const loadSession = async () => {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-
-        // ⚡ Sesión real
-        setSession(session);
-        setUser(session?.user ?? null);
-
-        setInitializing(false);
-      };
-
-      loadSession();
-
-      // 🔥 Escuchar cambios de sesión
+    if (!isDevMode()) {
       const { data: subscription } = supabase.auth.onAuthStateChange(
         (event, session) => {
-         
+          console.log("🔐 Auth event:", event);
 
           setSession(session);
           setUser(session?.user ?? null);
+          setIsDevUser(false);
 
-          if (
-            event === "SIGNED_IN" ||
-            event === "TOKEN_REFRESHED"
-          ) {
+          if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
             setAuthInProgress(false);
-            setAuthFlow(null)
+            setAuthFlow(null);
           }
         }
       );
 
-
       return () => subscription.subscription.unsubscribe();
-    }, []);
+    }
+  }, []);
 
-  // SIGN UP
-    const signUp = async (email: string, password: string, full_name: string) => {
-      setLoading(true);
-      setAuthFlow("register");
+  const signUp = async (
+    email: string,
+    password: string,
+    full_name: string
+  ) => {
+    if (isDevMode()) {
+      console.log("🔧 DEV MODE - Registro simulado");
+      const mockUser = getDevUser();
 
-      const result = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { full_name } },
-      });
+      setUser({
+        id: mockUser!.id,
+        email: mockUser!.email,
+        user_metadata: mockUser!.user_metadata,
+      } as User);
 
-      setLoading(false);
-      return result;
-    };
-    
-    const signOut = async () => {
-      setAuthFlow(null);
-      setAuthInProgress(false);
-      await supabase.auth.signOut();
-    };
+      setIsDevUser(true);
 
+      return {
+        data: { user: mockUser },
+        error: null,
+      };
+    }
 
-  // SIGN IN
- const signIn = async (email: string, password: string) => {
+    setLoading(true);
+    setAuthFlow("register");
+
+    const result = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name } },
+    });
+
+    setLoading(false);
+    return result;
+  };
+
+  const signIn = async (email: string, password: string) => {
+    if (isDevMode()) {
+      console.log("🔧 DEV MODE - Login simulado");
+      const mockUser = getDevUser();
+
+      setUser({
+        id: mockUser!.id,
+        email: mockUser!.email,
+        user_metadata: mockUser!.user_metadata,
+      } as User);
+
+      setIsDevUser(true);
+
+      return {
+        data: { user: mockUser },
+        error: null,
+      };
+    }
+
     setLoading(true);
     setAuthFlow("login");
 
@@ -157,7 +181,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
     return result;
   };
- 
+
+  const signOut = async () => {
+    setAuthFlow(null);
+    setAuthInProgress(false);
+    setIsDevUser(false);
+
+    if (!isDevMode()) {
+      await supabase.auth.signOut();
+    } else {
+      console.log("🔧 DEV MODE - Logout simulado");
+      setUser(null);
+    }
+  };
 
   return (
     <AuthContext.Provider
@@ -176,9 +212,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signUp,
         signIn,
         signOut,
+
+        isDevUser,
       }}
     >
-
       {children}
     </AuthContext.Provider>
   );

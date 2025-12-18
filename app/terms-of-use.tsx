@@ -1,4 +1,4 @@
-
+// app/terms-of-use.tsx
 import AppText from "@/src/components/AppText";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import { layout } from "@/src/styles/layout";

@@ -112,7 +112,7 @@ export const layout = StyleSheet.create({
   },
 
   description: {
-    fontSize: 18,
+    fontSize: 20,
     color: Colors.light.textSecondary,
     textAlign: "center",
     marginTop: 8,
@@ -137,7 +137,7 @@ export const layout = StyleSheet.create({
   /* 🔵 IMÁGENES GRANDES (mockups tipo celular) */
   image: {
     width: "100%",
-    height: 230, // ajustá si es más alta o más baja
+    height: 250, // ajustá si es más alta o más baja
     marginVertical: 20,
   },
   bigImage: {
@@ -200,7 +200,7 @@ export const layout = StyleSheet.create({
 
     text: {
       textAlign: "center",
-      fontSize: 14,
+      fontSize: 16,
       color: Colors.light.textMuted,
       lineHeight: 20,
     },

@@ -131,7 +131,7 @@ export const components = StyleSheet.create({
     footer: {
       
       color: Colors.light.text,
-      fontSize: 18,
+      fontSize: 20,
       textAlign: "center",
       paddingBottom: 30
     },

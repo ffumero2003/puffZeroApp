@@ -17,7 +17,7 @@ import { StyleSheet, View } from "react-native";
 
 
 
-export default function Paywall() {
+export default function OnboardingPaywall() {
   // const [selected, setSelected] = useState<"monthly" | "yearly">("yearly");
   // const { grantAccess } = useSubscription();
   const { 
@@ -133,7 +133,7 @@ export default function Paywall() {
                 <AppText weight="bold" style={{ color: Colors.light.primary }}>
                   {firstName}
                 </AppText>
-                , desbloqueá PuffHOME
+                , desbloqueá Puff
               </>
             ) : (
               <>Hey, desbloqueá Puff</>

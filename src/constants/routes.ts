@@ -32,7 +32,7 @@ export const ROUTES = {
   POST_SIGNUP_PLAN: "/(onboarding)/post-signup/step-personalized-plan",
   POST_SIGNUP_FACTS: "/(onboarding)/post-signup/step-facts",
   POST_SIGNUP_NOTIFICATIONS: "/(onboarding)/post-signup/step-notifications",
-
+  POST_SIGNUP_PAYWALL: "/(onboarding)/post-signup/paywall", // futuro
   // App
   HOME: "/home",
   PAYWALL: "/paywall", // futuro

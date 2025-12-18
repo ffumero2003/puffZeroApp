@@ -13,7 +13,7 @@ import { layout } from "@/src/styles/layout";
 export default function StepFacts() {
 
   const goPay = () => {
-    router.push(ROUTES.PAYWALL);
+    router.push(ROUTES.POST_SIGNUP_PAYWALL);
   };
   return (
     <View style={layout.screenContainer}>

@@ -17,10 +17,13 @@ export default function StepPersonalizedPlan() {
   const { targetDate, puffsChart, status, finishFlow } =
     usePersonalizedPlanViewModel();
 
-  if (status === "invalid") {
-    router.replace(ROUTES.POST_SIGNUP_REVIEW);
-    return null;
-  }
+  //  useEffect(() => {
+  //     if (status === "invalid") {
+  //       router.replace(ROUTES.POST_SIGNUP_REVIEW);
+  //     }
+  //   }, [status]);
+
+  //   if (status === "invalid") return null;
 
   const handleContinue = () => {
     const ok = finishFlow();

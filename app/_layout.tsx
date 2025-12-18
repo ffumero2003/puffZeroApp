@@ -1,3 +1,4 @@
+// app/_layout.tsx
 import {
   Manrope_300Light,
   Manrope_400Regular,
@@ -8,109 +9,27 @@ import {
   useFonts,
 } from "@expo-google-fonts/manrope";
 
-import { Stack, router, useSegments } from "expo-router";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as WebBrowser from "expo-web-browser";
-import { useEffect } from "react";
 
 import Splash from "../src/components/system/splash";
+import { useAuthGuard } from "../src/guards/AuthGuard";
 import { AuthProvider, useAuth } from "../src/providers/auth-provider";
-import { OnboardingProvider, useOnboarding } from "../src/providers/onboarding-provider";
+import { OnboardingProvider } from "../src/providers/onboarding-provider";
 
-// 👉 NECESARIO para PKCE + expo-web-browser
 WebBrowser.maybeCompleteAuthSession();
 
 function RootNavigation() {
-  const { user, initializing, authInProgress, authFlow } = useAuth();
-  const { loading } = useOnboarding();
-  const segments = useSegments();
-  // 🔥 TEMPORAL – hasta implementar suscripciones reales
-  const isPremium = false;
+  const { initializing } = useAuth();
+  
+  // 🔥 TODO EL FLUJO EN UN SOLO LUGAR
+  useAuthGuard();
 
-
-  // 🟣 Importar DEV_MODE
-  const { DEV_MODE, DEV_SCREEN } = require("../src/config/dev");
-
-  const isLoading = initializing || loading;
-
-
-  useEffect(() => {
-    if (DEV_MODE) {
-      router.replace(DEV_SCREEN);
-      return;
-    }
-
-    if (authInProgress || isLoading) return;
-
-    const [group] = segments;
-    const isPaywall = group === "(paywall)";
-    const isAuth = group === "(auth)";
-    const isOnboarding = group === "(onboarding)";
-
-    /**
-     * 🔒 RESET PASSWORD RULE
-     * --------------------------------------------------
-     * reset-password SOLO es válido si existe sesión.
-     * Si no hay user, se expulsa inmediatamente.
-     * --------------------------------------------------
-     */
-    if (group === "reset-password") {
-      if (!user) {
-        router.replace("/(onboarding)/onboarding"); // o ROUTES.LOGIN
-      }
-      return;
-    }
-
-    /**
-     * 🚪 USUARIO NO AUTENTICADO
-     * --------------------------------------------------
-     * Solo puede estar en (auth) o (onboarding)
-     * --------------------------------------------------
-     */
-    if (!user) {
-      if (!isAuth && !isOnboarding && !isPaywall) {
-        router.replace("/(onboarding)/onboarding");
-      }
-      return;
-    }
-
-
-    /**
-     * 🏠 USUARIO AUTENTICADO
-     * --------------------------------------------------
-     * No debe volver a auth ni onboarding
-     * --------------------------------------------------
-     */
-    /**
- * 🏠 USUARIO AUTENTICADO
- */
-    if (user) {
-      // ❌ NO premium → solo puede estar en paywall
-      if (!isPremium) {
-        if (!isPaywall) {
-          router.replace("/(paywall)/paywall");
-        }
-        return;
-      }
-
-      // ✅ Premium → solo puede estar en app
-      if (group !== "(app)") {
-        router.replace("/(app)/home");
-      }
-      return;
-    }
-
-
-    // Usuario autenticado y ya en (app) → OK
-  }, [authInProgress, isLoading, user, segments]);
-
-
-
-  if (isLoading && !DEV_MODE) return <Splash />;
+  if (initializing) return <Splash />;
 
   return (
     <>
-     
       <Stack
         screenOptions={{
           headerShown: false,
@@ -119,7 +38,6 @@ function RootNavigation() {
       />
     </>
   );
-
 }
 
 export default function RootLayout() {
