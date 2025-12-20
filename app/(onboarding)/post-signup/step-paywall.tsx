@@ -11,6 +11,7 @@ import { Colors } from "@/src/constants/theme";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { layout } from "@/src/styles/layout";
+import { useOnboardingPaywallViewModel } from "@/src/viewmodels/onboarding/useOnboardingPaywallViewModel";
 import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -25,12 +26,14 @@ export default function OnboardingPaywall() {
     goal_speed,
     puffs_per_day,
     money_per_month,
+    currency,
     why_stopped,
     completeOnboarding, 
     resetAll
   } = useOnboarding();
   const { user } = useAuth();
-  
+
+  const { formatMoney } = useOnboardingPaywallViewModel();
   const [plan, setPlan] = useState<"weekly" | "yearly">("yearly");
 
   const displayName = name || 
@@ -65,13 +68,13 @@ export default function OnboardingPaywall() {
   const trackingText =
   "Seguí tu plan día a día sin confusión ni complicaciones";
 
-  const moneyText = money_per_month ? (
+  const moneyText = money_per_month && currency ? (
     <>
       Empezá a ahorrar hasta{" "}
       <AppText weight="bold" style={{ color: Colors.light.primary }}>
-        ₡{money_per_month.toLocaleString("es-CR")}
+        {formatMoney(money_per_month * 12, currency)}
       </AppText>{" "}
-      cada mes
+      cada año
     </>
   ) : (
     "Convertí cada día sin fumar en dinero ahorrado"

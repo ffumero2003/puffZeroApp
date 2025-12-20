@@ -16,6 +16,8 @@ export function useMoneySpentViewModel() {
     return true;
   }
 
+  
+
   return {
     isValidAmount,
     submitMoney,

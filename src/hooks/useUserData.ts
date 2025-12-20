@@ -19,7 +19,7 @@ export function useUserData() {
 
   async function loadUserData() {
     // 🔧 DEV MODE: Retornar datos mock
-    if (isDevUser && isDevMode()) {
+    if (isDevUser) {
       console.log("🔧 DEV MODE - Usando profile mock");
       setProfile(DEV_CONFIG.MOCK_USER.profile);
       setLoading(false);

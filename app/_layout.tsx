@@ -18,7 +18,7 @@ import { router } from "expo-router";
 import { useEffect } from "react";
 import Splash from "../src/components/system/splash";
 import { supabase } from "../src/lib/supabase";
-// import { useAuthGuard } from "../src/guards/AuthGuard";
+import { useAuthGuard } from "../src/guards/AuthGuard";
 import { AuthProvider, useAuth } from "../src/providers/auth-provider";
 import { OnboardingProvider } from "../src/providers/onboarding-provider";
 
@@ -28,7 +28,7 @@ function RootNavigation() {
   const { initializing } = useAuth();
   
   // 🔥 TODO EL FLUJO EN UN SOLO LUGAR
-  // useAuthGuard();
+  useAuthGuard();
 
   useEffect(() => {
     const resetAll = async () => {
@@ -39,7 +39,7 @@ function RootNavigation() {
     };
     
     // 🔥 DESCOMENTAR ESTA LÍNEA PARA HACER RESET:
-    resetAll();
+    // resetAll();
   }, []);
 
 

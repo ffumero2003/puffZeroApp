@@ -1,33 +1,35 @@
 // app/(app)/home.tsx
-import { router } from "expo-router";
+import AppText from "@/src/components/AppText";
+import DayDetailModal from "@/src/components/app/home/DayDetailModal";
+import HomeHeader from "@/src/components/app/home/HomeHeader";
+import ProgressCircle from "@/src/components/app/home/ProgressCircle";
+import WeekDayCircle from "@/src/components/app/home/WeekDayCircle";
+import { Colors } from "@/src/constants/theme";
+import { useHomeViewModel } from "@/src/viewmodels/app/useHomeViewModel";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import AppText from "../../src/components/AppText";
-import { isDevMode } from "../../src/config/dev";
-import { devResetApp } from "../../src/config/dev-reset";
-import { Colors } from "../../src/constants/theme";
-import { useAuth } from "../../src/providers/auth-provider";
 
 export default function Home() {
-  const { user, signOut, isDevUser } = useAuth();
+  const {
+    firstName,
+    dailyGoal,
+    todayPuffs,
+    percentage,
+    timeSinceLastPuff,
+    motivationalMessage,
+    currentWeek,
+    canGoBack,
+    canGoForward,
+    addPuff,
+    goToPreviousWeek,
+    goToNextWeek,
+  } = useHomeViewModel();
 
-  const handleLogout = async () => {
-    await signOut();
-    router.replace("/(onboarding)/onboarding");
-  };
-
-  const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuario";
+  const [selectedDay, setSelectedDay] = useState<any>(null);
 
   return (
     <View style={styles.container}>
-      {/* 🔧 Banner de Dev Mode */}
-      {isDevUser && (
-        <View style={styles.devBanner}>
-          <AppText weight="bold" style={styles.devText}>
-            🔧 DEV MODE ACTIVO
-          </AppText>
-        </View>
-      )}
-
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
@@ -35,103 +37,93 @@ export default function Home() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <AppText weight="bold" style={styles.title}>
-            Hola, {userName}! 👋
-          </AppText>
-          <AppText style={styles.subtitle}>
-            Bienvenido a PuffZero
-          </AppText>
+          <HomeHeader firstName={firstName} dailyGoal={dailyGoal} />
         </View>
 
-        {/* Card de Info */}
-        <View style={styles.card}>
-          <AppText weight="bold" style={styles.cardTitle}>
-            Tu Cuenta
-          </AppText>
+        {/* Week selector */}
+        {currentWeek && (
+          <View style={styles.weekContainer}>
+            <View style={styles.weekHeader}>
+              <TouchableOpacity
+                onPress={goToPreviousWeek}
+                disabled={!canGoBack}
+                style={[styles.arrowButton, !canGoBack && styles.arrowButtonDisabled]}
+              >
+                <Ionicons
+                  name="chevron-back"
+                  size={20}
+                  color={canGoBack ? Colors.light.primary : Colors.light.textSecondary}
+                />
+              </TouchableOpacity>
 
-          <View style={styles.infoRow}>
-            <AppText style={styles.label}>📧 Email:</AppText>
-            <AppText weight="medium" style={styles.value}>
-              {user?.email}
-            </AppText>
-          </View>
-
-          <View style={styles.infoRow}>
-            <AppText style={styles.label}>👤 Nombre:</AppText>
-            <AppText weight="medium" style={styles.value}>
-              {userName}
-            </AppText>
-          </View>
-
-          <View style={styles.infoRow}>
-            <AppText style={styles.label}>🎯 Estado:</AppText>
-            <AppText weight="medium" style={styles.value}>
-              Usuario Activo
-            </AppText>
-          </View>
-        </View>
-
-        {/* Botones de Navegación */}
-        <View style={styles.navSection}>
-          <AppText weight="bold" style={styles.sectionTitle}>
-            Navegación Rápida
-          </AppText>
-
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => router.push("/(app)/profile")}
-          >
-            <AppText weight="semibold" style={styles.navButtonText}>
-              👤 Ver Perfil
-            </AppText>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => router.push("/(app)/progress")}
-          >
-            <AppText weight="semibold" style={styles.navButtonText}>
-              📊 Ver Progreso
-            </AppText>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => router.push("/(app)/zuffy")}
-          >
-            <AppText weight="semibold" style={styles.navButtonText}>
-              💬 Hablar con Zuffy
-            </AppText>
-          </TouchableOpacity>
-        </View>
-
-        {/* Botones de Acción */}
-        <View style={styles.actionsSection}>
-          {/* Logout */}
-          <TouchableOpacity
-            style={[styles.button, styles.logoutButton]}
-            onPress={handleLogout}
-            activeOpacity={0.7}
-          >
-            <AppText weight="bold" style={styles.buttonText}>
-              🚪 Cerrar Sesión
-            </AppText>
-          </TouchableOpacity>
-
-          {/* Reset App (solo en dev) */}
-          {isDevMode() && (
-            <TouchableOpacity
-              style={[styles.button, styles.resetButton]}
-              onPress={devResetApp}
-              activeOpacity={0.7}
-            >
-              <AppText weight="bold" style={[styles.buttonText, { color: "#000" }]}>
-                🔁 Reset App (DEV)
+              <AppText weight="semibold" style={styles.weekLabel}>
+                {currentWeek.weekLabel}
               </AppText>
-            </TouchableOpacity>
-          )}
+
+              <TouchableOpacity
+                onPress={goToNextWeek}
+                disabled={!canGoForward}
+                style={[styles.arrowButton, !canGoForward && styles.arrowButtonDisabled]}
+              >
+                <Ionicons
+                  name="chevron-forward"
+                  size={20}
+                  color={canGoForward ? Colors.light.primary : Colors.light.textSecondary}
+                />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.daysRow}>
+              {currentWeek.days.map((day, index) => (
+                <WeekDayCircle
+                  key={index}
+                  day={day.day}
+                  puffs={day.puffs}
+                  isToday={day.isToday}
+                  isActive={day.isToday}
+                  onPress={() => setSelectedDay(day)}
+                />
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* Motivational Quote */}
+        <View style={styles.quoteContainer}>
+          <AppText style={styles.quote}>"{motivationalMessage}"</AppText>
         </View>
+
+        {/* Progress Circle */}
+        <ProgressCircle
+          percentage={percentage}
+          currentPuffs={todayPuffs}
+          totalPuffs={dailyGoal}
+          lastPuffTime={timeSinceLastPuff}
+        />
+
+        {/* Add Puff Button */}
+        <TouchableOpacity style={styles.addButton} onPress={addPuff} activeOpacity={0.8}>
+          <Ionicons name="add" size={60} color={Colors.light.textWhite} />
+          <AppText weight="bold" style={styles.addButtonText}>
+            Agregar Puffs
+          </AppText>
+        </TouchableOpacity>
       </ScrollView>
+
+      {/* Day Detail Modal */}
+      {selectedDay && (
+        <DayDetailModal
+          visible={!!selectedDay}
+          day={selectedDay.day}
+          date={new Date(selectedDay.date).toLocaleDateString('es-ES', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })}
+          puffs={selectedDay.puffs}
+          onClose={() => setSelectedDay(null)}
+        />
+      )}
     </View>
   );
 }
@@ -141,130 +133,65 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.light.background,
   },
-  
-  devBanner: {
-    backgroundColor: "#FFD700",
-    padding: 12,
-    alignItems: "center",
-  },
-  
-  devText: {
-    fontSize: 14,
-    color: "#000",
-  },
-
   scrollView: {
     flex: 1,
   },
-
   content: {
     padding: 24,
-    paddingBottom: 40,
+    paddingBottom: 100,
   },
-
   header: {
-    marginBottom: 24,
+    marginTop: 40,
+    marginBottom: 20,
   },
-
-  title: {
-    fontSize: 32,
-    color: Colors.light.text,
-    marginBottom: 8,
+  weekContainer: {
+    marginBottom: 20,
   },
-
-  subtitle: {
-    fontSize: 16,
-    color: Colors.light.textSecondary,
-    opacity: 0.7,
-  },
-
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 3,
-  },
-
-  cardTitle: {
-    fontSize: 20,
-    color: Colors.light.primary,
-    marginBottom: 16,
-  },
-
-  infoRow: {
+  weekHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.light.secondary,
+    marginBottom: 16,
   },
-
-  label: {
-    fontSize: 16,
-    opacity: 0.7,
-  },
-
-  value: {
-    fontSize: 16,
+  weekLabel: {
+    fontSize: 14,
     color: Colors.light.text,
-    flex: 1,
-    textAlign: "right",
   },
-
-  navSection: {
-    marginBottom: 24,
+  arrowButton: {
+    padding: 8,
   },
-
-  sectionTitle: {
+  arrowButtonDisabled: {
+    opacity: 0.3,
+  },
+  daysRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 4,
+  },
+  quoteContainer: {
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+  },
+  quote: {
     fontSize: 18,
+    fontStyle: "italic",
+    textAlign: "center",
     color: Colors.light.text,
-    marginBottom: 12,
+    lineHeight: 26,
   },
-
-  navButton: {
-    backgroundColor: Colors.light.secondary,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    borderWidth: 2,
-    borderColor: Colors.light.border,
-  },
-
-  navButtonText: {
-    fontSize: 16,
-    color: Colors.light.text,
-  },
-
-  actionsSection: {
-    gap: 12,
-  },
-
-  button: {
-    padding: 16,
-    borderRadius: 12,
+  addButton: {
+    backgroundColor: Colors.light.primary,
+    borderRadius: 28,
+    paddingVertical: 32,
+    paddingHorizontal: 40,
     alignItems: "center",
     justifyContent: "center",
+    alignSelf: "center",
+    marginTop: 20,
+    gap: 8,
   },
-
-  logoutButton: {
-    backgroundColor: Colors.light.primary,
-  },
-
-  resetButton: {
-    backgroundColor: "#FFD700",
-    borderWidth: 2,
-    borderColor: "#000",
-  },
-
-  buttonText: {
+  addButtonText: {
     fontSize: 18,
-    color: "#fff",
+    color: Colors.light.textWhite,
   },
 });

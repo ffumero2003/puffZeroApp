@@ -1,6 +1,7 @@
 // src/guards/AuthGuard.tsx
 import { router, useSegments } from "expo-router";
 import { useEffect } from "react";
+import { getInitialRoute } from "../config/dev";
 import { useAuth } from "../providers/auth-provider";
 
 export function useAuthGuard() {
@@ -12,6 +13,14 @@ export function useAuthGuard() {
 
   useEffect(() => {
     if (initializing) return;
+
+    // 🔧 DEV MODE: Navegar directamente a la pantalla configurada
+    const devRoute = getInitialRoute();
+    if (devRoute) {
+      console.log("🔧 DEV MODE - Navegando a:", devRoute);
+      router.replace(devRoute as any);
+      return;
+    }
 
     const inApp = segments[0] === "(app)";
     const inAuth = segments[0] === "(auth)";
