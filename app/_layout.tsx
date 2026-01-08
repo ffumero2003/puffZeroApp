@@ -6,6 +6,7 @@ import {
   Manrope_600SemiBold,
   Manrope_700Bold,
   Manrope_800ExtraBold,
+
   useFonts,
 } from "@expo-google-fonts/manrope";
 

@@ -94,8 +94,17 @@ export default function Home() {
 
           {/* Motivational Quote */}
           <View style={styles.quoteContainer}>
-            <AppText style={styles.quote}>{motivationalMessage}</AppText>
-          </View>
+          <AppText
+            style={[
+              styles.quote,
+              { transform: [{ skewX: "-10deg" }] },
+            ]}
+            weight="bold"
+          >
+            {motivationalMessage}
+          </AppText>
+        </View>
+
 
           {/* Progress Circle */}
           <ProgressCircle

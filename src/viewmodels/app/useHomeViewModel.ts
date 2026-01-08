@@ -1,6 +1,7 @@
 // src/viewmodels/app/useHomeViewModel.ts
 import { useUserData } from "@/src/hooks/useUserData";
 import { useAuth } from "@/src/providers/auth-provider";
+import { fetchAIQuote } from "@/src/services/ai-quotes-service";
 import { useEffect, useState } from "react";
 
 type DayPuffs = {
@@ -92,25 +93,27 @@ export function useHomeViewModel() {
     setWeeks(weeksData);
   };
 
-  // Load motivational message (will integrate AI later)
-  const loadMotivationalMessage = () => {
-    const messages = [
-      "Cada 'no' al vape es un 'sí' a tu mejor versión.",
-      "Tu salud te lo agradece cada día que resistes.",
-      "Cada paso cuenta, estás más cerca de tu meta.",
-      "Tu fuerza de voluntad es más poderosa de lo que crees.",
-      "Hoy es un buen día para seguir avanzando.",
-      "Respirá profundo, estás logrando algo increíble.",
-      "Tu futuro yo te está agradeciendo ahora mismo.",
-    ];
-    
-    const randomIndex = Math.floor(Math.random() * messages.length);
-    setMotivationalMessage(messages[randomIndex]);
+  // Load AI-generated motivational message
+  const loadMotivationalMessage = async () => {
+    const quote = await fetchAIQuote({
+      firstName: getFirstName(),
+      dailyGoal,
+      todayPuffs,
+      percentage,
+    });
+    setMotivationalMessage(quote);
   };
 
   useEffect(() => {
     generateWeeks();
     loadMotivationalMessage();
+  }, []);
+
+  // Reload quote when puffs change significantly (every 5 puffs or when reaching limits)
+  useEffect(() => {
+    if (todayPuffs > 0 && (todayPuffs % 5 === 0 || todayPuffs === dailyGoal)) {
+      loadMotivationalMessage();
+    }
   }, [todayPuffs]);
 
   const addPuff = () => {
