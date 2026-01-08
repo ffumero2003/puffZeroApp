@@ -3,11 +3,13 @@ import { isDevMode } from "@/src/config/dev";
 import { devResetApp } from "@/src/config/dev-reset";
 import { Colors } from "@/src/constants/theme";
 import { useAuth } from "@/src/providers/auth-provider";
+import { useNotificationsViewModel } from "@/src/viewmodels/onboarding/useNotificationsViewModel";
 import { router } from "expo-router";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function Profile() {
   const { user, signOut } = useAuth();
+  const { sendTestNotification, testDailyQuoteNotification } = useNotificationsViewModel();
 
   const handleLogout = async () => {
     await signOut();
@@ -66,16 +68,39 @@ export default function Profile() {
             </AppText>
           </TouchableOpacity>
 
+          {/* 🧪 TEST BUTTONS */}
           {isDevMode() && (
-            <TouchableOpacity
-              style={[styles.button, styles.resetButton]}
-              onPress={devResetApp}
-              activeOpacity={0.7}
-            >
-              <AppText weight="bold" style={[styles.buttonText, { color: "#000" }]}>
-                🔁 Reset App (DEV)
-              </AppText>
-            </TouchableOpacity>
+            <>
+              <TouchableOpacity
+                style={[styles.button, styles.testButton]}
+                onPress={sendTestNotification}
+                activeOpacity={0.7}
+              >
+                <AppText weight="bold" style={[styles.buttonText, { color: "#000" }]}>
+                  🔔 Test Notification
+                </AppText>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.button, styles.testButton]}
+                onPress={testDailyQuoteNotification}
+                activeOpacity={0.7}
+              >
+                <AppText weight="bold" style={[styles.buttonText, { color: "#000" }]}>
+                  💬 Test Quote Notification
+                </AppText>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.button, styles.resetButton]}
+                onPress={devResetApp}
+                activeOpacity={0.7}
+              >
+                <AppText weight="bold" style={[styles.buttonText, { color: "#000" }]}>
+                  🔁 Reset App (DEV)
+                </AppText>
+              </TouchableOpacity>
+            </>
           )}
         </View>
       </ScrollView>
@@ -155,6 +180,11 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     backgroundColor: Colors.light.primary,
+  },
+  testButton: {
+    backgroundColor: "#90EE90", // Light green
+    borderWidth: 2,
+    borderColor: "#228B22",
   },
   resetButton: {
     backgroundColor: "#FFD700",

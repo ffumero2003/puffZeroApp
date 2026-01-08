@@ -5,10 +5,10 @@
 
 export const DEV_CONFIG = {
   // 🎚️ CONTROL PRINCIPAL
-  ENABLED: true, // ← CAMBIAR A false PARA PRODUCCIÓN
+  ENABLED: false, // ← CAMBIAR A false PARA PRODUCCIÓN
   
   // 🚀 NAVEGACIÓN DIRECTA (comentá o poné null para flujo normal)
-  DIRECT_SCREEN: "/(app)/home", // ← Cambiá esto según donde estés trabajando
+  DIRECT_SCREEN: "/(app)/profile", // ← Cambiá esto según donde estés trabajando
   
   // 👤 USUARIO MOCK (cuando ENABLED = true)
   MOCK_USER: {
