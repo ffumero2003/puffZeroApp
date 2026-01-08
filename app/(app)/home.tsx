@@ -4,7 +4,6 @@ import AppHeader from "@/src/components/app/AppHeader";
 import DayDetailModal from "@/src/components/app/home/DayDetailModal";
 import HomeHeader from "@/src/components/app/home/HomeHeader";
 import ProgressCircle from "@/src/components/app/home/ProgressCircle";
-import WeekDayCircle from "@/src/components/app/home/WeekDayCircle";
 import { Colors } from "@/src/constants/theme";
 import { useHomeViewModel } from "@/src/viewmodels/app/useHomeViewModel";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,20 +18,21 @@ export default function Home() {
     percentage,
     timeSinceLastPuff,
     motivationalMessage,
-    currentWeek,
-    canGoBack,
-    canGoForward,
+    // currentWeek,
+    // canGoBack,
+    // canGoForward,
     addPuff,
-    goToPreviousWeek,
-    goToNextWeek,
+    // goToPreviousWeek,
+    // goToNextWeek,
   } = useHomeViewModel();
 
   const [selectedDay, setSelectedDay] = useState<any>(null);
 
   return (
     <>
-      <AppHeader style={{ margin: 0 }} />
       <View style={styles.container}>
+        <AppHeader style={{ margin: 0, padding: 0 }} />
+        
           {/* Header */}
           <View style={styles.header}>
             <HomeHeader firstName={firstName} dailyGoal={dailyGoal} />
@@ -44,7 +44,7 @@ export default function Home() {
           showsVerticalScrollIndicator={false}
         >
 
-          {/* Week selector */}
+          {/* Week selector
           {currentWeek && (
             <View style={styles.weekContainer}>
               <View style={styles.weekHeader}>
@@ -90,11 +90,11 @@ export default function Home() {
                 ))}
               </View>
             </View>
-          )}
+          )} */}
 
           {/* Motivational Quote */}
           <View style={styles.quoteContainer}>
-            <AppText style={styles.quote}>"{motivationalMessage}"</AppText>
+            <AppText style={styles.quote}>{motivationalMessage}</AppText>
           </View>
 
           {/* Progress Circle */}
@@ -143,32 +143,32 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 24,
-    paddingBottom: 100,
+    padding: 10,
+    
   },
   header: {
     marginTop: 20,
     marginBottom: 20,
   },
-  weekContainer: {
-    marginBottom: 20,
-  },
-  weekHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  weekLabel: {
-    fontSize: 14,
-    color: Colors.light.text,
-  },
-  arrowButton: {
-    padding: 8,
-  },
-  arrowButtonDisabled: {
-    opacity: 0.3,
-  },
+  // weekContainer: {
+  //   marginBottom: 0,
+  // },
+  // weekHeader: {
+  //   flexDirection: "row",
+  //   justifyContent: "space-between",
+  //   alignItems: "center",
+  //   marginBottom: 16,
+  // },
+  // weekLabel: {
+  //   fontSize: 14,
+  //   color: Colors.light.text,
+  // },
+  // arrowButton: {
+  //   padding: 8,
+  // },
+  // arrowButtonDisabled: {
+  //   opacity: 0.3,
+  // },
   daysRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -179,9 +179,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   quote: {
-    fontSize: 18,
-    fontStyle: "italic",
+    fontSize: 22,
     textAlign: "center",
+    fontStyle: "italic",
     color: Colors.light.text,
     lineHeight: 26,
   },

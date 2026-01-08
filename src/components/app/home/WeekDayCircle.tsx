@@ -36,9 +36,9 @@ export default function WeekDayCircle({ day, puffs, isToday, isActive, onPress }
 
 const styles = StyleSheet.create({
   container: {
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     backgroundColor: Colors.light.secondary,
     alignItems: "center",
     justifyContent: "center",

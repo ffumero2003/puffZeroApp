@@ -17,7 +17,7 @@ export default function ProgressCircle({
   totalPuffs,
   lastPuffTime,
 }: Props) {
-  const size = 280;
+  const size = 300;
   const strokeWidth = 20;
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
@@ -54,16 +54,19 @@ export default function ProgressCircle({
 
       <View style={styles.content}>
         <AppText style={styles.percentageLabel}>
-          Le has dado al {percentage}% de tu límite
+          Le has dado al <AppText weight="extrabold" style={{ color: Colors.light.primary, fontSize: 20 }}>{percentage}%</AppText> de tu límite
         </AppText>
         
         <AppText weight="bold" style={styles.puffsCount}>
-          {currentPuffs}/{totalPuffs} Puffs
+          <AppText weight="extrabold" style={{ color: Colors.light.primary, fontSize: 36 }}>{currentPuffs}/{totalPuffs} </AppText>
+          Puffs
         </AppText>
         
-        <AppText style={styles.lastTime}>
-          Última vez: {lastPuffTime}
-        </AppText>
+        <View style={styles.lastTimeContainer}>
+          <AppText style={styles.lastTime}>
+            Última vez: <AppText weight="extrabold" style={{ color: Colors.light.primary }}>{lastPuffTime}</AppText>
+          </AppText>
+        </View>
       </View>
     </View>
   );
@@ -73,7 +76,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 30,
+    marginVertical: 10,
   },
   svg: {
     transform: [{ rotateZ: '0deg' }],
@@ -85,19 +88,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   percentageLabel: {
-    fontSize: 16,
+    fontSize: 14,
     textAlign: "center",
     color: Colors.light.text,
     marginBottom: 12,
   },
   puffsCount: {
-    fontSize: 32,
+    fontSize: 26,
     color: Colors.light.text,
     marginBottom: 8,
+  },
+  lastTimeContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    
+    backgroundColor: Colors.light.secondary,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
   },
   lastTime: {
     fontSize: 14,
     color: Colors.light.textSecondary,
-    opacity: 0.7,
   },
 });
