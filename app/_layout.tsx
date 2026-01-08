@@ -17,8 +17,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useEffect } from "react";
 import Splash from "../src/components/system/splash";
-import { supabase } from "../src/lib/supabase";
 import { useAuthGuard } from "../src/guards/AuthGuard";
+import { supabase } from "../src/lib/supabase";
 import { AuthProvider, useAuth } from "../src/providers/auth-provider";
 import { OnboardingProvider } from "../src/providers/onboarding-provider";
 

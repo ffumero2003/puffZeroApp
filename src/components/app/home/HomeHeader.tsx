@@ -34,9 +34,10 @@ export default function HomeHeader({ firstName, dailyGoal }: HomeHeaderProps) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
+    alignSelf: "center",
     justifyContent: "space-between",
-    alignItems: "flex-start",
-    width: "100%",
+    alignItems: "center",
+    width: "85%",
   },
   textContainer: {
     flex: 1,

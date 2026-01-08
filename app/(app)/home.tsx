@@ -1,5 +1,6 @@
 // app/(app)/home.tsx
 import AppText from "@/src/components/AppText";
+import AppHeader from "@/src/components/app/AppHeader";
 import DayDetailModal from "@/src/components/app/home/DayDetailModal";
 import HomeHeader from "@/src/components/app/home/HomeHeader";
 import ProgressCircle from "@/src/components/app/home/ProgressCircle";
@@ -29,102 +30,106 @@ export default function Home() {
   const [selectedDay, setSelectedDay] = useState<any>(null);
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <HomeHeader firstName={firstName} dailyGoal={dailyGoal} />
-        </View>
-
-        {/* Week selector */}
-        {currentWeek && (
-          <View style={styles.weekContainer}>
-            <View style={styles.weekHeader}>
-              <TouchableOpacity
-                onPress={goToPreviousWeek}
-                disabled={!canGoBack}
-                style={[styles.arrowButton, !canGoBack && styles.arrowButtonDisabled]}
-              >
-                <Ionicons
-                  name="chevron-back"
-                  size={20}
-                  color={canGoBack ? Colors.light.primary : Colors.light.textSecondary}
-                />
-              </TouchableOpacity>
-
-              <AppText weight="semibold" style={styles.weekLabel}>
-                {currentWeek.weekLabel}
-              </AppText>
-
-              <TouchableOpacity
-                onPress={goToNextWeek}
-                disabled={!canGoForward}
-                style={[styles.arrowButton, !canGoForward && styles.arrowButtonDisabled]}
-              >
-                <Ionicons
-                  name="chevron-forward"
-                  size={20}
-                  color={canGoForward ? Colors.light.primary : Colors.light.textSecondary}
-                />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.daysRow}>
-              {currentWeek.days.map((day, index) => (
-                <WeekDayCircle
-                  key={index}
-                  day={day.day}
-                  puffs={day.puffs}
-                  isToday={day.isToday}
-                  isActive={day.isToday}
-                  onPress={() => setSelectedDay(day)}
-                />
-              ))}
-            </View>
+    <>
+      <AppHeader style={{ margin: 0 }} />
+      <View style={styles.container}>
+          {/* Header */}
+          <View style={styles.header}>
+            <HomeHeader firstName={firstName} dailyGoal={dailyGoal} />
           </View>
+
+          <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+        >
+
+          {/* Week selector */}
+          {currentWeek && (
+            <View style={styles.weekContainer}>
+              <View style={styles.weekHeader}>
+                <TouchableOpacity
+                  onPress={goToPreviousWeek}
+                  disabled={!canGoBack}
+                  style={[styles.arrowButton, !canGoBack && styles.arrowButtonDisabled]}
+                >
+                  <Ionicons
+                    name="chevron-back"
+                    size={20}
+                    color={canGoBack ? Colors.light.primary : Colors.light.textSecondary}
+                  />
+                </TouchableOpacity>
+
+                <AppText weight="semibold" style={styles.weekLabel}>
+                  {currentWeek.weekLabel}
+                </AppText>
+
+                <TouchableOpacity
+                  onPress={goToNextWeek}
+                  disabled={!canGoForward}
+                  style={[styles.arrowButton, !canGoForward && styles.arrowButtonDisabled]}
+                >
+                  <Ionicons
+                    name="chevron-forward"
+                    size={20}
+                    color={canGoForward ? Colors.light.primary : Colors.light.textSecondary}
+                  />
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.daysRow}>
+                {currentWeek.days.map((day, index) => (
+                  <WeekDayCircle
+                    key={index}
+                    day={day.day}
+                    puffs={day.puffs}
+                    isToday={day.isToday}
+                    isActive={day.isToday}
+                    onPress={() => setSelectedDay(day)}
+                  />
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Motivational Quote */}
+          <View style={styles.quoteContainer}>
+            <AppText style={styles.quote}>"{motivationalMessage}"</AppText>
+          </View>
+
+          {/* Progress Circle */}
+          <ProgressCircle
+            percentage={percentage}
+            currentPuffs={todayPuffs}
+            totalPuffs={dailyGoal}
+            lastPuffTime={timeSinceLastPuff}
+          />
+
+          {/* Add Puff Button */}
+          <TouchableOpacity style={styles.addButton} onPress={addPuff} activeOpacity={0.8}>
+            <Ionicons name="add" size={60} color={Colors.light.textWhite} />
+            <AppText weight="bold" style={styles.addButtonText}>
+              Agregar Puffs
+            </AppText>
+          </TouchableOpacity>
+        </ScrollView>
+
+        {/* Day Detail Modal */}
+        {selectedDay && (
+          <DayDetailModal
+            visible={!!selectedDay}
+            day={selectedDay.day}
+            date={new Date(selectedDay.date).toLocaleDateString('es-ES', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            })}
+            puffs={selectedDay.puffs}
+            onClose={() => setSelectedDay(null)}
+          />
         )}
-
-        {/* Motivational Quote */}
-        <View style={styles.quoteContainer}>
-          <AppText style={styles.quote}>"{motivationalMessage}"</AppText>
-        </View>
-
-        {/* Progress Circle */}
-        <ProgressCircle
-          percentage={percentage}
-          currentPuffs={todayPuffs}
-          totalPuffs={dailyGoal}
-          lastPuffTime={timeSinceLastPuff}
-        />
-
-        {/* Add Puff Button */}
-        <TouchableOpacity style={styles.addButton} onPress={addPuff} activeOpacity={0.8}>
-          <Ionicons name="add" size={60} color={Colors.light.textWhite} />
-          <AppText weight="bold" style={styles.addButtonText}>
-            Agregar Puffs
-          </AppText>
-        </TouchableOpacity>
-      </ScrollView>
-
-      {/* Day Detail Modal */}
-      {selectedDay && (
-        <DayDetailModal
-          visible={!!selectedDay}
-          day={selectedDay.day}
-          date={new Date(selectedDay.date).toLocaleDateString('es-ES', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-          })}
-          puffs={selectedDay.puffs}
-          onClose={() => setSelectedDay(null)}
-        />
-      )}
-    </View>
+      </View>
+    </>
   );
 }
 
@@ -132,6 +137,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.light.background,
+    width: "100%",
   },
   scrollView: {
     flex: 1,
@@ -141,7 +147,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   header: {
-    marginTop: 40,
+    marginTop: 20,
     marginBottom: 20,
   },
   weekContainer: {
