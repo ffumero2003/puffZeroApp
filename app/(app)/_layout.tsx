@@ -65,13 +65,13 @@ export default function AppLayout() {
         <View style={styles.tabBarContainer}>
           <CustomTabBarButton
             focused={props.state.index === 0}
-            label="HOME"
+            label="Home"
             icon="home"
             onPress={() => props.navigation.navigate("home")}
           />
           <CustomTabBarButton
             focused={props.state.index === 1}
-            label="PROGRESO"
+            label="Progreso"
             icon="stats-chart"
             onPress={() => props.navigation.navigate("progress")}
           />
@@ -83,7 +83,7 @@ export default function AppLayout() {
           />
           <CustomTabBarButton
             focused={props.state.index === 3}
-            label="PERFIL"
+            label="Perfil"
             icon="person"
             onPress={() => props.navigation.navigate("profile")}
           />
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   tabLabel: {
-    fontSize: 12,
+    fontSize: 14,
     marginTop: 2,
   },
 });
