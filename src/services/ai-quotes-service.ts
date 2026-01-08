@@ -1,5 +1,5 @@
 // src/services/ai-quotes-service.ts
-import { OPENAI_API_KEY } from "@/src/config/env";
+export const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
 
 type QuoteContext = {
   firstName?: string;
