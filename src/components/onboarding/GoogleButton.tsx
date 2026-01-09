@@ -1,7 +1,8 @@
+// src/components/onboarding/GoogleButton.tsx
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
-import { ActivityIndicator, TouchableOpacity } from "react-native";
+import { ActivityIndicator, Alert, TouchableOpacity } from "react-native";
 
 import AppText from "@/src/components/AppText";
 import { ROUTES } from "@/src/constants/routes";
@@ -9,6 +10,12 @@ import { createProfile } from "@/src/lib/profile";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
+import {
+  areNotificationsEnabled,
+  getStoredPushToken,
+  sendWelcomeBackNotification,
+  sendWelcomeNotification
+} from "@/src/services/notification-service";
 import { components } from "@/src/styles/components";
 
 
@@ -27,7 +34,7 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
     goal_speed,
     why_stopped,
     worries,
-    setProfileCreatedAt  // 🔥 AGREGAR ESTO
+    setProfileCreatedAt
   } = useOnboarding();
 
   const signInWithGoogle = async () => {
@@ -79,18 +86,28 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
 
       if (sessionError) throw sessionError;
 
-      // 🔥 GUARDAR EL NOMBRE DEL USUARIO DE GOOGLE EN ONBOARDING
       const full_name = sessionData?.user?.user_metadata?.full_name;
       const userId = sessionData?.user?.id;
+      const firstName = full_name?.trim().split(" ")[0];
 
       if (full_name && mode === "register") {
         setName(full_name);
       }
 
-      // 🔥 CREAR PERFIL EN LA BASE DE DATOS (SOLO SI ES REGISTER)
+      // 🔔 NOTIFICATION LOGIC
+      const notificationsEnabled = await areNotificationsEnabled();
+
       if (mode === "register" && userId) {
         console.log("📝 Creando perfil para usuario de Google...");
         
+        // Get push token if available
+        let pushToken: string | null = null;
+        try {
+          pushToken = await getStoredPushToken();
+        } catch (e) {
+          console.log("No push token available yet");
+        }
+
         const { data: profile, error: profileError } = await createProfile({
           user_id: userId,
           full_name: full_name || "Usuario Google",
@@ -101,6 +118,7 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
           goal_speed,
           why_stopped,
           worries,
+          push_token: pushToken,
         });
 
         if (profileError) {
@@ -113,6 +131,18 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
         if (profile?.created_at) {
           console.log("✅ Perfil creado con created_at:", profile.created_at);
           setProfileCreatedAt(profile.created_at);
+        }
+
+        // 🔔 Send welcome notification for new user
+        if (notificationsEnabled) {
+          console.log("🔔 Sending welcome notification for new Google user");
+          await sendWelcomeNotification();
+        }
+      } else if (mode === "login") {
+        // 🔔 Send welcome back notification for returning user
+        if (notificationsEnabled) {
+          console.log("🔔 Sending welcome back notification for Google login");
+          await sendWelcomeBackNotification(firstName);
         }
       }
 

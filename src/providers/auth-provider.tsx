@@ -3,6 +3,10 @@ import { Session, User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { getDevUser, isDevMode } from "../config/dev";
 import { supabase } from "../lib/supabase";
+import {
+  areNotificationsEnabled,
+  sendWelcomeBackNotification
+} from "../services/notification-service";
 
 interface AuthContextProps {
   user: User | null;
@@ -148,6 +152,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     setLoading(false);
+    
+    // Note: Welcome notification is sent in useRegisterViewModel after profile creation
+    // This ensures we have confirmed the registration was successful
+    
     return result;
   };
 
@@ -164,6 +172,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setIsDevUser(true);
 
+      // 🔔 Send welcome back notification in dev mode too
+      const notificationsEnabled = await areNotificationsEnabled();
+      if (notificationsEnabled) {
+        const firstName = mockUser?.user_metadata?.full_name?.split(" ")[0];
+        sendWelcomeBackNotification(firstName);
+      }
+
       return {
         data: { user: mockUser },
         error: null,
@@ -179,6 +194,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     setLoading(false);
+
+    // 🔔 Send welcome back notification on successful login
+    if (!result.error && result.data?.user) {
+      const notificationsEnabled = await areNotificationsEnabled();
+      if (notificationsEnabled) {
+        const firstName = result.data.user.user_metadata?.full_name?.split(" ")[0];
+        sendWelcomeBackNotification(firstName);
+      }
+    }
+
     return result;
   };
 

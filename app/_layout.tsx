@@ -10,12 +10,11 @@ import {
   useFonts,
 } from "@expo-google-fonts/manrope";
 
-import { Stack } from "expo-router";
+import { useAuthGuard } from "@/src/guards/AuthGuard";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as WebBrowser from "expo-web-browser";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
 import { useEffect } from "react";
 import Splash from "../src/components/system/splash";
 import { supabase } from "../src/lib/supabase";
@@ -28,7 +27,7 @@ function RootNavigation() {
   const { initializing } = useAuth();
   
   // 🔥 TODO EL FLUJO EN UN SOLO LUGAR
-  // useAuthGuard();
+  useAuthGuard();
 
   useEffect(() => {
     const resetAll = async () => {

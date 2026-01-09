@@ -1,9 +1,14 @@
-// useRegisterViewModel.ts
+// src/viewmodels/auth/useRegisterViewModel.ts
 import { Alert } from "react-native";
 
 import { createProfile } from "@/src/lib/profile";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
+import {
+  areNotificationsEnabled,
+  getStoredPushToken,
+  sendWelcomeNotification
+} from "@/src/services/notification-service";
 
 type RegisterPayload = {
   email: string;
@@ -36,14 +41,19 @@ export function useRegisterViewModel() {
 
     setName(nombre);
     
-
-
     const userId = data?.user?.id;
     if (!userId) {
       Alert.alert("Error", "No se pudo obtener el usuario.");
       return false;
     }
 
+    // Get push token if available
+    let pushToken: string | null = null;
+    try {
+      pushToken = await getStoredPushToken();
+    } catch (e) {
+      console.log("No push token available yet");
+    }
 
     const { data: profile, error: profileError } = await createProfile({
       user_id: userId,
@@ -55,6 +65,7 @@ export function useRegisterViewModel() {
       goal_speed,
       why_stopped,
       worries,
+      push_token: pushToken, // Store push token in profile
     });
 
     if (profileError) {
@@ -72,12 +83,18 @@ export function useRegisterViewModel() {
 
     setProfileCreatedAt(profile.created_at);
 
+    // 🔔 Send welcome notification for new user
+    const notificationsEnabled = await areNotificationsEnabled();
+    if (notificationsEnabled) {
+      console.log("🔔 Sending welcome notification for new user");
+      await sendWelcomeNotification();
+    }
+
     Alert.alert("Cuenta creada", "Revisá tu correo para confirmar tu cuenta.");
     return true;
   }
 
   return {
     register
-    
   };
 }

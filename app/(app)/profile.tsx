@@ -1,3 +1,4 @@
+// app/(app)/profile.tsx
 import AppText from "@/src/components/AppText";
 import { isDevMode } from "@/src/config/dev";
 import { devResetApp } from "@/src/config/dev-reset";
@@ -9,7 +10,12 @@ import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function Profile() {
   const { user, signOut } = useAuth();
-  const { sendTestNotification, testDailyQuoteNotification } = useNotificationsViewModel();
+  const { 
+    sendTestNotification, 
+    testDailyQuoteNotification,
+    testWelcomeNotification,
+    testWelcomeBackNotification 
+  } = useNotificationsViewModel();
 
   const handleLogout = async () => {
     await signOut();
@@ -68,16 +74,22 @@ export default function Profile() {
             </AppText>
           </TouchableOpacity>
 
-          {/* 🧪 TEST BUTTONS */}
+          {/* 🧪 TEST BUTTONS - Only visible in dev mode */}
           {isDevMode() && (
             <>
+              <View style={styles.devSectionHeader}>
+                <AppText weight="bold" style={styles.devSectionTitle}>
+                  🧪 Test Notifications
+                </AppText>
+              </View>
+
               <TouchableOpacity
                 style={[styles.button, styles.testButton]}
                 onPress={sendTestNotification}
                 activeOpacity={0.7}
               >
                 <AppText weight="bold" style={[styles.buttonText, { color: "#000" }]}>
-                  🔔 Test Notification
+                  🔔 Test Basic Notification
                 </AppText>
               </TouchableOpacity>
 
@@ -87,9 +99,35 @@ export default function Profile() {
                 activeOpacity={0.7}
               >
                 <AppText weight="bold" style={[styles.buttonText, { color: "#000" }]}>
-                  💬 Test Quote Notification
+                  💬 Test Daily Quote
                 </AppText>
               </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.button, styles.welcomeButton]}
+                onPress={testWelcomeNotification}
+                activeOpacity={0.7}
+              >
+                <AppText weight="bold" style={[styles.buttonText, { color: "#000" }]}>
+                  🎉 Test Welcome (Register)
+                </AppText>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.button, styles.welcomeBackButton]}
+                onPress={testWelcomeBackNotification}
+                activeOpacity={0.7}
+              >
+                <AppText weight="bold" style={[styles.buttonText, { color: "#000" }]}>
+                  🔥 Test Welcome Back (Login)
+                </AppText>
+              </TouchableOpacity>
+
+              <View style={styles.devSectionHeader}>
+                <AppText weight="bold" style={styles.devSectionTitle}>
+                  🔧 Dev Tools
+                </AppText>
+              </View>
 
               <TouchableOpacity
                 style={[styles.button, styles.resetButton]}
@@ -186,6 +224,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#228B22",
   },
+  welcomeButton: {
+    backgroundColor: "#FFB6C1", // Light pink
+    borderWidth: 2,
+    borderColor: "#FF69B4",
+  },
+  welcomeBackButton: {
+    backgroundColor: "#87CEEB", // Light blue
+    borderWidth: 2,
+    borderColor: "#4169E1",
+  },
   resetButton: {
     backgroundColor: "#FFD700",
     borderWidth: 2,
@@ -194,5 +242,16 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 18,
     color: "#fff",
+  },
+  devSectionHeader: {
+    marginTop: 20,
+    marginBottom: 8,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: Colors.light.border,
+  },
+  devSectionTitle: {
+    fontSize: 16,
+    color: Colors.light.textSecondary,
   },
 });
