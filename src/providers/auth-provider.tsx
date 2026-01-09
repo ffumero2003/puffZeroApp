@@ -1,11 +1,10 @@
 // src/providers/auth-provider.tsx
 import { Session, User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
-import { getDevUser, isDevMode } from "../config/dev";
 import { supabase } from "../lib/supabase";
 import {
-  areNotificationsEnabled,
-  sendWelcomeBackNotification
+    areNotificationsEnabled,
+    sendWelcomeBackNotification
 } from "../services/notification-service";
 
 interface AuthContextProps {
@@ -15,7 +14,7 @@ interface AuthContextProps {
   initializing: boolean;
 
   authFlow: "login" | "register" | null;
-  setAuthFlow: (flow: "login" | "register") => void;
+  setAuthFlow: (flow: "login" | "register" | null) => void;
 
   authInProgress: boolean;
   setAuthInProgress: (v: boolean) => void;
@@ -30,8 +29,6 @@ interface AuthContextProps {
     password: string
   ) => Promise<{ data: any; error: any }>;
   signOut: () => Promise<void>;
-
-  isDevUser: boolean;
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -49,8 +46,6 @@ const AuthContext = createContext<AuthContextProps>({
   signUp: async () => ({ data: null, error: null }),
   signIn: async () => ({ data: null, error: null }),
   signOut: async () => {},
-
-  isDevUser: false,
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -60,63 +55,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [authInProgress, setAuthInProgress] = useState(false);
   const [authFlow, setAuthFlow] = useState<"login" | "register" | null>(null);
-  const [isDevUser, setIsDevUser] = useState(false);
 
   useEffect(() => {
     const loadSession = async () => {
-      // 🔧 DEV MODE: Cargar usuario mock
-      if (isDevMode()) {
-        console.log("🔧 DEV MODE - Usuario mock cargado");
-        const mockUser = getDevUser();
-
-        if (mockUser) {
-          const devUser = {
-            id: mockUser.id,
-            email: mockUser.email,
-            user_metadata: mockUser.user_metadata,
-            app_metadata: {},
-            aud: "authenticated",
-            created_at: new Date().toISOString(),
-          } as User;
-
-          setUser(devUser);
-          setIsDevUser(true);
-          setInitializing(false);
-          return;
-        }
-      }
-
-      // ⚡ Flujo normal
       const {
         data: { session },
       } = await supabase.auth.getSession();
 
       setSession(session);
       setUser(session?.user ?? null);
-      setIsDevUser(false);
       setInitializing(false);
     };
 
     loadSession();
 
-    if (!isDevMode()) {
-      const { data: subscription } = supabase.auth.onAuthStateChange(
-        (event, session) => {
-          console.log("🔐 Auth event:", event);
+    const { data: subscription } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log("🔐 Auth event:", event);
 
-          setSession(session);
-          setUser(session?.user ?? null);
-          setIsDevUser(false);
+        setSession(session);
+        setUser(session?.user ?? null);
 
-          if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-            setAuthInProgress(false);
-            setAuthFlow(null);
-          }
+        if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+          setAuthInProgress(false);
+          setAuthFlow(null);
         }
-      );
+      }
+    );
 
-      return () => subscription.subscription.unsubscribe();
-    }
+    return () => subscription.subscription.unsubscribe();
   }, []);
 
   const signUp = async (
@@ -124,24 +91,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     password: string,
     full_name: string
   ) => {
-    if (isDevMode()) {
-      console.log("🔧 DEV MODE - Registro simulado");
-      const mockUser = getDevUser();
-
-      setUser({
-        id: mockUser!.id,
-        email: mockUser!.email,
-        user_metadata: mockUser!.user_metadata,
-      } as User);
-
-      setIsDevUser(true);
-
-      return {
-        data: { user: mockUser },
-        error: null,
-      };
-    }
-
     setLoading(true);
     setAuthFlow("register");
 
@@ -160,31 +109,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-    if (isDevMode()) {
-      console.log("🔧 DEV MODE - Login simulado");
-      const mockUser = getDevUser();
-
-      setUser({
-        id: mockUser!.id,
-        email: mockUser!.email,
-        user_metadata: mockUser!.user_metadata,
-      } as User);
-
-      setIsDevUser(true);
-
-      // 🔔 Send welcome back notification in dev mode too
-      const notificationsEnabled = await areNotificationsEnabled();
-      if (notificationsEnabled) {
-        const firstName = mockUser?.user_metadata?.full_name?.split(" ")[0];
-        sendWelcomeBackNotification(firstName);
-      }
-
-      return {
-        data: { user: mockUser },
-        error: null,
-      };
-    }
-
     setLoading(true);
     setAuthFlow("login");
 
@@ -210,14 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     setAuthFlow(null);
     setAuthInProgress(false);
-    setIsDevUser(false);
-
-    if (!isDevMode()) {
-      await supabase.auth.signOut();
-    } else {
-      console.log("🔧 DEV MODE - Logout simulado");
-      setUser(null);
-    }
+    await supabase.auth.signOut();
   };
 
   return (
@@ -237,8 +154,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signUp,
         signIn,
         signOut,
-
-        isDevUser,
       }}
     >
       {children}

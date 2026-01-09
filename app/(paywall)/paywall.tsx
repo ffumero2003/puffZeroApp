@@ -7,6 +7,7 @@ import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import FeatureItem from "@/src/components/paywall/FeatureItem";
 import SubscriptionOption from "@/src/components/paywall/SubscriptionOption";
+import { BYPASS_PAYWALL } from "@/src/config/dev";
 import { Colors } from "@/src/constants/theme";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
@@ -14,7 +15,7 @@ import { layout } from "@/src/styles/layout";
 import { useOnboardingPaywallViewModel } from "@/src/viewmodels/onboarding/useOnboardingPaywallViewModel";
 import { router } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 
 
@@ -31,7 +32,7 @@ export default function Paywall() {
     completeOnboarding, 
     resetAll
   } = useOnboarding();
-  const { user } = useAuth();
+  const { user, setAuthFlow } = useAuth();
 
   const { formatMoney } = useOnboardingPaywallViewModel();
   const [plan, setPlan] = useState<"weekly" | "yearly">("yearly");
@@ -118,6 +119,7 @@ export default function Paywall() {
   function grantAccess() {
     completeOnboarding(); // marca onboarding como terminado
     resetAll();           // limpia datos temporales
+    setAuthFlow(null);    // 🔥 Resetea el authFlow para que AuthGuard no bloquee
     router.replace("/(app)/home");
   }
 
@@ -185,6 +187,18 @@ export default function Paywall() {
             style={layout.bottomButtonContainer}
           />
 
+          {/* 🔧 DEV: Skip paywall button - visible when BYPASS_PAYWALL = false but still in dev */}
+          {__DEV__ && !BYPASS_PAYWALL && (
+            <TouchableOpacity
+              style={styles.devSkipButton}
+              onPress={grantAccess}
+              activeOpacity={0.7}
+            >
+              <AppText weight="bold" style={styles.devSkipText}>
+                🔧 SKIP PAYWALL (DEV)
+              </AppText>
+            </TouchableOpacity>
+          )}
             
         </View> 
       
@@ -196,5 +210,18 @@ export default function Paywall() {
 const styles = StyleSheet.create({
   featureContainer: {
     marginTop: 25
-  }
+  },
+  devSkipButton: {
+    backgroundColor: "#FFD700",
+    borderWidth: 2,
+    borderColor: "#000",
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 16,
+    alignItems: "center",
+  },
+  devSkipText: {
+    color: "#000",
+    fontSize: 14,
+  },
 })

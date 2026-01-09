@@ -43,12 +43,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     color: Colors.light.text,
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 15,
+    fontSize: 16,
     color: Colors.light.textSecondary,
   },
   cloudIcon: {

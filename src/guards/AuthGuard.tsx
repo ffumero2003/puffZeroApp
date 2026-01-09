@@ -1,15 +1,17 @@
 // src/guards/AuthGuard.tsx
 import { router, useSegments } from "expo-router";
 import { useEffect } from "react";
-import { getInitialRoute } from "../config/dev";
+import { getInitialRoute, shouldBypassPaywall } from "../config/dev";
 import { useAuth } from "../providers/auth-provider";
 
 export function useAuthGuard() {
   const { user, initializing, authFlow } = useAuth();
   const segments = useSegments();
 
-  // 🔥 VARIABLE DE PAYWALL (cambiá esto cuando tengas la lógica real)
-  const hasPremium = false; // ← TODO: conectar con tu sistema de pagos
+  // 🔥 VARIABLE DE PAYWALL
+  // - shouldBypassPaywall() = BYPASS_PAYWALL en dev.ts (independiente)
+  // - En PROD: TODO conectar con tu sistema de pagos real (RevenueCat, etc.)
+  const hasPremium = shouldBypassPaywall();
 
   useEffect(() => {
     if (initializing) return;
@@ -40,8 +42,9 @@ export function useAuthGuard() {
     // TIPO 1: Usuario SIN sesión (nuevo o logout)
     // ════════════════════════════════════════════════════════
     if (!user) {
-      // Si está en (app) o (paywall), mandarlo a onboarding
-      if (inApp || inPaywall) {
+      // Si está en (app), (paywall) o en root (/), mandarlo a onboarding
+      const inRoot = !inApp && !inAuth && !inOnboarding && !inPaywall && !isPublicRoute;
+      if (inApp || inPaywall || inRoot) {
         router.replace("/(onboarding)/onboarding");
         return;
       }
@@ -53,12 +56,12 @@ export function useAuthGuard() {
     // TIPO 2: Usuario CON sesión que acaba de REGISTRARSE
     // ════════════════════════════════════════════════════════
     if (user && authFlow === "register") {
-      // 🔥 Si viene del registro, DEBE estar en post-signup
-      if (!inPostSignup && !inOnboarding) {
+      // 🔥 Si viene del registro, DEBE estar en post-signup O paywall O app
+      if (!inPostSignup && !inOnboarding && !inPaywall && !inApp) {
         router.replace("/(onboarding)/post-signup/step-review");
         return;
       }
-      // Si ya está en post-signup, dejarlo navegar libremente
+      // Si está en post-signup, paywall o app, dejarlo navegar libremente
       return;
     }
 

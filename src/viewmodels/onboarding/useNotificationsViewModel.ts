@@ -84,7 +84,7 @@ export function useNotificationsViewModel() {
   async function sendTestNotification(): Promise<void> {
     console.log("🧪 Sending test notification...");
 
-    const { default: Notifications } = await import("expo-notifications");
+    const Notifications = await import("expo-notifications");
 
     Notifications.setNotificationHandler({
       handleNotification: async () => ({

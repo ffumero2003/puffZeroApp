@@ -1,6 +1,5 @@
 // app/(app)/profile.tsx
 import AppText from "@/src/components/AppText";
-import { isDevMode } from "@/src/config/dev";
 import { devResetApp } from "@/src/config/dev-reset";
 import { Colors } from "@/src/constants/theme";
 import { useAuth } from "@/src/providers/auth-provider";
@@ -74,8 +73,8 @@ export default function Profile() {
             </AppText>
           </TouchableOpacity>
 
-          {/* 🧪 TEST BUTTONS - Only visible in dev mode */}
-          {isDevMode() && (
+          {/* 🧪 TEST BUTTONS - Only visible in development */}
+          {__DEV__ && (
             <>
               <View style={styles.devSectionHeader}>
                 <AppText weight="bold" style={styles.devSectionTitle}>
