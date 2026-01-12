@@ -17,7 +17,7 @@ export default function ProgressCircle({
   totalPuffs,
   lastPuffTime,
 }: Props) {
-  const size = 300;
+  const size = 280;
   const strokeWidth = 20;
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
@@ -103,12 +103,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     
     backgroundColor: Colors.light.secondary,
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
     paddingVertical: 5,
     borderRadius: 10,
   },
   lastTime: {
-    fontSize: 14,
+    fontSize: 12,
     color: Colors.light.textSecondary,
   },
 });

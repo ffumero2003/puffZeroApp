@@ -11,10 +11,10 @@ import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
 import {
-  areNotificationsEnabled,
-  getStoredPushToken,
-  sendWelcomeBackNotification,
-  sendWelcomeNotification
+    areNotificationsEnabled,
+    savePushTokenToProfile,
+    sendWelcomeBackNotification,
+    sendWelcomeNotification
 } from "@/src/services/notification-service";
 import { components } from "@/src/styles/components";
 
@@ -99,14 +99,6 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
 
       if (mode === "register" && userId) {
         console.log("📝 Creando perfil para usuario de Google...");
-        
-        // Get push token if available
-        let pushToken: string | null = null;
-        try {
-          pushToken = await getStoredPushToken();
-        } catch (e) {
-          console.log("No push token available yet");
-        }
 
         const { data: profile, error: profileError } = await createProfile({
           user_id: userId,
@@ -118,7 +110,6 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
           goal_speed,
           why_stopped,
           worries,
-          push_token: pushToken,
         });
 
         if (profileError) {
@@ -138,12 +129,17 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
           console.log("🔔 Sending welcome notification for new Google user");
           await sendWelcomeNotification();
         }
-      } else if (mode === "login") {
+
+        // 📲 Save push token to profile for daily notifications
+        savePushTokenToProfile(userId);
+      } else if (mode === "login" && userId) {
         // 🔔 Send welcome back notification for returning user
         if (notificationsEnabled) {
           console.log("🔔 Sending welcome back notification for Google login");
           await sendWelcomeBackNotification(firstName);
         }
+        // 📲 Save push token to profile for daily notifications
+        savePushTokenToProfile(userId);
       }
 
       // 🔥 NAVEGACIÓN EXPLÍCITA SEGÚN CONTEXTO

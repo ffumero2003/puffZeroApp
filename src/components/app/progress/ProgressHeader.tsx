@@ -1,31 +1,31 @@
-// src/components/app/home/HomeHeader.tsx
+// src/components/app/progress/ProgressHeader.tsx
 import Logo from "@/assets/images/logo-puff-zero.png";
 import AppText from "@/src/components/AppText";
 import { Colors } from "@/src/constants/theme";
 import { Image, StyleSheet, View } from "react-native";
 
-interface HomeHeaderProps {
-  firstName: string;
-  dailyGoal: number;
+interface ProgressHeaderProps {
+  timeSinceLastPuff: string;
 }
 
-export default function HomeHeader({ firstName, dailyGoal }: HomeHeaderProps) {
+export default function ProgressHeader({ timeSinceLastPuff }: ProgressHeaderProps) {
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
         <AppText weight="bold" style={styles.title}>
-          Hola, {firstName} 👋
+          Tu Progreso
         </AppText>
         <AppText style={styles.subtitle}>
-          Tu meta diaria: {dailyGoal} puffs
+          Última actualización: {timeSinceLastPuff}
         </AppText>
       </View>
 
-      <View style={styles.cloudIcon}>
+      <View style={styles.logoContainer}>
         <Image 
-            source={Logo} 
-            style={styles.cloudIcon} 
-            resizeMode="contain" />
+          source={Logo} 
+          style={styles.logo} 
+          resizeMode="contain" 
+        />
       </View>
     </View>
   );
@@ -38,23 +38,26 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "90%",
-    
+    marginTop: 20,
+    marginBottom: 20,
   },
   textContainer: {
     flex: 1,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     color: Colors.light.text,
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: Colors.light.textSecondary,
+    opacity: 0.7,
   },
-  cloudIcon: {
-    
+  logoContainer: {
     marginLeft: 12,
+  },
+  logo: {
     height: 85,
     width: 85,
   },

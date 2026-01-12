@@ -1,37 +1,116 @@
-import AppText from "@/src/components/AppText";
+// app/(app)/progress.tsx
+import AppHeader from "@/src/components/app/AppHeader";
+import CountdownTimer from "@/src/components/app/progress/CountdownTimer";
+import GoalVsActualChart from "@/src/components/app/progress/GoalVsActualChart";
+import MoneySavedCard from "@/src/components/app/progress/MoneySavedCard";
+import ProgressHeader from "@/src/components/app/progress/ProgressHeader";
+import PuffsChart from "@/src/components/app/progress/PuffsChart";
+import RecentPuffsStats from "@/src/components/app/progress/RecentPuffsStats";
+import StreakCard from "@/src/components/app/progress/StreakCard";
 import { Colors } from "@/src/constants/theme";
-import { useProgressViewModel } from "@/src/viewmodels/app/usePorgressViewModel";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { useProgressViewModel } from "@/src/viewmodels/app/useProgressViewModel";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useMemo } from "react";
+import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 
 export default function Progress() {
-  const { loading, progressData } = useProgressViewModel();
+  const {
+    loading,
+    timeSinceLastPuff,
+    lastPuffTime,
+    countdownToGoal,
+    goalSpeedDays,
+    puffsLast24Hours,
+    puffsLast7Days,
+    puffsLast30Days,
+    moneySaved,
+    currencySymbol,
+    currency,
+    chartData,
+    goalVsActualData,
+    dailyGoal,
+    selectedTimeRange,
+    setSelectedTimeRange,
+    refreshData,
+  } = useProgressViewModel();
+
+  // Refresh data every time the screen gains focus
+  useFocusEffect(
+    useCallback(() => {
+      refreshData();
+    }, [refreshData])
+  );
+
+  // Calculate profile created date for countdown timer
+  const profileCreatedAt = useMemo(() => {
+    // Calculate backwards from countdown to goal
+    const now = new Date();
+    const endTime = new Date(now.getTime() + countdownToGoal.totalMs);
+    return new Date(endTime.getTime() - goalSpeedDays * 24 * 60 * 60 * 1000);
+  }, [countdownToGoal.totalMs, goalSpeedDays]);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.light.primary} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
+      <AppHeader style={{ margin: 0, padding: 0 }} />
+      
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.header}>
-          <AppText weight="bold" style={styles.title}>
-            Tu Progreso 📊
-          </AppText>
-          <AppText style={styles.subtitle}>
-            Visualiza tu evolución día a día
-          </AppText>
+        <ProgressHeader timeSinceLastPuff={timeSinceLastPuff} />
+
+        {/* Countdown Timer to Goal */}
+        <CountdownTimer 
+          goalSpeedDays={goalSpeedDays} 
+          profileCreatedAt={profileCreatedAt} 
+        />
+
+        {/* Recent Puffs Statistics */}
+        <RecentPuffsStats
+          puffsLast24Hours={puffsLast24Hours}
+          puffsLast7Days={puffsLast7Days}
+          puffsLast30Days={puffsLast30Days}
+        />
+
+        {/* Money Saved & Streak Cards */}
+        <View style={styles.cardsRow}>
+          <MoneySavedCard
+            moneySaved={moneySaved}
+            currencySymbol={currencySymbol}
+            currency={currency}
+          />
+          <StreakCard
+            lastPuffTime={lastPuffTime}
+            profileCreatedAt={profileCreatedAt}
+          />
         </View>
 
-        {/* Content will go here */}
-        <View style={styles.card}>
-          <AppText weight="bold" style={styles.cardTitle}>
-            Próximamente
-          </AppText>
-          <AppText style={styles.cardText}>
-            Aquí verás tus estadísticas y progreso
-          </AppText>
-        </View>
+        {/* Puffs Line Chart */}
+        <PuffsChart
+          data={chartData}
+          dailyGoal={dailyGoal}
+          selectedRange={selectedTimeRange}
+          onRangeChange={setSelectedTimeRange}
+        />
+
+        {/* Goal vs Actual Bar Chart */}
+        <GoalVsActualChart
+          data={goalVsActualData}
+          dailyGoal={dailyGoal}
+        />
+
+        {/* Bottom padding for scroll */}
+        <View style={{ height: 40 }} />
       </ScrollView>
     </View>
   );
@@ -41,46 +120,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.light.background,
+    width: "100%",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Colors.light.background,
   },
   scrollView: {
     flex: 1,
   },
   content: {
-    padding: 24,
-    paddingBottom: 40,
+    padding: 10,
   },
-  header: {
-    marginBottom: 24,
-    marginTop: 40,
-  },
-  title: {
-    fontSize: 32,
-    color: Colors.light.text,
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: Colors.light.textSecondary,
-    opacity: 0.7,
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 3,
-  },
-  cardTitle: {
-    fontSize: 20,
-    color: Colors.light.primary,
-    marginBottom: 16,
-  },
-  cardText: {
-    fontSize: 16,
-    color: Colors.light.text,
+  cardsRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginHorizontal: 10,
+    marginVertical: 16,
   },
 });

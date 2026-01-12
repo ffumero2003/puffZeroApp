@@ -30,6 +30,7 @@ export async function createProfile(
 
 /**
  * Obtener perfil por user_id
+ * Returns null for data if no profile found (not an error)
  */
 export async function getProfileByUserId(userId: string) {
   if (!userId) {
@@ -40,7 +41,7 @@ export async function getProfileByUserId(userId: string) {
     .from("profiles")
     .select("*")
     .eq("user_id", userId)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.log("❌ Error obteniendo profile:", error);
@@ -52,6 +53,7 @@ export async function getProfileByUserId(userId: string) {
 
 /**
  * Actualizar perfil
+ * Returns null for data if no profile found to update
  */
 export async function updateProfile(
   userId: string,
@@ -66,13 +68,16 @@ export async function updateProfile(
     .update(updates)
     .eq("user_id", userId)
     .select()
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.log("❌ Error actualizando profile:", error);
     return { data: null, error };
   }
 
-  console.log("✅ Profile actualizado:", data);
+  if (data) {
+    console.log("✅ Profile actualizado:", data);
+  }
+  
   return { data, error: null };
 }

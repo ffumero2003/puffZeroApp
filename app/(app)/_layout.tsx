@@ -28,7 +28,7 @@ function CustomTabBarButton({
     >
       <Ionicons
         name={icon as any}
-        size={24}
+        size={20}
         color={focused ? Colors.light.textWhite : Colors.light.text}
       />
       <AppText
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
   tabBarContainer: {
     flexDirection: "row",
     backgroundColor: Colors.light.background,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 12,
     paddingBottom: 20,
     gap: 8,
@@ -120,6 +120,6 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     fontSize: 14,
-    marginTop: 2,
+    
   },
 });

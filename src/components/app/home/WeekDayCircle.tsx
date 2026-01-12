@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.secondary,
     alignItems: "center",
     justifyContent: "center",
+    
   },
   active: {
     backgroundColor: Colors.light.primary,

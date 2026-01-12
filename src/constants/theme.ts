@@ -1,12 +1,3 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
-
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
-
 // constants/theme.ts
 
 export const Colors = {
@@ -39,28 +30,6 @@ export const Colors = {
     danger: "#FF4D4D",
     warning: "#FFB020",
   },
-
-  dark: {
-    background: "#0E0E12",
-    primary: "#5974FF",
-    secondary: "#2A2740",
-
-    text: "#FFFFFF",
-    textSecondary: "#C8C8D5",
-    textMuted: "#9A9AAF",
-
-    border: "#3B345A",
-
-    tint: "#5974FF",
-    icon: "#5974FF",
-
-    tabIconDefault: "#777",
-    tabIconSelected: "#5974FF",
-
-    success: "#4CAF50",
-    danger: "#FF4D4D",
-    warning: "#FFB020",
-  },
 };
 
 // Manrope font family mapping for consistent usage
@@ -72,5 +41,3 @@ export const Fonts = {
   bold: "Manrope_700Bold",
   extrabold: "Manrope_800ExtraBold",
 };
-
-

@@ -1,6 +1,7 @@
 // src/services/notification-service.ts
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
+import { updateProfile } from "@/src/lib/profile";
 
 // Storage keys
 const PUSH_TOKEN_KEY = "expo_push_token";
@@ -141,6 +142,44 @@ export async function getStoredPushToken(): Promise<string | null> {
 export async function areNotificationsEnabled(): Promise<boolean> {
   const enabled = await AsyncStorage.getItem(NOTIFICATIONS_ENABLED_KEY);
   return enabled === "true";
+}
+
+/**
+ * Save push token to user's profile in the database
+ * Call this after login/register to ensure the token is always up to date
+ * Will register for push notifications if no token exists
+ */
+export async function savePushTokenToProfile(userId: string): Promise<void> {
+  if (!userId) {
+    console.log("⚠️ savePushTokenToProfile: No userId provided");
+    return;
+  }
+
+  try {
+    // First try to get stored token
+    let pushToken = await getStoredPushToken();
+    
+    // If no token stored, register for push notifications
+    if (!pushToken) {
+      console.log("📲 No push token stored, registering for notifications...");
+      pushToken = await registerForPushNotifications();
+    }
+    
+    if (!pushToken) {
+      console.log("⚠️ savePushTokenToProfile: Could not get push token");
+      return;
+    }
+
+    const { error } = await updateProfile(userId, { push_token: pushToken });
+    
+    if (error) {
+      console.log("❌ Error saving push token to profile:", error);
+    } else {
+      console.log("✅ Push token saved to profile");
+    }
+  } catch (error) {
+    console.log("⚠️ Error in savePushTokenToProfile:", error);
+  }
 }
 
 // ============================================
@@ -300,9 +339,9 @@ export async function scheduleDailyLocalReminder(): Promise<void> {
 }
 
 /**
- * Cancel daily local reminder
+ * Cancel daily local reminder (used internally by scheduleDailyLocalReminder)
  */
-export async function cancelDailyLocalReminder(): Promise<void> {
+async function cancelDailyLocalReminder(): Promise<void> {
   const Notif = await getNotifications();
   if (!Notif) return;
 
@@ -316,35 +355,5 @@ export async function cancelDailyLocalReminder(): Promise<void> {
     }
   } catch (error) {
     console.log("⚠️ Error canceling daily reminder:", error);
-  }
-}
-
-/**
- * Cancel all scheduled notifications
- */
-export async function cancelAllNotifications(): Promise<void> {
-  const Notif = await getNotifications();
-  if (!Notif) return;
-
-  try {
-    await Notif.cancelAllScheduledNotificationsAsync();
-    console.log("✅ All notifications cancelled");
-  } catch (error) {
-    console.log("⚠️ Error canceling notifications:", error);
-  }
-}
-
-/**
- * Get all scheduled notifications (for debugging)
- */
-export async function getScheduledNotifications() {
-  const Notif = await getNotifications();
-  if (!Notif) return [];
-
-  try {
-    return Notif.getAllScheduledNotificationsAsync();
-  } catch (error) {
-    console.log("⚠️ Error getting scheduled notifications:", error);
-    return [];
   }
 }

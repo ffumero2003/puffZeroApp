@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import {
     areNotificationsEnabled,
+    savePushTokenToProfile,
     sendWelcomeBackNotification
 } from "../services/notification-service";
 
@@ -126,6 +127,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const firstName = result.data.user.user_metadata?.full_name?.split(" ")[0];
         sendWelcomeBackNotification(firstName);
       }
+      // 📲 Save push token to profile for daily notifications
+      savePushTokenToProfile(result.data.user.id);
     }
 
     return result;

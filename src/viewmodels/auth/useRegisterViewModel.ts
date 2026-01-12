@@ -6,7 +6,7 @@ import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
 import {
   areNotificationsEnabled,
-  getStoredPushToken,
+  savePushTokenToProfile,
   sendWelcomeNotification
 } from "@/src/services/notification-service";
 
@@ -47,14 +47,6 @@ export function useRegisterViewModel() {
       return false;
     }
 
-    // Get push token if available
-    let pushToken: string | null = null;
-    try {
-      pushToken = await getStoredPushToken();
-    } catch (e) {
-      console.log("No push token available yet");
-    }
-
     const { data: profile, error: profileError } = await createProfile({
       user_id: userId,
       full_name: nombre,
@@ -65,7 +57,6 @@ export function useRegisterViewModel() {
       goal_speed,
       why_stopped,
       worries,
-      push_token: pushToken, // Store push token in profile
     });
 
     if (profileError) {
@@ -89,6 +80,9 @@ export function useRegisterViewModel() {
       console.log("🔔 Sending welcome notification for new user");
       await sendWelcomeNotification();
     }
+
+    // 📲 Save push token to profile for daily notifications
+    savePushTokenToProfile(userId);
 
     Alert.alert("Cuenta creada", "Revisá tu correo para confirmar tu cuenta.");
     return true;

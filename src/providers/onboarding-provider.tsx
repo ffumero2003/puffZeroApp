@@ -11,7 +11,7 @@ interface OnboardingData {
   goal_speed: string | null;
   why_stopped: string[];
   worries: string[];
-
+ 
   profile_created_at: string | null;
   setProfileCreatedAt: (d: string) => Promise<void>;
 

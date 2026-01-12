@@ -4,11 +4,14 @@ import AppHeader from "@/src/components/app/AppHeader";
 import DayDetailModal from "@/src/components/app/home/DayDetailModal";
 import HomeHeader from "@/src/components/app/home/HomeHeader";
 import ProgressCircle from "@/src/components/app/home/ProgressCircle";
+import WeekDayCircle from "@/src/components/app/home/WeekDayCircle";
+// COMMENTED OUT: Invalid direct imports - these are returned by the hook, not exported
+// import { currentWeek, canGoBack, canGoForward, goToPreviousWeek, goToNextWeek } from "@/src/viewmodels/app/useHomeViewModel";
 import { Colors } from "@/src/constants/theme";
 import { useHomeViewModel } from "@/src/viewmodels/app/useHomeViewModel";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function Home() {
   const {
@@ -18,7 +21,8 @@ export default function Home() {
     percentage,
     timeSinceLastPuff,
     motivationalMessage,
-    // currentWeek,
+    currentWeek,
+    // COMMENTED OUT: Week navigation - kept for potential future use
     // canGoBack,
     // canGoForward,
     addPuff,
@@ -38,59 +42,26 @@ export default function Home() {
             <HomeHeader firstName={firstName} dailyGoal={dailyGoal} />
           </View>
 
-          <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.content}
-          showsVerticalScrollIndicator={false}
+          <View
+          style={[styles.scrollView, styles.content]}
+          
         >
 
-          {/* Week selector
+          {/* Week selector - current week only */}
           {currentWeek && (
-            <View style={styles.weekContainer}>
-              <View style={styles.weekHeader}>
-                <TouchableOpacity
-                  onPress={goToPreviousWeek}
-                  disabled={!canGoBack}
-                  style={[styles.arrowButton, !canGoBack && styles.arrowButtonDisabled]}
-                >
-                  <Ionicons
-                    name="chevron-back"
-                    size={20}
-                    color={canGoBack ? Colors.light.primary : Colors.light.textSecondary}
-                  />
-                </TouchableOpacity>
-
-                <AppText weight="semibold" style={styles.weekLabel}>
-                  {currentWeek.weekLabel}
-                </AppText>
-
-                <TouchableOpacity
-                  onPress={goToNextWeek}
-                  disabled={!canGoForward}
-                  style={[styles.arrowButton, !canGoForward && styles.arrowButtonDisabled]}
-                >
-                  <Ionicons
-                    name="chevron-forward"
-                    size={20}
-                    color={canGoForward ? Colors.light.primary : Colors.light.textSecondary}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.daysRow}>
-                {currentWeek.days.map((day, index) => (
-                  <WeekDayCircle
-                    key={index}
-                    day={day.day}
-                    puffs={day.puffs}
-                    isToday={day.isToday}
-                    isActive={day.isToday}
-                    onPress={() => setSelectedDay(day)}
-                  />
-                ))}
-              </View>
+            <View style={styles.daysRow}>
+              {currentWeek.days.map((day, index) => (
+                <WeekDayCircle
+                  key={index}
+                  day={day.day}
+                  puffs={day.puffs}
+                  isToday={day.isToday}
+                  isActive={day.isToday}
+                  onPress={() => setSelectedDay(day)}
+                />
+              ))}
             </View>
-          )} */}
+          )}
 
           {/* Motivational Quote */}
           <View style={styles.quoteContainer}>
@@ -121,7 +92,7 @@ export default function Home() {
               Agregar Puffs
             </AppText>
           </TouchableOpacity>
-        </ScrollView>
+        </View>
 
         {/* Day Detail Modal */}
         {selectedDay && (
@@ -182,9 +153,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     gap: 4,
+    
   },
   quoteContainer: {
-    paddingVertical: 20,
+    paddingVertical: 14,
     paddingHorizontal: 16,
   },
   quote: {
