@@ -33,11 +33,11 @@ export default function Login() {
       router.replace(ROUTES.HOME);
     }
   };
-
+ 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={layout.containerAuth}>
-        <OnboardingHeader showProgress={false} style={{ marginBottom: 30 }} />
+        <OnboardingHeader showProgress={false} />
 
         <AuthHeader
           title="Iniciar Sesión"

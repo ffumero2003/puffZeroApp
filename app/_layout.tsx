@@ -16,6 +16,7 @@ import { router, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as WebBrowser from "expo-web-browser";
 import { useEffect } from "react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import Splash from "../src/components/system/splash";
 import { supabase } from "../src/lib/supabase";
 import { AuthProvider, useAuth } from "../src/providers/auth-provider";
@@ -69,11 +70,14 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <AuthProvider>
-      <OnboardingProvider>
-        <StatusBar style="dark" />
-        <RootNavigation />
-      </OnboardingProvider>
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <OnboardingProvider>
+          <StatusBar style="dark" />
+            <RootNavigation />
+          </OnboardingProvider>
+        </AuthProvider>
+    </SafeAreaProvider>
+    
   );
 }

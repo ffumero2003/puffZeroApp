@@ -24,7 +24,7 @@ export default function RecentPuffsStats({
         <StatCard 
           label="Últimas 24 horas" 
           value={puffsLast24Hours} 
-          highlight 
+           
         />
         <StatCard 
           label="Últimos 7 días" 
@@ -42,15 +42,15 @@ export default function RecentPuffsStats({
 interface StatCardProps {
   label: string;
   value: number;
-  highlight?: boolean;
+  
 }
 
-function StatCard({ label, value, highlight }: StatCardProps) {
+function StatCard({ label, value }: StatCardProps) {
   return (
-    <View style={[styles.card, highlight && styles.cardHighlight]}>
+    <View style={styles.card}>
       <AppText 
         weight="semibold" 
-        style={[styles.cardLabel, highlight && styles.cardLabelHighlight]}
+        style={styles.cardLabel}
       >
         {label}
       </AppText>
@@ -90,17 +90,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
   },
-  cardHighlight: {
-    borderWidth: 2,
-    borderColor: Colors.light.primary,
-  },
+  
   cardLabel: {
-    fontSize: 16,
+    fontSize: 18,
     color: Colors.light.text,
   },
-  cardLabelHighlight: {
-    color: Colors.light.text,
-  },
+  
   cardValue: {
     fontSize: 16,
     color: Colors.light.text,

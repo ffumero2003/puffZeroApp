@@ -8,7 +8,7 @@ export const components = StyleSheet.create({
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: 20,
+      marginTop: 10,
     },
 
     headerTextContainer: {
@@ -19,8 +19,8 @@ export const components = StyleSheet.create({
 
   
     headerLogo: {
-      width: 95,
-      height: 95,
+      width: 105,
+      height: 105,
     },
 
     bottomButtonContainer: {
@@ -107,7 +107,7 @@ export const components = StyleSheet.create({
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "flex-start",
-      marginTop: 40,
+      
       gap: 10,
     },
     backButton: {

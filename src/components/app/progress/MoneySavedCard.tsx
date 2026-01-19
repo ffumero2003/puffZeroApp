@@ -29,7 +29,7 @@ export default function MoneySavedCard({ moneySaved, currencySymbol, currency }:
   return (
     <View style={styles.container}>
       <AppText weight="bold" style={styles.title}>
-        Dinero Ahorrado 💰
+        Ahorro 💰
       </AppText>
       
       <View style={styles.amountContainer}>
@@ -44,8 +44,10 @@ export default function MoneySavedCard({ moneySaved, currencySymbol, currency }:
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.secondary,
+    backgroundColor: Colors.light.textWhite,
     borderRadius: 16,
+    borderWidth: 2,
+    borderColor: Colors.light.secondary,
     padding: 16,
     minHeight: 100,
   },
@@ -55,14 +57,16 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   amountContainer: {
-    backgroundColor: Colors.light.primary,
+    backgroundColor: Colors.light.secondary,
     borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    borderWidth: 1,
+    borderColor: Colors.light.primary,
   },
   amount: {
     fontSize: 14,
-    color: Colors.light.textWhite,
+    color: Colors.light.text,
     textAlign: "center",
   },
 });

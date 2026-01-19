@@ -4,6 +4,7 @@ import { Colors } from "@/src/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 function CustomTabBarButton({ 
   focused, 
@@ -48,6 +49,7 @@ function CustomTabBarButton({
 
 export default function AppLayout() {
   return (
+  <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -95,6 +97,7 @@ export default function AppLayout() {
       <Tabs.Screen name="zuffy" />
       <Tabs.Screen name="profile" />
     </Tabs>
+    </SafeAreaView>
   );
 }
 

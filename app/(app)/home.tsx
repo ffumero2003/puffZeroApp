@@ -1,6 +1,5 @@
 // app/(app)/home.tsx
 import AppText from "@/src/components/AppText";
-import AppHeader from "@/src/components/app/AppHeader";
 import DayDetailModal from "@/src/components/app/home/DayDetailModal";
 import HomeHeader from "@/src/components/app/home/HomeHeader";
 import ProgressCircle from "@/src/components/app/home/ProgressCircle";
@@ -35,7 +34,7 @@ export default function Home() {
   return (
     <>
       <View style={styles.container}>
-        <AppHeader style={{ margin: 0, padding: 0 }} />
+       
         
           {/* Header */}
           <View style={styles.header}>
@@ -126,10 +125,7 @@ const styles = StyleSheet.create({
     padding: 10,
     
   },
-  header: {
-    marginTop: 20,
-    marginBottom: 20,
-  },
+  
   // weekContainer: {
   //   marginBottom: 0,
   // },
@@ -152,12 +148,13 @@ const styles = StyleSheet.create({
   daysRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 4,
+    gap: 6,
+    paddingVertical: 6,
     
   },
   quoteContainer: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
+    paddingVertical: 24,
+    paddingHorizontal: 18,
   },
   quote: {
     fontSize: 22,

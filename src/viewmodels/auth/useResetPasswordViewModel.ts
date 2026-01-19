@@ -1,4 +1,5 @@
 // useResetPasswordViewModel.ts
+import { isDevMode } from "@/src/config/dev";
 import { ROUTES } from "@/src/constants/routes";
 import { supabase } from "@/src/lib/supabase";
 import * as Linking from "expo-linking";
@@ -29,8 +30,11 @@ export function useResetPasswordViewModel() {
     const refresh_token = parsed.queryParams?.refresh_token as string | undefined;
 
     if (!access_token || !refresh_token) {
-      router.replace(ROUTES.ONBOARDING);
-      return false;
+      if(!isDevMode()) {
+        router.replace(ROUTES.ONBOARDING);
+        return false;
+      }
+      return true;
     }
 
     const { error } = await supabase.auth.setSession({

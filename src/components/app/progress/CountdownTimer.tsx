@@ -72,7 +72,7 @@ function TimeBox({ value, label }: { value: number; label: string }) {
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
-    marginVertical: 16,
+    
   },
   title: {
     fontSize: 22,
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   timeBox: {
-    backgroundColor: Colors.light.text,
+    backgroundColor: Colors.light.secondary,
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -95,12 +95,12 @@ const styles = StyleSheet.create({
   },
   timeValue: {
     fontSize: 28,
-    color: Colors.light.textWhite,
+    color: Colors.light.text,
     marginBottom: 2,
   },
   timeLabel: {
     fontSize: 11,
-    color: Colors.light.textWhite,
+    color: Colors.light.text,
     opacity: 0.8,
   },
 });

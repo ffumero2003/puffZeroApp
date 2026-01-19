@@ -1,12 +1,13 @@
 // src/guards/AuthGuard.tsx
 import { router, useSegments } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { getInitialRoute, shouldBypassPaywall } from "../config/dev";
 import { useAuth } from "../providers/auth-provider";
 
 export function useAuthGuard() {
   const { user, initializing, authFlow } = useAuth();
   const segments = useSegments();
+  const lastDevRoute = useRef<string | null>(null);
 
   // 🔥 VARIABLE DE PAYWALL
   // - shouldBypassPaywall() = BYPASS_PAYWALL en dev.ts (independiente)
@@ -19,8 +20,12 @@ export function useAuthGuard() {
     // 🔧 DEV MODE: Navegar directamente a la pantalla configurada
     const devRoute = getInitialRoute();
     if (devRoute) {
-      console.log("🔧 DEV MODE - Navegando a:", devRoute);
-      router.replace(devRoute as any);
+      // Only navigate if we haven't navigated to THIS specific route yet
+      if (lastDevRoute.current !== devRoute) {
+        lastDevRoute.current = devRoute;  // ← Remember which route we navigated to
+        console.log("🔧 DEV MODE - Navegando a:", devRoute);
+        router.replace(devRoute as any);
+      }
       return;
     }
 

@@ -38,14 +38,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "90%",
-    marginTop: 20,
-    marginBottom: 20,
+    
   },
   textContainer: {
     flex: 1,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     color: Colors.light.text,
     marginBottom: 4,
   },

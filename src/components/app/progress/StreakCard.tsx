@@ -40,12 +40,12 @@ export default function StreakCard({ lastPuffTime, profileCreatedAt }: StreakCar
 
   const formatStreak = () => {
     if (streak.days > 0) {
-      return `Llevas ${streak.days} día${streak.days > 1 ? "s" : ""} sin fumar`;
+      return ` ${streak.days} día${streak.days > 1 ? "s" : ""} sin fumar`;
     }
     if (streak.hours > 0) {
-      return `Llevas ${streak.hours}h ${streak.minutes}m sin fumar`;
+      return ` ${streak.hours}h ${streak.minutes}m sin fumar`;
     }
-    return `Llevas ${streak.minutes}m ${streak.seconds}s sin fumar`;
+    return ` ${streak.minutes}m ${streak.seconds}s sin fumar`;
   };
 
   return (
@@ -66,8 +66,10 @@ export default function StreakCard({ lastPuffTime, profileCreatedAt }: StreakCar
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.secondary,
+    backgroundColor: Colors.light.textWhite,
     borderRadius: 16,
+    borderWidth: 2,
+    borderColor: Colors.light.secondary,
     padding: 16,
     minHeight: 100,
   },
@@ -77,14 +79,17 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   streakContainer: {
-    backgroundColor: Colors.light.primary,
+    backgroundColor: Colors.light.secondary,
     borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 14,
+    
+    
+    borderWidth: 1,
+    borderColor: Colors.light.primary,
   },
   streakText: {
-    fontSize: 13,
-    color: Colors.light.textWhite,
+    fontSize: 14,
+    color: Colors.light.text,
     textAlign: "center",
   },
 });

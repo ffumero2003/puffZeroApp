@@ -8,7 +8,7 @@ export const layout = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.light.background,
     paddingHorizontal: 24,
-    paddingTop: 30,
+    
     justifyContent: "space-between"
   },
 
@@ -16,7 +16,7 @@ export const layout = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.light.background,
     paddingHorizontal: 24,
-    paddingTop: 30,
+    
   },
 
   container: {
@@ -32,7 +32,7 @@ export const layout = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.light.background,
     paddingHorizontal: 24,
-    paddingTop: 20,
+    
   },
   /* 🔵 HEADER SUPERIOR (OnboardingHeader) */
   headerContainer: {
@@ -40,13 +40,17 @@ export const layout = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     paddingHorizontal: 24,
-    paddingTop: 30,
+    
   },
 
   /* 🔵 BLOQUE DE CONTENIDO CENTRAL */
   content: {
     
-    marginTop: 40,
+    marginTop: 20,
+  },
+  contentNotifications: {
+    
+    marginTop: 0,
   },
 
   /* 🔵 SECCIONES FLEXIBLES (UP, MIDDLE, BOTTOM) */
@@ -142,10 +146,10 @@ export const layout = StyleSheet.create({
   },
   bigImage: {
     width: "100%",
-    height: 480,
+    height: 510,
   },
 
-
+ 
 
   //footer login link
 

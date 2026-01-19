@@ -107,13 +107,14 @@ export default function Register() {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 50 : 0}
       >
         <View style={layout.containerAuth}>
-          <OnboardingHeader showProgress={false} style={{ marginBottom: 30 }} />
+          <OnboardingHeader showProgress={false}/>
 
           <AuthHeader
             title="Crear Cuenta"
-            subtitle="Configurá tu cuenta y empezá tu proceso."
+            subtitle="Empezá tu proceso."
           />
 
           <ScrollView

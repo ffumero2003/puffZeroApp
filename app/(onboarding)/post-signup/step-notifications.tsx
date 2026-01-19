@@ -1,7 +1,6 @@
 // notifications-step.tsx
 import NotificationsModal from "@/assets/images/onboarding/notifications-modal.png";
 import AppText from "@/src/components/AppText";
-import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import { ROUTES } from "@/src/constants/routes";
 import { Colors } from "@/src/constants/theme";
 import { layout } from "@/src/styles/layout";
@@ -30,14 +29,9 @@ export default function NotificationsStep() {
 
   return (
     <View style={layout.containerWithLoadingBar}>
-      <OnboardingHeader
-        step={0}
-        total={11}
-        showBack={false}
-        showProgress={false}
-      />
+      
 
-      <View style={layout.content}>
+      <View style={layout.contentNotifications}>
         <AppText weight="bold" style={layout.title}>
           Alcanza tus metas con{"\n"}recordatorios
         </AppText>

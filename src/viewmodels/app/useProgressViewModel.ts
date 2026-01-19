@@ -243,16 +243,7 @@ export function useProgressViewModel() {
     }
   }, [selectedTimeRange, aggregatePuffsByDay]);
 
-  // Goal vs Actual chart data
-  const goalVsActualData = useMemo(() => {
-    const dailyGoal = profile?.puffs_per_day || 200;
-    
-    return chartData.map(point => ({
-      day: point.x,
-      actual: point.y,
-      goal: dailyGoal,
-    }));
-  }, [chartData, profile?.puffs_per_day]);
+  
 
   // Daily goal from profile
   const dailyGoal = profile?.puffs_per_day || 200;
@@ -283,7 +274,6 @@ export function useProgressViewModel() {
     
     // Charts
     chartData,
-    goalVsActualData,
     dailyGoal,
     selectedTimeRange,
     setSelectedTimeRange,

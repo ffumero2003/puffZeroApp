@@ -2,7 +2,7 @@ import { Colors } from "@/src/constants/theme";
 import { Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function AuthLayout() {
+export default function PaywallLayout() {
   return (
     <SafeAreaView 
       style={{ flex: 1, backgroundColor: Colors.light.background }} 

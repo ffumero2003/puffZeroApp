@@ -29,7 +29,7 @@ export default function PuffsChart({
   const ranges: { key: TimeRange; label: string }[] = [
     { key: "7days", label: "7 días" },
     { key: "30days", label: "30 días" },
-    { key: "all", label: "Todo" },
+    { key: "all", label: "Uso Histórico" },
   ];
 
   // Limit labels for readability
@@ -43,40 +43,14 @@ export default function PuffsChart({
   const values = data.map(d => d.y);
 
   // If no data, show placeholder
-  if (data.length === 0) {
+  if (data.length < 7) {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
-          <AppText weight="semibold" style={styles.title}>
-            Consumo diario - Últimos {selectedRange === "7days" ? "7" : selectedRange === "30days" ? "30" : ""} días
-          </AppText>
-          
-          <View style={styles.rangeSelector}>
-            {ranges.map(range => (
-              <TouchableOpacity
-                key={range.key}
-                style={[
-                  styles.rangeButton,
-                  selectedRange === range.key && styles.rangeButtonActive,
-                ]}
-                onPress={() => onRangeChange(range.key)}
-              >
-                <AppText
-                  weight={selectedRange === range.key ? "bold" : "regular"}
-                  style={[
-                    styles.rangeButtonText,
-                    selectedRange === range.key && styles.rangeButtonTextActive,
-                  ]}
-                >
-                  {range.label}
-                </AppText>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
+        {/* Your range selector header here */}
         <View style={styles.emptyChart}>
-          <AppText style={styles.emptyText}>Sin datos aún</AppText>
+          <AppText style={styles.emptyText}>
+            Vuelve en {7 - data.length} días para ver tu progreso
+          </AppText>
         </View>
       </View>
     );
@@ -106,9 +80,7 @@ export default function PuffsChart({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <AppText weight="semibold" style={styles.title}>
-          Consumo diario - Últimos {selectedRange === "7days" ? "7" : selectedRange === "30days" ? "30" : ""} días
-        </AppText>
+        
         
         <View style={styles.rangeSelector}>
           {ranges.map(range => (
@@ -195,14 +167,14 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
     marginBottom: 8,
     flexWrap: "wrap",
     gap: 8,
   },
   title: {
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.light.text,
     flex: 1,
   },
@@ -211,6 +183,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.secondary,
     borderRadius: 8,
     padding: 2,
+    
   },
   rangeButton: {
     paddingHorizontal: 12,
@@ -221,7 +194,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.primary,
   },
   rangeButtonText: {
-    fontSize: 11,
+    fontSize: 12,
     color: Colors.light.text,
   },
   rangeButtonTextActive: {

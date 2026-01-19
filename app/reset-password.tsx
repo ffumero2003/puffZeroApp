@@ -2,6 +2,7 @@ import AppText from "@/src/components/AppText";
 import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import UnderlineInput from "@/src/components/onboarding/UnderlineInput";
+import { Colors } from "@/src/constants/theme";
 import {
   validateConfirmPassword,
   validatePassword,
@@ -10,7 +11,7 @@ import { layout } from "@/src/styles/layout";
 import { useResetPasswordViewModel } from "@/src/viewmodels/auth/useResetPasswordViewModel";
 import { useState } from "react";
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View } from "react-native";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ROUTES } from "@/src/constants/routes";
 import { router } from "expo-router";
@@ -59,63 +60,65 @@ export default function ResetPasswordScreen() {
 
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={layout.screenContainer}>
-          <View>
-            <OnboardingHeader showBack={false} showProgress={false} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light.background }} edges={["top"]}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={layout.screenContainer}>
+            <View>
+              <OnboardingHeader showBack={false} showProgress={false} />
 
-            <View style={layout.content}>
-              <AppText weight="bold" style={layout.title}>
-                Crear nueva contraseña
-              </AppText>
+              <View style={layout.content}>
+                <AppText weight="bold" style={layout.title}>
+                  Crear nueva contraseña
+                </AppText>
 
-              <AppText style={layout.subtitle}>
-                Ingresá y confirmá tu nueva contraseña para continuar.
-              </AppText>
+                <AppText style={layout.subtitle}>
+                  Ingresá y confirmá tu nueva contraseña para continuar.
+                </AppText>
+              </View>
+
+              <UnderlineInput
+                placeholder="Contraseña"
+                value={password}
+                onChangeText={onPasswordChange}
+                fieldType="password"
+                secureTextEntry
+              />
+
+
+              {passwordError && (
+                <AppText style={layout.errorText} weight="extrabold">
+                  {passwordError}
+                </AppText>
+              )}
+
+
+              <UnderlineInput
+                placeholder="Confirmar contraseña"
+                value={confirm}
+                onChangeText={onConfirmChange}
+                fieldType="confirmPassword"
+                secureTextEntry
+              />
+              {confirmError && (
+                <AppText style={layout.errorText} weight="extrabold">
+                  {confirmError}
+                </AppText>
+              )}
+
+
             </View>
 
-            <UnderlineInput
-              placeholder="Contraseña"
-              value={password}
-              onChangeText={onPasswordChange}
-              fieldType="password"
-              secureTextEntry
+            <ContinueButton
+              text={loading ? "Actualizando..." : "Actualizar contraseña"}
+              onPress={handleSubmit}
+              disabled={!canSubmit}
+              style={layout.bottomButtonContainer}
             />
-
-
-            {passwordError && (
-              <AppText style={layout.errorText} weight="extrabold">
-                {passwordError}
-              </AppText>
-            )}
-
-
-            <UnderlineInput
-              placeholder="Confirmar contraseña"
-              value={confirm}
-              onChangeText={onConfirmChange}
-              fieldType="confirmPassword"
-              secureTextEntry
-            />
-            {confirmError && (
-              <AppText style={layout.errorText} weight="extrabold">
-                {confirmError}
-              </AppText>
-            )}
-
 
           </View>
-
-          <ContinueButton
-            text={loading ? "Actualizando..." : "Actualizar contraseña"}
-            onPress={handleSubmit}
-            disabled={!canSubmit}
-            style={layout.bottomButtonContainer}
-          />
-
-        </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

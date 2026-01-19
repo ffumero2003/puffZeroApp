@@ -1,7 +1,5 @@
 // app/(app)/progress.tsx
-import AppHeader from "@/src/components/app/AppHeader";
 import CountdownTimer from "@/src/components/app/progress/CountdownTimer";
-import GoalVsActualChart from "@/src/components/app/progress/GoalVsActualChart";
 import MoneySavedCard from "@/src/components/app/progress/MoneySavedCard";
 import ProgressHeader from "@/src/components/app/progress/ProgressHeader";
 import PuffsChart from "@/src/components/app/progress/PuffsChart";
@@ -27,7 +25,6 @@ export default function Progress() {
     currencySymbol,
     currency,
     chartData,
-    goalVsActualData,
     dailyGoal,
     selectedTimeRange,
     setSelectedTimeRange,
@@ -59,15 +56,16 @@ export default function Progress() {
 
   return (
     <View style={styles.container}>
-      <AppHeader style={{ margin: 0, padding: 0 }} />
+      
+      {/* Header */}
+      <ProgressHeader timeSinceLastPuff={timeSinceLastPuff} />
       
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <ProgressHeader timeSinceLastPuff={timeSinceLastPuff} />
+        
 
         {/* Countdown Timer to Goal */}
         <CountdownTimer 
@@ -103,11 +101,7 @@ export default function Progress() {
           onRangeChange={setSelectedTimeRange}
         />
 
-        {/* Goal vs Actual Bar Chart */}
-        <GoalVsActualChart
-          data={goalVsActualData}
-          dailyGoal={dailyGoal}
-        />
+        
 
         {/* Bottom padding for scroll */}
         <View style={{ height: 40 }} />
@@ -138,6 +132,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     marginHorizontal: 10,
-    marginVertical: 16,
+    marginVertical: 5,
   },
 });
