@@ -6,6 +6,7 @@ import { layout } from "@/src/styles/layout";
 import { Image, View } from "react-native";
 
 import ProgressScreen from "@/assets/images/onboarding/onboarding-progress-page.png";
+import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
 import { useOnboardingViewModel } from "@/src/viewmodels/onboarding/useOnboardingViewModel";
 import { router } from "expo-router";
@@ -19,28 +20,30 @@ export default function OnboardingProgress() {
   }
 
   return (
-    <View style={layout.screenContainer}>
-      <OnboardingHeader step={1} total={11} />
+    <ScreenWrapper>
+      <View style={layout.screenContainer}>
+        <OnboardingHeader step={1} total={11} />
 
-      <View style={{ width: "100%", alignItems: "center" }}>
-        <Image
-          source={ProgressScreen}
-          style={layout.bigImage}
-          resizeMode="contain"
-        />
+        <View style={{ width: "100%", alignItems: "center" }}>
+          <Image
+            source={ProgressScreen}
+            style={layout.bigImage}
+            resizeMode="contain"
+          />
 
-        <AppText weight="bold" style={layout.titleCenter}>
-          Visualiza fácilmente tu progreso
-        </AppText>
+          <AppText weight="bold" style={layout.titleCenter}>
+            Visualiza fácilmente tu progreso
+          </AppText>
 
-        <ContinueButton
-          text="Continuar"
-          onPress={goToZuffy}
-          style={layout.bottomButtonContainer}
-        />
+          <ContinueButton
+            text="Continuar"
+            onPress={goToZuffy}
+            style={layout.bottomButtonContainer}
+          />
 
-        {showLogin && <LoginText />}
+          {showLogin && <LoginText />}
+        </View>
       </View>
-    </View>
+    </ScreenWrapper>
   );
 }

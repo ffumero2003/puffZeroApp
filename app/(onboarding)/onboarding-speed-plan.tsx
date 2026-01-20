@@ -5,9 +5,9 @@ import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import OnboardingOptionCard from "@/src/components/onboarding/OnboardingOptionCard";
 import TitleBlock from "@/src/components/onboarding/TitleBlock";
-import { layout } from "@/src/styles/layout";
-
+import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
+import { layout } from "@/src/styles/layout";
 import { useSpeedPlanViewModel } from "@/src/viewmodels/onboarding/useSpeedPlanViewModel";
 import { router } from "expo-router";
 
@@ -51,40 +51,42 @@ export default function OnboardingSpeedPlan() {
 };
 
   return (
-    <View style={layout.screenContainer}>
-      <OnboardingHeader step={9} total={11} />
+    <ScreenWrapper>
+      <View style={layout.screenContainer}>
+        <OnboardingHeader step={9} total={11} />
 
-      <View style={layout.content}>
-        <TitleBlock
-          title="¿Qué tan rápido querés alcanzar tu meta?"
-          subtitle="Escogé el plan que mejor vaya con tu forma de vivir y tu momento actual."
+        <View style={layout.content}>
+          <TitleBlock
+            title="¿Qué tan rápido querés alcanzar tu meta?"
+            subtitle="Escogé el plan que mejor vaya con tu forma de vivir y tu momento actual."
+          />
+        </View>
+
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          >
+            {OPTIONS.map((opt) => (
+              <OnboardingOptionCard
+                key={opt.id}
+                id={opt.id}
+                title={opt.title}
+                description={opt.description}
+                selected={selected === opt.id}
+                onPress={() => setSelected(opt.id)}
+              />
+            ))}
+          </ScrollView>
+        </View>
+
+        <ContinueButton
+          text="Continuar"
+          disabled={selected === null}
+          onPress={() => handleContinue(selected!)}
+          style={layout.bottomButtonContainer}
         />
       </View>
-
-      <View style={{ flex: 1 }}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        >
-          {OPTIONS.map((opt) => (
-            <OnboardingOptionCard
-              key={opt.id}
-              id={opt.id}
-              title={opt.title}
-              description={opt.description}
-              selected={selected === opt.id}
-              onPress={() => setSelected(opt.id)}
-            />
-          ))}
-        </ScrollView>
-      </View>
-
-      <ContinueButton
-        text="Continuar"
-        disabled={selected === null}
-        onPress={() => handleContinue(selected!)}
-        style={layout.bottomButtonContainer}
-      />
-    </View>
+    </ScreenWrapper>
   );
 }

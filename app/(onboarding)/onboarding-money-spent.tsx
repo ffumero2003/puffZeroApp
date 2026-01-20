@@ -20,6 +20,7 @@ import AppText from "@/src/components/AppText";
 import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import TitleBlock from "@/src/components/onboarding/TitleBlock";
+import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { Colors } from "@/src/constants/theme";
 import { layout } from "@/src/styles/layout";
 
@@ -67,111 +68,113 @@ export default function OnboardingMoneySpent() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <View style={layout.screenContainer}>
-        <View style={{ flex: 1 }}>
-          <OnboardingHeader step={6} total={11} />
+    <ScreenWrapper>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <View style={layout.screenContainer}>
+          <View style={{ flex: 1 }}>
+            <OnboardingHeader step={6} total={11} />
 
-          <ScrollView
-            style={layout.content}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 20 }}
-          >
-            <TitleBlock
-              title="¿Cuánto gastás por mes?"
-              subtitle="Registrar tus gastos te muestra cuánto podrías ahorrar."
-            />
-
-            <TextInput
-              style={styles.inputCurrency}
-              keyboardType="numeric"
-              placeholder="0"
-              placeholderTextColor="#A0A0BF"
-              value={amount}
-              onChangeText={(t) => setAmount(t.replace(/[^0-9]/g, ""))}
-            />
-
-            {formatted ? (
-              <AppText style={layout.previewText}>
-                ≈ {formatted} por semana
-              </AppText>
-            ) : null}
-
-            <TouchableOpacity
-              style={styles.currencyPicker}
-              onPress={() => {
-                setPickerOpen(true);
-                overlayOpacity.value = withTiming(1, { duration: 200 });
-                modalTranslate.value = withTiming(0, {
-                  duration: 260,
-                  easing: Easing.out(Easing.quad),
-                });
-                modalOpacity.value = withTiming(1, { duration: 260 });
-              }}
+            <ScrollView
+              style={layout.content}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 20 }}
             >
-              <AppText weight="semibold" style={styles.currencyText}>
-                {LATAM_CURRENCIES.find((c) => c.code === localCurrency)?.label}
-              </AppText>
-              <AppText style={styles.arrow}>▼</AppText>
-            </TouchableOpacity>
-          </ScrollView>
+              <TitleBlock
+                title="¿Cuánto gastás por mes?"
+                subtitle="Registrar tus gastos te muestra cuánto podrías ahorrar."
+              />
+
+              <TextInput
+                style={styles.inputCurrency}
+                keyboardType="numeric"
+                placeholder="0"
+                placeholderTextColor="#A0A0BF"
+                value={amount}
+                onChangeText={(t) => setAmount(t.replace(/[^0-9]/g, ""))}
+              />
+
+              {formatted ? (
+                <AppText style={layout.previewText}>
+                  ≈ {formatted} por semana
+                </AppText>
+              ) : null}
+
+              <TouchableOpacity
+                style={styles.currencyPicker}
+                onPress={() => {
+                  setPickerOpen(true);
+                  overlayOpacity.value = withTiming(1, { duration: 200 });
+                  modalTranslate.value = withTiming(0, {
+                    duration: 260,
+                    easing: Easing.out(Easing.quad),
+                  });
+                  modalOpacity.value = withTiming(1, { duration: 260 });
+                }}
+              >
+                <AppText weight="semibold" style={styles.currencyText}>
+                  {LATAM_CURRENCIES.find((c) => c.code === localCurrency)?.label}
+                </AppText>
+                <AppText style={styles.arrow}>▼</AppText>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+
+          <ContinueButton
+            text="Continuar"
+            disabled={!isValidAmount(amountNumber, localCurrency)}
+            onPress={handleContinue}
+            style={layout.bottomButtonContainer}
+          />
         </View>
 
-        <ContinueButton
-          text="Continuar"
-          disabled={!isValidAmount(amountNumber, localCurrency)}
-          onPress={handleContinue}
-          style={layout.bottomButtonContainer}
-        />
-      </View>
+        {pickerOpen && (
+          <Animated.View
+            style={[styles.modalOverlay, overlayStyle]}
+            onStartShouldSetResponder={() => true}
+            onResponderRelease={(e) => {
+              if (!modalRef.current) return;
 
-      {pickerOpen && (
-        <Animated.View
-          style={[styles.modalOverlay, overlayStyle]}
-          onStartShouldSetResponder={() => true}
-          onResponderRelease={(e) => {
-            if (!modalRef.current) return;
+              modalRef.current.measure((x, y, width, height, pageX, pageY) => {
+                const { pageX: tx, pageY: ty } = e.nativeEvent;
+                const inside =
+                  tx >= pageX &&
+                  tx <= pageX + width &&
+                  ty >= pageY &&
+                  ty <= pageY + height;
 
-            modalRef.current.measure((x, y, width, height, pageX, pageY) => {
-              const { pageX: tx, pageY: ty } = e.nativeEvent;
-              const inside =
-                tx >= pageX &&
-                tx <= pageX + width &&
-                ty >= pageY &&
-                ty <= pageY + height;
-
-              if (!inside) {
-                overlayOpacity.value = withTiming(0, { duration: 150 });
-                modalOpacity.value = withTiming(0, { duration: 150 });
-                modalTranslate.value = withTiming(50, { duration: 150 });
-                setTimeout(() => setPickerOpen(false), 150);
-              }
-            });
-          }}
-        >
-          <Animated.View ref={modalRef} style={[styles.modalBox, modalBoxStyle]}>
-            <ScrollView style={{ maxHeight: 300 }}>
-              {LATAM_CURRENCIES.map((item) => (
-                <TouchableOpacity
-                  key={item.code}
-                  style={styles.modalOption}
-                  onPress={() => {
-                    setLocalCurrency(item.code);
-                    setPickerOpen(false);
-                  }}
-                >
-                  <AppText weight="medium">{item.label}</AppText>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+                if (!inside) {
+                  overlayOpacity.value = withTiming(0, { duration: 150 });
+                  modalOpacity.value = withTiming(0, { duration: 150 });
+                  modalTranslate.value = withTiming(50, { duration: 150 });
+                  setTimeout(() => setPickerOpen(false), 150);
+                }
+              });
+            }}
+          >
+            <Animated.View ref={modalRef} style={[styles.modalBox, modalBoxStyle]}>
+              <ScrollView style={{ maxHeight: 300 }}>
+                {LATAM_CURRENCIES.map((item) => (
+                  <TouchableOpacity
+                    key={item.code}
+                    style={styles.modalOption}
+                    onPress={() => {
+                      setLocalCurrency(item.code);
+                      setPickerOpen(false);
+                    }}
+                  >
+                    <AppText weight="medium">{item.label}</AppText>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </Animated.View>
           </Animated.View>
-        </Animated.View>
-      )}
-    </KeyboardAvoidingView>
+        )}
+      </KeyboardAvoidingView>
+    </ScreenWrapper>
   );
 }
 

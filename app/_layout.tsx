@@ -10,6 +10,7 @@ import {
   useFonts,
 } from "@expo-google-fonts/manrope";
 
+import Splash from "@/src/components/system/Splash";
 import { useAuthGuard } from "@/src/guards/AuthGuard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, Stack } from "expo-router";
@@ -17,7 +18,6 @@ import { StatusBar } from "expo-status-bar";
 import * as WebBrowser from "expo-web-browser";
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import Splash from "../src/components/system/splash";
 import { supabase } from "../src/lib/supabase";
 import { AuthProvider, useAuth } from "../src/providers/auth-provider";
 import { OnboardingProvider } from "../src/providers/onboarding-provider";

@@ -9,6 +9,7 @@ import { ROUTES } from "@/src/constants/routes";
 import { layout } from "@/src/styles/layout";
 import { router } from "expo-router";
 
+import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { useWorriesViewModel } from "@/src/viewmodels/onboarding/useWorriesViewModel";
 
 const CONCERNS = [
@@ -42,38 +43,40 @@ export default function OnboardingWorries() {
   };
 
   return (
-    <View style={layout.screenContainer}>
-      <OnboardingHeader step={11} total={11} />
+    <ScreenWrapper>
+      <View style={layout.screenContainer}>
+        <OnboardingHeader step={11} total={11} />
 
-      <View style={layout.content}>
-        <TitleBlock
-          title="¿Qué te preocupa al dejar el vape?"
-          subtitle="Conocer tus preocupaciones nos ayuda a darte un mejor apoyo."
+        <View style={layout.content}>
+          <TitleBlock
+            title="¿Qué te preocupa al dejar el vape?"
+            subtitle="Conocer tus preocupaciones nos ayuda a darte un mejor apoyo."
+          />
+        </View>
+
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          >
+            {CONCERNS.map(item => (
+              <MultiSelectButton
+                key={item.id}
+                title={item.title}
+                selected={selected.includes(item.id)}
+                onPress={() => toggleSelect(item.id)}
+              />
+            ))}
+          </ScrollView>
+        </View>
+
+        <ContinueButton
+          text="Continuar"
+          disabled={selected.length === 0}
+          onPress={() => handleContinue(selected)}
+          style={layout.bottomButtonContainer}
         />
       </View>
-
-      <View style={{ flex: 1 }}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        >
-          {CONCERNS.map(item => (
-            <MultiSelectButton
-              key={item.id}
-              title={item.title}
-              selected={selected.includes(item.id)}
-              onPress={() => toggleSelect(item.id)}
-            />
-          ))}
-        </ScrollView>
-      </View>
-
-      <ContinueButton
-        text="Continuar"
-        disabled={selected.length === 0}
-        onPress={() => handleContinue(selected)}
-        style={layout.bottomButtonContainer}
-      />
-    </View>
+    </ScreenWrapper>
   );
 }

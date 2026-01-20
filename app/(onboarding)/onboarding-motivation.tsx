@@ -7,6 +7,7 @@ import OnboardingWhiteButton from "@/src/components/onboarding/OnboardingWhiteBu
 import TitleBlock from "@/src/components/onboarding/TitleBlock";
 import { layout } from "@/src/styles/layout";
 
+import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { useMotivationViewModel } from "@/src/viewmodels/onboarding/useMotivationViewModel";
 
 const MOTIVATION_OPTIONS = [
@@ -30,28 +31,30 @@ export default function OnboardingMotivation() {
   };
 
   return (
-    <View style={layout.containerWithLoadingBar}>
-      <OnboardingHeader step={10} total={11} />
+    <ScreenWrapper>
+      <View style={layout.containerWithLoadingBar}>
+        <OnboardingHeader step={10} total={11} />
 
-      <View style={layout.content}>
-        <TitleBlock
-          title="¿Por qué querés dejar de vapear?"
-          subtitle="Entender tu motivación fortalece tu proceso."
-        />
-      </View>
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 40 }}
-      >
-        {MOTIVATION_OPTIONS.map((opt) => (
-          <OnboardingWhiteButton
-            key={opt.id}
-            title={opt.title}
-            onPress={() => handleSelect(opt.id)}
+        <View style={layout.content}>
+          <TitleBlock
+            title="¿Por qué querés dejar de vapear?"
+            subtitle="Entender tu motivación fortalece tu proceso."
           />
-        ))}
-      </ScrollView>
-    </View>
+        </View>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 40 }}
+        >
+          {MOTIVATION_OPTIONS.map((opt) => (
+            <OnboardingWhiteButton
+              key={opt.id}
+              title={opt.title}
+              onPress={() => handleSelect(opt.id)}
+            />
+          ))}
+        </ScrollView>
+      </View>
+    </ScreenWrapper>
   );
 }

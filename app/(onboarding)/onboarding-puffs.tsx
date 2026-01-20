@@ -14,6 +14,7 @@ import AppText from "@/src/components/AppText";
 import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import TitleBlock from "@/src/components/onboarding/TitleBlock";
+import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
 import { Colors } from "@/src/constants/theme";
 import { layout } from "@/src/styles/layout";
@@ -57,48 +58,50 @@ export default function OnboardingPuffs() {
   };
 
   return (
-    <View style={layout.screenContainer}>
-      <View>
-        <OnboardingHeader step={5} total={11} />
+    <ScreenWrapper>
+      <View style={layout.screenContainer}>
+        <View>
+          <OnboardingHeader step={5} total={11} />
 
-        <View style={layout.content}>
-          <TitleBlock
-            title="¿Cuántos puffs consumís por día?"
-            subtitle="No tiene que ser exacto. Si en los primeros días notamos que el límite es muy bajo, lo ajustamos sin problema."
-          />
+          <View style={layout.content}>
+            <TitleBlock
+              title="¿Cuántos puffs consumís por día?"
+              subtitle="No tiene que ser exacto. Si en los primeros días notamos que el límite es muy bajo, lo ajustamos sin problema."
+            />
 
-          <Slider
-            style={styles.slider}
-            value={value}
-            onValueChange={setValue}
-            minimumValue={0}
-            maximumValue={400}
-            step={1}
-            minimumTrackTintColor={Colors.light.primary}
-            maximumTrackTintColor="#CFCBFF"
-            thumbTintColor={Colors.light.primary}
-          />
+            <Slider
+              style={styles.slider}
+              value={value}
+              onValueChange={setValue}
+              minimumValue={0}
+              maximumValue={400}
+              step={1}
+              minimumTrackTintColor={Colors.light.primary}
+              maximumTrackTintColor="#CFCBFF"
+              thumbTintColor={Colors.light.primary}
+            />
 
-          <AnimatedTextInput
-            style={styles.input}
-            editable={false}
-            animatedProps={animatedProps}
-          />
+            <AnimatedTextInput
+              style={styles.input}
+              editable={false}
+              animatedProps={animatedProps}
+            />
 
-          <Animated.View style={labelStyle}>
-            <AppText weight="semibold" style={styles.classification}>
-              {addiction}
-            </AppText>
-          </Animated.View>
+            <Animated.View style={labelStyle}>
+              <AppText weight="semibold" style={styles.classification}>
+                {addiction}
+              </AppText>
+            </Animated.View>
+          </View>
         </View>
-      </View>
 
-      <ContinueButton
-        text="Continuar"
-        disabled={!isValidPuffs(value)}
-        onPress={handleContinue}
-      />
-    </View>
+        <ContinueButton
+          text="Continuar"
+          disabled={!isValidPuffs(value)}
+          onPress={handleContinue}
+        />
+      </View>
+    </ScreenWrapper>
   );
 }
 

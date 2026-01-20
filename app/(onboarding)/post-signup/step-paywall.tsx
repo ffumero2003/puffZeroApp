@@ -7,6 +7,7 @@ import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import FeatureItem from "@/src/components/paywall/FeatureItem";
 import SubscriptionOption from "@/src/components/paywall/SubscriptionOption";
+import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { Colors } from "@/src/constants/theme";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
@@ -123,6 +124,7 @@ export default function OnboardingPaywall() {
 
     
   return (
+    <ScreenWrapper>
       <View style={layout.screenContainer}>
         <View >   
             {/* Header */}
@@ -190,6 +192,7 @@ export default function OnboardingPaywall() {
       
               
       </View>
+    </ScreenWrapper>
     );
 }
 

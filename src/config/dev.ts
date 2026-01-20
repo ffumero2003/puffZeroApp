@@ -17,7 +17,7 @@ export const DEV_CONFIG = {
   ENABLED: false, // ← CAMBIAR A false PARA PRODUCCIÓN
 
   // 🚀 NAVEGACIÓN DIRECTA (pantalla a la que vas directo cuando ENABLED = true)
-  DIRECT_SCREEN: "/post-signup/step-notifications", // ← Cambiá esto según donde estés trabajando
+  DIRECT_SCREEN: "/post-signup/step-review", // ← Cambiá esto según donde estés trabajando
 };
 
 // ═══════════════════════════════════════════════════════════

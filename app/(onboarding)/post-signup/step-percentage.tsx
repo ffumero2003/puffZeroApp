@@ -9,6 +9,8 @@ import { router } from "expo-router";
 import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 
+import ScreenWrapper from "@/src/components/system/ScreenWrapper";
+
 export default function StepPercentage() {
   const { progress, getStatusText, completed } = useStepPercentageViewModel();
   const animatedWidth = useRef(new Animated.Value(0)).current;
@@ -33,31 +35,33 @@ export default function StepPercentage() {
 }, [completed]);
 
   return (
-    <View style={layout.screenContainer}>
-      <OnboardingHeader showBack={false} showProgress={false} />
+    <ScreenWrapper>
+      <View style={layout.screenContainer}>
+        <OnboardingHeader showBack={false} showProgress={false} />
 
-      <View style={styles.center}>
-        <AppText weight="extrabold" style={styles.percentage}>
-          {progress}%
-        </AppText>
+        <View style={styles.center}>
+          <AppText weight="extrabold" style={styles.percentage}>
+            {progress}%
+          </AppText>
 
-        <View style={styles.progressTrack}>
-          <Animated.View
-            style={[styles.progressFill, { width: progressWidth }]}
-          />
-        </View>
+          <View style={styles.progressTrack}>
+            <Animated.View
+              style={[styles.progressFill, { width: progressWidth }]}
+            />
+          </View>
 
-        <AppText style={styles.statusText}>{getStatusText()}</AppText>
+          <AppText style={styles.statusText}>{getStatusText()}</AppText>
 
-        <View style={styles.checklist}>
-          <CheckItem text="Mejorar tu salud" active={progress >= 20} />
-          <CheckItem text="Reducir puffs" active={progress >= 35} />
-          <CheckItem text="Control de ansiedad" active={progress >= 55} />
-          <CheckItem text="Reducción de nicotina" active={progress >= 75} />
-          <CheckItem text="Manejo del estrés" active={progress >= 90} />
+          <View style={styles.checklist}>
+            <CheckItem text="Mejorar tu salud" active={progress >= 20} />
+            <CheckItem text="Reducir puffs" active={progress >= 35} />
+            <CheckItem text="Control de ansiedad" active={progress >= 55} />
+            <CheckItem text="Reducción de nicotina" active={progress >= 75} />
+            <CheckItem text="Manejo del estrés" active={progress >= 90} />
+          </View>
         </View>
       </View>
-    </View>
+    </ScreenWrapper>
   );
 }
 
