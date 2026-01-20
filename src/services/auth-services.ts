@@ -46,3 +46,29 @@ export async function resetPassword(email: string) {
 
   return { error: null };
 }
+
+export async function sendVerificationEmail(email: string) {
+  const res = await fetch(
+    "https://ifjbatvmxeujewbrfjzg.supabase.co/functions/v1/send-email-verification",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // 🔒 SUPABASE EDGE GUARD (OBLIGATORIO)
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        // 🔐 TU PROPIA SEGURIDAD
+        "x-internal-key": INTERNAL_SECRET,
+      },
+      body: JSON.stringify({ email }),
+    }
+  );
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    console.log("VERIFICATION EMAIL ERROR:", data);
+    return { error: { message: data.error ?? "Error enviando correo de verificación" } };
+  }
+
+  return { error: null };
+}

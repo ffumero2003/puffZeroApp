@@ -1,14 +1,15 @@
 // src/viewmodels/auth/useRegisterViewModel.ts
-import { Alert } from "react-native";
-
 import { createProfile } from "@/src/lib/profile";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
+import { sendVerificationEmail } from "@/src/services/auth-services";
 import {
   areNotificationsEnabled,
   savePushTokenToProfile,
+  scheduleVerificationReminder,
   sendWelcomeNotification
 } from "@/src/services/notification-service";
+import { Alert } from "react-native";
 
 type RegisterPayload = {
   email: string;
@@ -81,11 +82,34 @@ export function useRegisterViewModel() {
       await sendWelcomeNotification();
     }
 
-    // 📲 Save push token to profile for daily notifications
     savePushTokenToProfile(userId);
 
-    Alert.alert("Cuenta creada", "Revisá tu correo para confirmar tu cuenta.");
-    return true;
+    // 📧 Send verification email
+    const { error: emailError } = await sendVerificationEmail(email);
+    if (emailError) {
+      console.error("❌ Error sending verification email:", emailError);
+      // Don't block registration, just warn
+    }
+
+    // Alert.alert(
+    //   "Verificá tu cuenta",
+    //   "Te enviamos un email de verificación. Revisá tu bandeja de entrada para activar tu cuenta.",
+    //   [{ text: "OK" }]
+    // );
+
+
+    Alert.alert(
+      "¡Cuenta creada!",
+      "Tu cuenta fue creada exitosamente.",
+      [{ text: "OK" }]
+    );
+
+    // ⏰ Schedule verification reminder for 1.5 days
+    if (notificationsEnabled) {
+      await scheduleVerificationReminder();
+    }
+
+return true;
   }
 
   return {

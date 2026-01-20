@@ -14,10 +14,10 @@ export const BYPASS_PAYWALL = true;
 // ════════════════════════════════════════════════════════════════
 export const DEV_CONFIG = {
   // ENABLED te deja ir directo a una pantalla específica
-  ENABLED: true, // ← CAMBIAR A false PARA PRODUCCIÓN
+  ENABLED: false, // ← CAMBIAR A false PARA PRODUCCIÓN
 
   // 🚀 NAVEGACIÓN DIRECTA (pantalla a la que vas directo cuando ENABLED = true)
-  DIRECT_SCREEN: "/reset-password", // ← Cambiá esto según donde estés trabajando
+  DIRECT_SCREEN: "/post-signup/step-notifications", // ← Cambiá esto según donde estés trabajando
 };
 
 // ═══════════════════════════════════════════════════════════

@@ -7,10 +7,11 @@ import WeekDayCircle from "@/src/components/app/home/WeekDayCircle";
 // COMMENTED OUT: Invalid direct imports - these are returned by the hook, not exported
 // import { currentWeek, canGoBack, canGoForward, goToPreviousWeek, goToNextWeek } from "@/src/viewmodels/app/useHomeViewModel";
 import { Colors } from "@/src/constants/theme";
+import { useAuth } from "@/src/providers/auth-provider";
 import { useHomeViewModel } from "@/src/viewmodels/app/useHomeViewModel";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function Home() {
   const {
@@ -30,6 +31,20 @@ export default function Home() {
   } = useHomeViewModel();
 
   const [selectedDay, setSelectedDay] = useState<any>(null);
+  const { user } = useAuth();
+  const hasShownVerificationAlert = useRef(false);
+
+  // Show verification reminder when entering Home (only if unverified)
+  useEffect(() => {
+    if (user && !user.email_confirmed_at && !hasShownVerificationAlert.current) {
+      hasShownVerificationAlert.current = true;
+      Alert.alert(
+        "Verificá tu cuenta",
+        "Te enviamos un email de verificación. Revisá tu bandeja de entrada para no perder tu progreso.",
+        [{ text: "OK" }]
+      );
+    }
+  }, [user]);
 
   return (
     <>
@@ -37,9 +52,9 @@ export default function Home() {
        
         
           {/* Header */}
-          <View style={styles.header}>
+          {/* <View style={styles.header}> */}
             <HomeHeader firstName={firstName} dailyGoal={dailyGoal} />
-          </View>
+          {/* </View> */}
 
           <View
           style={[styles.scrollView, styles.content]}

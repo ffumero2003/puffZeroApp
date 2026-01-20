@@ -11,6 +11,7 @@ export const ROUTES = {
   //business
   PRIVACY_POLICY: "/privacy-policy",
   TERMS_OF_USE: "/terms-of-use",
+  VERIFY_EMAIL: "/verify-email",
 
   // Onboarding
   ONBOARDING_GOAL: "/onboarding-goal",

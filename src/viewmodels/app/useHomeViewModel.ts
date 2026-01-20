@@ -31,6 +31,7 @@ export function useHomeViewModel() {
   const [motivationalMessage, setMotivationalMessage] = useState("");
   const [currentWeek, setCurrentWeek] = useState<WeekData | null>(null);
 
+
   // Memoize firstName to avoid recalculation and fix TypeScript issue
   const firstName = useMemo(() => {
     const fullName = profile?.full_name || user?.user_metadata?.full_name || "Usuario";

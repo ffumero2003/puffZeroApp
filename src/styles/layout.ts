@@ -16,6 +16,7 @@ export const layout = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.light.background,
     paddingHorizontal: 24,
+    paddingTop: 20,
     
   },
 

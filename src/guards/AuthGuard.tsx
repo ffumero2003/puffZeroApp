@@ -19,6 +19,9 @@ export function useAuthGuard() {
 
     // 🔧 DEV MODE: Navegar directamente a la pantalla configurada
     const devRoute = getInitialRoute();
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/0fd0a7db-6453-4c6c-82b9-a41e6e00598d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthGuard.tsx:devMode',message:'Dev mode check',data:{devRoute,lastDevRoute:lastDevRoute.current,willNavigate:devRoute && lastDevRoute.current !== devRoute},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H4'})}).catch(()=>{});
+    // #endregion
     if (devRoute) {
       // Only navigate if we haven't navigated to THIS specific route yet
       if (lastDevRoute.current !== devRoute) {
@@ -36,11 +39,41 @@ export function useAuthGuard() {
     const inPostSignup = segments[1] === "post-signup"; // 🔥 DETECTAR POST-SIGNUP
     
     // 🔓 RUTAS PÚBLICAS (siempre accesibles)
-    const publicRoutes = ["privacy-policy", "terms-of-use", "reset-password"];
+    const publicRoutes = ["privacy-policy", "terms-of-use", "reset-password", "verify-email", "verify-required"];
     const isPublicRoute = publicRoutes.includes(segments[0]);
 
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/0fd0a7db-6453-4c6c-82b9-a41e6e00598d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthGuard.tsx:publicRouteCheck',message:'Checking public route',data:{segments:segments,isPublicRoute,currentSegment:segments[0]},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+    // #endregion
+
     if (isPublicRoute) {
-      return; // ← Dejar pasar privacy-policy, terms-of-use, reset-password
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/0fd0a7db-6453-4c6c-82b9-a41e6e00598d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthGuard.tsx:publicRouteAllowed',message:'Public route - allowing passage',data:{route:segments[0]},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+      // #endregion
+      return; // ← Dejar pasar privacy-policy, terms-of-use, reset-password, verify-email
+    }
+
+
+    // ════════════════════════════════════════════════════════
+    // 📧 EMAIL VERIFICATION - GRACE PERIOD (3 días)
+    // ════════════════════════════════════════════════════════
+    const GRACE_PERIOD_DAYS = 3;
+
+    if (user && !user.email_confirmed_at) {
+      // Google users have email_confirmed_at set, so this only affects email/password users
+      const createdAt = new Date(user.created_at);
+      const now = new Date();
+      const daysSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+
+      if (daysSinceCreation > GRACE_PERIOD_DAYS) {
+        // Grace period expired - must verify
+        if (segments[0] !== "verify-required") {
+          router.replace("/verify-required");
+          return;
+        }
+        return; // Already on verify-required, stay there
+      }
+      // Within grace period - let them continue using the app
     }
 
     // ════════════════════════════════════════════════════════

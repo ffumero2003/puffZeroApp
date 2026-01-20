@@ -10,7 +10,7 @@ serve(async (req: Request): Promise<Response> => {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  console.log("🔥 Function hit");
+  console.log("🔥 Function hit - Email Verification");
 
   try {
     console.log("➡️ Headers:", Object.fromEntries(req.headers.entries()));
@@ -41,16 +41,17 @@ serve(async (req: Request): Promise<Response> => {
 
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
-    // 🔄 GENERAR LINK DE RECOVERY
+    // 🔄 GENERAR LINK DE SIGNUP (verificación)
     const { data, error } = await supabase.auth.admin.generateLink({
-      type: "recovery",
+      type: "magiclink",  // ← CAMBIO: "signup" en vez de "recovery"
       email,
       options: {
-        redirectTo: "https://reset.puffzero.lat",
+        redirectTo: "https://verify.puffzero.lat",  // ← Tu deep link de la app
       },
     });
 
     if (error || !data?.properties?.action_link) {
+      console.error("❌ Error generating link:", error);
       return new Response(JSON.stringify({ error: "Failed to generate link" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
@@ -66,22 +67,22 @@ serve(async (req: Request): Promise<Response> => {
     const emailResult = await resend.emails.send({
       from: "Soporte PuffZero <soporte@puffzero.lat>",
       to: email,
-      subject: "Restablecer tu contraseña",
+      subject: "Verificá tu cuenta en PuffZero",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; background: #F6F3FF; border-radius: 12px;">
           <div style="text-align:center; margin-bottom: 20px;">
             <img src="https://reset.puffzero.lat/logo-puff-zero.png" alt="PuffZero Logo" style="width: 80px;" />
           </div>
 
-          <h2 style="text-align:center; color:#1F2859;">Restablecer contraseña</h2>
+          <h2 style="text-align:center; color:#1F2859;">Verificá tu cuenta</h2>
 
           <p style="color:#1F2859; font-size:16px; text-align:center;">
-            Usá el siguiente enlace para crear una nueva contraseña:
+            ¡Bienvenido a PuffZero! Hacé clic en el botón para verificar tu email y comenzar tu camino:
           </p>
 
           <div style="text-align:center; margin: 24px 0;">
             <a href="${actionLink}" style="background:#5974FF; color:#ffffff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
-              Restablecer contraseña
+              Verificar mi cuenta
             </a>
           </div>
 
