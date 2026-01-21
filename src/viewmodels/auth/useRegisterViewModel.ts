@@ -98,11 +98,11 @@ export function useRegisterViewModel() {
     // );
 
 
-    Alert.alert(
-      "¡Cuenta creada!",
-      "Tu cuenta fue creada exitosamente.",
-      [{ text: "OK" }]
-    );
+    // Alert.alert(
+    //   "¡Cuenta creada!",
+    //   "Tu cuenta fue creada exitosamente.",
+    //   [{ text: "OK" }]
+    // );
 
     // ⏰ Schedule verification reminder for 1.5 days
     if (notificationsEnabled) {

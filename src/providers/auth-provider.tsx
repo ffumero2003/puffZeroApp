@@ -3,9 +3,9 @@ import { Session, User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import {
-    areNotificationsEnabled,
-    savePushTokenToProfile,
-    sendWelcomeBackNotification
+  areNotificationsEnabled,
+  savePushTokenToProfile,
+  sendWelcomeBackNotification
 } from "../services/notification-service";
 
 interface AuthContextProps {
@@ -78,8 +78,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null);
 
         if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-          setAuthInProgress(false);
-          setAuthFlow(null);
+          // setAuthInProgress(false);
+          // setAuthFlow(null);
         }
       }
     );

@@ -67,7 +67,7 @@ function StatCard({ label, value }: StatCardProps) {
 const styles = StyleSheet.create({
   container: {
     marginVertical: 16,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
   },
   title: {
     fontSize: 20,
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#FFF",
     borderRadius: 16,
-    padding: 16,
+    paddingVertical: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -89,16 +89,20 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
+    borderWidth: 2,
+    borderColor: Colors.light.secondary,
   },
   
   cardLabel: {
     fontSize: 18,
     color: Colors.light.text,
+    paddingHorizontal: 8,
   },
   
   cardValue: {
     fontSize: 16,
     color: Colors.light.text,
+    paddingHorizontal: 8,
   },
   cardValueNumber: {
     fontSize: 20,

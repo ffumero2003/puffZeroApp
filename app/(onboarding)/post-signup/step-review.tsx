@@ -3,8 +3,10 @@ import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import ReviewCard from "@/src/components/onboarding/ReviewCard";
 import { Colors } from "@/src/constants/theme";
+import { useAuth } from "@/src/providers/auth-provider";
 import { layout } from "@/src/styles/layout";
-import { Image, ScrollView, View } from "react-native";
+import { useEffect, useRef } from "react";
+import { Alert, Image, ScrollView, View } from "react-native";
 
 import ReviewsModal from "@/assets/images/onboarding/reviews-modal.png";
 import AlexReview from "@/assets/images/reviews/alex-review.jpg";
@@ -14,6 +16,20 @@ import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 
 
 export default function Review() {
+  const { authFlow } = useAuth();
+  const hasShownAlert = useRef(false);
+
+  useEffect(() => {
+    if (authFlow === "register" && !hasShownAlert.current) {
+      hasShownAlert.current = true;
+      Alert.alert(
+        "¡Cuenta creada!",
+        "Tu cuenta fue creada exitosamente.",
+        [{ text: "OK" }]
+      );
+    }
+  }, [authFlow]);
+  
   return (
     <ScreenWrapper>
       <View style={layout.containerWithLoadingBar}>

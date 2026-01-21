@@ -243,6 +243,11 @@ export function useProgressViewModel() {
     }
   }, [selectedTimeRange, aggregatePuffsByDay]);
 
+  // Calculate days since profile creation
+  const daysSinceStart = useMemo(() => {
+    return Math.floor((Date.now() - profileCreatedDate.getTime()) / (24 * 60 * 60 * 1000));
+  }, [profileCreatedDate]);
+
   
 
   // Daily goal from profile
@@ -277,6 +282,7 @@ export function useProgressViewModel() {
     dailyGoal,
     selectedTimeRange,
     setSelectedTimeRange,
+    daysSinceStart,
     
     // Actions
     refreshData: loadPuffData,

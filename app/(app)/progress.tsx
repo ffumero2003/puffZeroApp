@@ -29,6 +29,7 @@ export default function Progress() {
     selectedTimeRange,
     setSelectedTimeRange,
     refreshData,
+    daysSinceStart,
   } = useProgressViewModel();
 
   // Refresh data every time the screen gains focus
@@ -99,6 +100,7 @@ export default function Progress() {
           dailyGoal={dailyGoal}
           selectedRange={selectedTimeRange}
           onRangeChange={setSelectedTimeRange}
+          daysSinceStart={daysSinceStart}
         />
 
         

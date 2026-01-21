@@ -5,7 +5,7 @@ import { getInitialRoute, shouldBypassPaywall } from "../config/dev";
 import { useAuth } from "../providers/auth-provider";
 
 export function useAuthGuard() {
-  const { user, initializing, authFlow } = useAuth();
+  const { user, initializing, authFlow, authInProgress } = useAuth();
   const segments = useSegments();
   const lastDevRoute = useRef<string | null>(null);
 
@@ -16,6 +16,7 @@ export function useAuthGuard() {
 
   useEffect(() => {
     if (initializing) return;
+    if(authInProgress) return;
 
     // 🔧 DEV MODE: Navegar directamente a la pantalla configurada
     const devRoute = getInitialRoute();

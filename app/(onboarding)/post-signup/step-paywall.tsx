@@ -32,7 +32,7 @@ export default function OnboardingPaywall() {
     completeOnboarding, 
     resetAll
   } = useOnboarding();
-  const { user } = useAuth();
+  const { user, setAuthFlow } = useAuth();
 
   const { formatMoney } = useOnboardingPaywallViewModel();
   const [plan, setPlan] = useState<"weekly" | "yearly">("yearly");
@@ -118,7 +118,8 @@ export default function OnboardingPaywall() {
 
   function grantAccess() {
     completeOnboarding(); // marca onboarding como terminado
-    resetAll();           // limpia datos temporales
+    resetAll();
+    setAuthFlow(null);           // limpia datos temporales
     router.replace("/(app)/home");
   }
 

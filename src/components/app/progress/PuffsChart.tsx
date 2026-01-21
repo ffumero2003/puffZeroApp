@@ -16,6 +16,7 @@ interface PuffsChartProps {
   dailyGoal: number;
   selectedRange: TimeRange;
   onRangeChange: (range: TimeRange) => void;
+  daysSinceStart: number;
 }
 
 const screenWidth = Dimensions.get("window").width;
@@ -25,6 +26,7 @@ export default function PuffsChart({
   dailyGoal,
   selectedRange,
   onRangeChange,
+  daysSinceStart,
 }: PuffsChartProps) {
   const ranges: { key: TimeRange; label: string }[] = [
     { key: "7days", label: "7 días" },
@@ -43,13 +45,13 @@ export default function PuffsChart({
   const values = data.map(d => d.y);
 
   // If no data, show placeholder
-  if (data.length < 7) {
+  if (daysSinceStart < 7) {
     return (
       <View style={styles.container}>
         {/* Your range selector header here */}
         <View style={styles.emptyChart}>
-          <AppText style={styles.emptyText}>
-            Vuelve en {7 - data.length} días para ver tu progreso
+          <AppText style={styles.emptyText} weight="bold">
+            Vuelve en {7 - daysSinceStart} días para ver tu progreso
           </AppText>
         </View>
       </View>
@@ -157,8 +159,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
     borderRadius: 16,
     padding: 16,
-    marginVertical: 16,
-    marginHorizontal: 10,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -213,10 +213,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.light.secondary,
     borderRadius: 12,
+    
   },
   emptyText: {
-    color: Colors.light.textMuted,
-    fontSize: 14,
+    color: Colors.light.text,
+    fontSize: 16,
   },
   legend: {
     flexDirection: "row",

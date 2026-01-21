@@ -24,13 +24,13 @@ import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import SeparatorRow from "@/src/components/onboarding/SeparatorRow";
 import UnderlineInput from "@/src/components/onboarding/UnderlineInput";
 
+import { useAuth } from "@/src/providers/auth-provider";
 import { layout } from "@/src/styles/layout";
 import { useRegisterViewModel } from "@/src/viewmodels/auth/useRegisterViewModel";
 
-import { ROUTES } from "@/src/constants/routes";
-import { router } from "expo-router";
 
 export default function Register() {
+  const { setAuthInProgress } = useAuth();
   /* ---------------------------
      STATE 
   ------------------------------*/
@@ -80,9 +80,10 @@ export default function Register() {
       nombre,
     });
 
-    if (ok) {
-      router.push(ROUTES.POST_SIGNUP_REVIEW);
-    }
+    // if (ok) {
+    //   router.push(ROUTES.POST_SIGNUP_REVIEW);
+    // }
+    setAuthInProgress(false);
   };
 
 
