@@ -118,7 +118,7 @@ export function useHomeViewModel() {
     weekStart.setDate(today.getDate() - today.getDay());
     
     const days: DayPuffs[] = [];
-    const dayNames = ["Lun", "Mar", "Mier", "Jue", "Vie", "Sab", "Dom"];
+    const dayNames = ["Dom", "Lun", "Mar", "Mier", "Jue", "Vie", "Sab"];
     
     for (let i = 0; i < 7; i++) {
       const currentDay = new Date(weekStart);
