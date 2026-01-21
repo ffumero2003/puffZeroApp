@@ -263,6 +263,7 @@ export function useProgressViewModel() {
     // Countdown to goal
     countdownToGoal,
     goalSpeedDays,
+    profileCreatedDate,
     
     // Puff statistics
     puffsLast24Hours,

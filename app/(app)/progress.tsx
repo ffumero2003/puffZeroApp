@@ -8,7 +8,7 @@ import StreakCard from "@/src/components/app/progress/StreakCard";
 import { Colors } from "@/src/constants/theme";
 import { useProgressViewModel } from "@/src/viewmodels/app/useProgressViewModel";
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 
 export default function Progress() {
@@ -30,6 +30,7 @@ export default function Progress() {
     setSelectedTimeRange,
     refreshData,
     daysSinceStart,
+    profileCreatedDate,
   } = useProgressViewModel();
 
   // Refresh data every time the screen gains focus
@@ -39,13 +40,7 @@ export default function Progress() {
     }, [refreshData])
   );
 
-  // Calculate profile created date for countdown timer
-  const profileCreatedAt = useMemo(() => {
-    // Calculate backwards from countdown to goal
-    const now = new Date();
-    const endTime = new Date(now.getTime() + countdownToGoal.totalMs);
-    return new Date(endTime.getTime() - goalSpeedDays * 24 * 60 * 60 * 1000);
-  }, [countdownToGoal.totalMs, goalSpeedDays]);
+  
 
   if (loading) {
     return (
@@ -71,7 +66,7 @@ export default function Progress() {
         {/* Countdown Timer to Goal */}
         <CountdownTimer 
           goalSpeedDays={goalSpeedDays} 
-          profileCreatedAt={profileCreatedAt} 
+          profileCreatedAt={profileCreatedDate} 
         />
 
         {/* Recent Puffs Statistics */}
@@ -90,7 +85,7 @@ export default function Progress() {
           />
           <StreakCard
             lastPuffTime={lastPuffTime}
-            profileCreatedAt={profileCreatedAt}
+            profileCreatedAt={profileCreatedDate}
           />
         </View>
 
