@@ -48,6 +48,17 @@ export default function Paywall() {
   const formattedWeeklyPrice = `${currencySymbol}${weeklyPrice.toLocaleString()}`;
   const formattedYearlyPrice = `${currencySymbol}${yearlyPrice.toLocaleString()}`;
 
+  console.log("🔍 PAYWALL DEBUG:", {
+    currency,
+    userCurrency,
+    exchangeRate,
+    currencySymbol,
+    weeklyPrice,
+    formattedWeeklyPrice,
+    yearlyPrice,
+    formattedYearlyPrice,
+  });
+
   const { formatMoney } = useOnboardingPaywallViewModel();
   const [plan, setPlan] = useState<"weekly" | "yearly">("yearly");
 
