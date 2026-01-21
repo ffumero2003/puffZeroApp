@@ -8,6 +8,7 @@ import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import FeatureItem from "@/src/components/paywall/FeatureItem";
 import SubscriptionOption from "@/src/components/paywall/SubscriptionOption";
 import { BYPASS_PAYWALL } from "@/src/config/dev";
+import { BASE_PRICES_CRC, CRC_EXCHANGE_RATES, CURRENCY_SYMBOLS } from "@/src/constants/currency";
 import { Colors } from "@/src/constants/theme";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
@@ -19,9 +20,11 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 
 
+
 export default function Paywall() {
   // const [selected, setSelected] = useState<"monthly" | "yearly">("yearly");
   // const { grantAccess } = useSubscription();
+
   const { 
     name,
     goal_speed,
@@ -33,6 +36,17 @@ export default function Paywall() {
     resetAll
   } = useOnboarding();
   const { user, setAuthFlow } = useAuth();
+
+  // Calculate converted prices
+  const userCurrency = currency || "CRC";
+  const exchangeRate = CRC_EXCHANGE_RATES[userCurrency] || 1;
+  const currencySymbol = CURRENCY_SYMBOLS[userCurrency] || "₡";
+
+  const weeklyPrice = Math.round(BASE_PRICES_CRC.weekly * exchangeRate);
+  const yearlyPrice = Math.round(BASE_PRICES_CRC.yearly * exchangeRate);
+
+  const formattedWeeklyPrice = `${currencySymbol}${weeklyPrice.toLocaleString()}`;
+  const formattedYearlyPrice = `${currencySymbol}${yearlyPrice.toLocaleString()}`;
 
   const { formatMoney } = useOnboardingPaywallViewModel();
   const [plan, setPlan] = useState<"weekly" | "yearly">("yearly");
@@ -159,26 +173,25 @@ export default function Paywall() {
 
           <View style={styles.featureContainer}>
               <SubscriptionOption
-              title="Acceso semanal"
-              subtitle="3 días de prueba gratis"
-              price="₡5,000"
-              strikePrice={true}
-              highlight="Mejor oferta"
-              badge="GRATIS"
-              selected={plan === "weekly"}
-              onPress={() => setPlan("weekly")}
-            />
+                title="Acceso semanal"
+                subtitle="3 días de prueba gratis"
+                price={formattedWeeklyPrice}  // Dynamic now
+                strikePrice={true}
+                highlight="Mejor oferta"
+                badge="GRATIS"
+                selected={plan === "weekly"}
+                onPress={() => setPlan("weekly")}
+              />
 
-            <SubscriptionOption
-              title="Acceso anual"
-              subtitle="3 días de prueba gratis"
-              price="₡700"
-              strikePrice={false}
-              badge="Ahorra 90%"
-      
-              selected={plan === "yearly"}
-              onPress={() => setPlan("yearly")}
-            />
+              <SubscriptionOption
+                title="Acceso anual"
+                subtitle="3 días de prueba gratis"
+                price={formattedYearlyPrice}  // Dynamic now
+                strikePrice={false}
+                badge="Ahorra 90%"
+                selected={plan === "yearly"}
+                onPress={() => setPlan("yearly")}
+              />
           </View>
 
           <ContinueButton
