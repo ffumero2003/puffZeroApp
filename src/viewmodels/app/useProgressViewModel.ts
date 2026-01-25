@@ -31,6 +31,10 @@ export function useProgressViewModel() {
   const [puffs, setPuffs] = useState<PuffRecord[]>([]);
   const [lastPuffTime, setLastPuffTime] = useState<Date | null>(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>("7days");
+  const [timeSinceLastPuff, setTimeSinceLastPuff] = useState("Nunca");
+  const [moneySaved, setMoneySaved] = useState(0);
+
+
 
   // Load puff data from Supabase
   const loadPuffData = useCallback(async () => {
@@ -81,23 +85,7 @@ export function useProgressViewModel() {
     loadLastPuffFromStorage();
   }, [user?.id]);
 
-  // Time since last puff (formatted)
-  const timeSinceLastPuff = useMemo(() => {
-    if (!lastPuffTime) return "Nunca";
-    
-    const now = new Date();
-    const diff = now.getTime() - lastPuffTime.getTime();
-    
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-    
-    if (days > 0) return `hace ${days} día${days > 1 ? 's' : ''}`;
-    if (hours > 0) return `hace ${hours} hora${hours > 1 ? 's' : ''}`;
-    if (minutes > 0) return `hace ${minutes} minuto${minutes > 1 ? 's' : ''}`;
-    return "hace un momento";
-  }, [lastPuffTime]);
-
+  
   // Get profile created date
   const profileCreatedDate = useMemo(() => {
     if (profile_created_at) {
@@ -144,12 +132,7 @@ export function useProgressViewModel() {
   const puffsLast7Days = useMemo(() => countPuffsInRange(24 * 7), [countPuffsInRange]);
   const puffsLast30Days = useMemo(() => countPuffsInRange(24 * 30), [countPuffsInRange]);
 
-  // Money saved calculation
-  const moneySaved = useMemo(() => {
-    const monthlyMoney = money_per_month || profile?.money_per_month || 0;
-    const daysSinceStart = Math.max(0, (Date.now() - profileCreatedDate.getTime()) / (1000 * 60 * 60 * 24));
-    return (monthlyMoney / 30) * daysSinceStart;
-  }, [money_per_month, profile?.money_per_month, profileCreatedDate]);
+  
 
   // Get currency symbol
   const currencySymbol = useMemo(() => {
@@ -252,6 +235,48 @@ export function useProgressViewModel() {
 
   // Daily goal from profile
   const dailyGoal = profile?.puffs_per_day || 200;
+
+
+  // Function to calculate time since last puff
+  const calculateTimeSinceLastPuff = useCallback(() => {
+    if (!lastPuffTime) return "Nunca";
+    
+    const now = new Date();
+    const diff = now.getTime() - lastPuffTime.getTime();
+    
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    
+    if (days > 0) return `hace ${days} día${days > 1 ? 's' : ''}`;
+    if (hours > 0) return `hace ${hours} hora${hours > 1 ? 's' : ''}`;
+    if (minutes > 0) return `hace ${minutes} minuto${minutes > 1 ? 's' : ''}`;
+    return "hace un momento";
+  }, [lastPuffTime]);
+
+  // Calculate money saved
+  const calculateMoneySaved = useCallback(() => {
+    const monthlyMoney = money_per_month || profile?.money_per_month || 0;
+    const daysSinceStart = Math.max(0, (Date.now() - profileCreatedDate.getTime()) / (1000 * 60 * 60 * 24));
+    return (monthlyMoney / 30) * daysSinceStart;
+  }, [money_per_month, profile?.money_per_month, profileCreatedDate]);
+
+  // Combined real-time updates every 30 seconds
+  useEffect(() => {
+    const updateRealTimeValues = () => {
+      setTimeSinceLastPuff(calculateTimeSinceLastPuff());
+      setMoneySaved(calculateMoneySaved());
+    };
+
+    // Calculate immediately
+    updateRealTimeValues();
+
+    // Update every 30 seconds
+    const interval = setInterval(updateRealTimeValues, 30000);
+
+    return () => clearInterval(interval);
+  }, [calculateTimeSinceLastPuff, calculateMoneySaved]);
+
 
   return {
     loading: loading || profileLoading,
