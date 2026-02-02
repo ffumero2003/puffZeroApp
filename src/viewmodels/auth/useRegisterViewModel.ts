@@ -4,11 +4,10 @@ import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { sendVerificationEmail } from "@/src/services/auth-services";
 import {
-    areNotificationsEnabled,
-    savePushTokenToProfile,
-    scheduleVerificationReminder,
-    sendWelcomeNotification
+  areNotificationsEnabled,
 } from "@/src/services/notifications/notification-service";
+import { scheduleVerificationReminder } from "@/src/services/notifications/verification-notification";
+import { sendWelcomeNotification } from "@/src/services/notifications/welcome-notification";
 import { Alert } from "react-native";
 
 type RegisterPayload = {
@@ -82,7 +81,7 @@ export function useRegisterViewModel() {
       await sendWelcomeNotification();
     }
 
-    savePushTokenToProfile(userId);
+
 
     // 📧 Send verification email
     const { error: emailError } = await sendVerificationEmail(email);

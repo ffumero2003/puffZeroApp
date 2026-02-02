@@ -3,6 +3,7 @@ import { useUserData } from "@/src/hooks/useUserData";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
 import { fetchAIQuote } from "@/src/services/ai-quotes-service";
+import { updateLastActivity } from "@/src/services/notifications/inactivity-notification";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -209,6 +210,8 @@ export function useHomeViewModel() {
         console.error("Error inserting puff:", error);
       }
     }
+
+    await updateLastActivity();
   }, [todayPuffs, user?.id]);
 
   return {

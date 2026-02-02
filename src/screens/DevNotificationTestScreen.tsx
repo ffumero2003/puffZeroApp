@@ -9,6 +9,28 @@ import {
 } from "react-native";
 
 // Import all notification functions
+
+// Add these imports with the other notification imports
+import {
+  cancelInactivityNotifications,
+  scheduleInactivityNotifications,
+  sendInactivityNotification,
+  updateLastActivity,
+} from "@/src/services/notifications/inactivity-notification";
+
+import {
+  cancelWeeklySummaryNotification,
+  scheduleWeeklySummaryNotification,
+  sendWeeklySummaryNotification,
+} from "@/src/services/notifications/weekly-summary-notification";
+
+import {
+  checkAndSendFirstPuffFreeDayNotification,
+  resetFirstPuffFreeDayTracking,
+  scheduleEndOfDayPuffFreeCheck,
+  sendFirstPuffFreeDayNotification,
+} from "@/src/services/notifications/first-puff-free-day-notification";
+
 import {
   scheduleDailyAchievementCheck,
   sendDailyAchievementNotification,
@@ -151,7 +173,15 @@ export function DevNotificationTestScreen() {
         "expo_push_token",
         "notifications_enabled",
         "milestone_notification_sent",
+        "money_milestone_achieved",
+        // New notification data
+        "last_activity_timestamp",
+        "inactivity_notifications_sent",
+        "first_puff_free_day_notification_sent",
       ]);
+      // Cancel scheduled notifications
+      await cancelInactivityNotifications();
+      await cancelWeeklySummaryNotification();
       showResult("✅ All notification data cleared!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
@@ -198,6 +228,131 @@ export function DevNotificationTestScreen() {
       // Simulate having saved 30,000 CRC (~$60)
       await checkAndSendMoneySavedMilestone(30000, "CRC");
       showResult("✅ Money milestone check complete!");
+    } catch (error) {
+      showResult(`❌ Error: ${error}`);
+    }
+  };
+
+  // ===== INACTIVITY NOTIFICATIONS =====
+  const testInactivity24h = async () => {
+    try {
+      showResult("Sending 24h inactivity notification...");
+      await sendInactivityNotification(24);
+      showResult("✅ 24h inactivity notification sent!");
+    } catch (error) {
+      showResult(`❌ Error: ${error}`);
+    }
+  };
+
+  const testInactivity48h = async () => {
+    try {
+      showResult("Sending 48h inactivity notification...");
+      await sendInactivityNotification(48);
+      showResult("✅ 48h inactivity notification sent!");
+    } catch (error) {
+      showResult(`❌ Error: ${error}`);
+    }
+  };
+
+  const testInactivity72h = async () => {
+    try {
+      showResult("Sending 72h inactivity notification...");
+      await sendInactivityNotification(72);
+      showResult("✅ 72h inactivity notification sent!");
+    } catch (error) {
+      showResult(`❌ Error: ${error}`);
+    }
+  };
+
+  const testScheduleInactivity = async () => {
+    try {
+      showResult("Scheduling inactivity notifications...");
+      await scheduleInactivityNotifications();
+      showResult("✅ Inactivity notifications scheduled for 24h, 48h, 72h!");
+    } catch (error) {
+      showResult(`❌ Error: ${error}`);
+    }
+  };
+
+  const testUpdateActivity = async () => {
+    try {
+      showResult("Updating last activity...");
+      await updateLastActivity();
+      showResult("✅ Activity updated! Inactivity timers reset.");
+    } catch (error) {
+      showResult(`❌ Error: ${error}`);
+    }
+  };
+
+  // ===== WEEKLY SUMMARY NOTIFICATIONS =====
+  const testWeeklySummary = async () => {
+    try {
+      showResult("Sending weekly summary notification...");
+      // Use a test user ID - replace with actual if needed
+      await sendWeeklySummaryNotification(
+        "test-user-id",
+        50000, // money per month
+        "CRC", // currency
+      );
+      showResult("✅ Weekly summary notification sent!");
+    } catch (error) {
+      showResult(`❌ Error: ${error}`);
+    }
+  };
+
+  const testScheduleWeeklySummary = async () => {
+    try {
+      showResult("Scheduling weekly summary...");
+      await scheduleWeeklySummaryNotification();
+      showResult("✅ Weekly summary scheduled for Sundays at 8 PM!");
+    } catch (error) {
+      showResult(`❌ Error: ${error}`);
+    }
+  };
+
+  // ===== FIRST PUFF-FREE DAY NOTIFICATIONS =====
+  const testFirstPuffFreeDay = async () => {
+    try {
+      showResult("Sending first puff-free day notification...");
+      await sendFirstPuffFreeDayNotification();
+      showResult("✅ First puff-free day notification sent!");
+    } catch (error) {
+      showResult(`❌ Error: ${error}`);
+    }
+  };
+
+  const testCheckPuffFreeDay = async () => {
+    try {
+      showResult("Checking for puff-free day...");
+      await resetFirstPuffFreeDayTracking(); // Reset first to allow re-testing
+      await checkAndSendFirstPuffFreeDayNotification();
+      showResult("✅ Puff-free day check complete!");
+    } catch (error) {
+      showResult(`❌ Error: ${error}`);
+    }
+  };
+
+  const testSchedulePuffFreeCheck = async () => {
+    try {
+      showResult("Scheduling end-of-day puff-free check...");
+      await resetFirstPuffFreeDayTracking();
+      await scheduleEndOfDayPuffFreeCheck();
+      showResult("✅ Puff-free check scheduled for 11:59 PM!");
+    } catch (error) {
+      showResult(`❌ Error: ${error}`);
+    }
+  };
+
+  const clearNewNotificationData = async () => {
+    try {
+      await AsyncStorage.multiRemove([
+        "last_activity_timestamp",
+        "inactivity_notifications_sent",
+        "first_puff_free_day_notification_sent",
+      ]);
+      await cancelInactivityNotifications();
+      await cancelWeeklySummaryNotification();
+      showResult("✅ New notification data cleared!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -272,6 +427,59 @@ export function DevNotificationTestScreen() {
       >
         <Text style={styles.buttonText}>
           11. Check Money Milestone (clears history)
+        </Text>
+      </TouchableOpacity>
+
+      <Text style={styles.sectionTitle}>Inactivity Notifications</Text>
+      <TouchableOpacity style={styles.button} onPress={testInactivity24h}>
+        <Text style={styles.buttonText}>12. Test Inactivity (24h)</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={testInactivity48h}>
+        <Text style={styles.buttonText}>13. Test Inactivity (48h)</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={testInactivity72h}>
+        <Text style={styles.buttonText}>14. Test Inactivity (72h)</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.button, styles.scheduledButton]}
+        onPress={testScheduleInactivity}
+      >
+        <Text style={styles.buttonText}>
+          15. Schedule Inactivity (24/48/72h)
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={testUpdateActivity}>
+        <Text style={styles.buttonText}>
+          16. Update Activity (Reset Timers)
+        </Text>
+      </TouchableOpacity>
+
+      <Text style={styles.sectionTitle}>Weekly Summary</Text>
+      <TouchableOpacity style={styles.button} onPress={testWeeklySummary}>
+        <Text style={styles.buttonText}>17. Test Weekly Summary</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.button, styles.scheduledButton]}
+        onPress={testScheduleWeeklySummary}
+      >
+        <Text style={styles.buttonText}>
+          18. Schedule Weekly (Sundays 8 PM)
+        </Text>
+      </TouchableOpacity>
+
+      <Text style={styles.sectionTitle}>First Puff-Free Day</Text>
+      <TouchableOpacity style={styles.button} onPress={testFirstPuffFreeDay}>
+        <Text style={styles.buttonText}>19. Test First Puff-Free Day</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={testCheckPuffFreeDay}>
+        <Text style={styles.buttonText}>20. Check Puff-Free Day (resets)</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.button, styles.scheduledButton]}
+        onPress={testSchedulePuffFreeCheck}
+      >
+        <Text style={styles.buttonText}>
+          21. Schedule Puff-Free Check (11:59 PM)
         </Text>
       </TouchableOpacity>
 

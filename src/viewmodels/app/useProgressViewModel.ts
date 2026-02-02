@@ -3,8 +3,8 @@ import { useUserData } from "@/src/hooks/useUserData";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
+import { checkandSendMilestoneNotification } from "@/src/services/notifications/milestone-notification";
 import { checkAndSendMoneySavedMilestone } from "@/src/services/notifications/money-saved-milestone-notification";
-import { checkandSendMilestoneNotification } from "@/src/services/notifications/notification-service";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useMemo, useState } from "react";
 

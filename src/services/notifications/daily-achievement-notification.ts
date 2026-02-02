@@ -1,4 +1,5 @@
 // src/services/notifications/daily-achievement-notification.ts
+import { supabase } from "../../lib/supabase";
 import { getNotifications } from "./notification-service";
 
 const TODAY_PUFFS_KEY = "todayPuffs";
@@ -41,7 +42,11 @@ function getAchievementMessage(todayPuffs: number, dailyGoal: number): { title: 
 /**
  * Schedule daily achievement check at 8 PM
  */
-export async function scheduleDailyAchievementCheck(dailyGoal: number): Promise<void> {
+/**
+ * Schedule daily achievement check at 8 PM
+ * Fetches the user's daily goal (puffs_per_day) from their profile
+ */
+export async function scheduleDailyAchievementCheck(): Promise<void> {  // REMOVE dailyGoal parameter
   const Notif = await getNotifications();
   if (!Notif) return;
 
@@ -49,6 +54,26 @@ export async function scheduleDailyAchievementCheck(dailyGoal: number): Promise<
   await cancelDailyAchievementCheck();
 
   try {
+    // Get the current user's ID
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) {
+      console.log("⚠️ No user found, skipping daily achievement scheduling");
+      return;
+    }
+
+    // Fetch the user's daily goal from their profile
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("puffs_per_day")
+      .eq("user_id", user.id)
+      .single();
+
+    const dailyGoal = profile?.puffs_per_day;
+    if (!dailyGoal) {
+      console.log("⚠️ No daily goal set, skipping daily achievement scheduling");
+      return;
+    }
+
     await Notif.scheduleNotificationAsync({
       content: {
         title: "🎯 Revisión diaria",
@@ -63,7 +88,7 @@ export async function scheduleDailyAchievementCheck(dailyGoal: number): Promise<
       },
     });
 
-    console.log("✅ Daily achievement check scheduled for 8 PM");
+    console.log(`✅ Daily achievement check scheduled for 8 PM (goal: ${dailyGoal})`);
   } catch (error) {
     console.error("❌ Error scheduling daily achievement check:", error);
   }

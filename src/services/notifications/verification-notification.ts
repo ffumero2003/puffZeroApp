@@ -55,7 +55,7 @@ export async function scheduleVerificationReminder(): Promise<void> {
   // Cancel any existing verification reminders
   await cancelVerificationReminder();
 
-  const REMINDER_HOURS = 36; // 1.5 days = 36 hours
+  const REMINDER_HOURS = 72; // 1.5 days = 36 hours
 
   try {
     await Notif.scheduleNotificationAsync({

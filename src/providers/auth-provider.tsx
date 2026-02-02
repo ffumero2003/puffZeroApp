@@ -1,12 +1,18 @@
 // src/providers/auth-provider.tsx
+import { sendWelcomeBackNotification } from "@/src/services/notifications/welcome-back-notification";
 import { Session, User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import { scheduleDailyAchievementCheck } from "../services/notifications/daily-achievement-notification";
+import { scheduleDailyQuoteNotification } from "../services/notifications/daily-quote-notification";
+import { scheduleDailyLocalReminder } from "../services/notifications/daily-reminder-notification";
 import {
-  areNotificationsEnabled,
-  savePushTokenToProfile,
-  sendWelcomeBackNotification,
-} from "../services/notifications/notification-service";
+  checkAndSendFirstPuffFreeDayNotification,
+  scheduleEndOfDayPuffFreeCheck,
+} from "../services/notifications/first-puff-free-day-notification";
+import { updateLastActivity } from "../services/notifications/inactivity-notification";
+import { areNotificationsEnabled } from "../services/notifications/notification-service";
+import { scheduleWeeklySummaryNotification } from "../services/notifications/weekly-summary-notification";
 
 interface AuthContextProps {
   user: User | null;
@@ -124,8 +130,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           result.data.user.user_metadata?.full_name?.split(" ")[0];
         sendWelcomeBackNotification(firstName);
       }
-      // 📲 Save push token to profile for daily notifications
-      savePushTokenToProfile(result.data.user.id);
     }
 
     return result;
@@ -136,6 +140,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAuthInProgress(false);
     await supabase.auth.signOut();
   };
+
+  // When user is authenticated and app becomes active:
+  useEffect(() => {
+    if (user?.id) {
+      // Update activity (resets inactivity timers)
+      updateLastActivity();
+
+      // Schedule weekly summary for Sundays 8pm
+      scheduleWeeklySummaryNotification();
+
+      // Check if yesterday was puff-free + schedule daily check
+      checkAndSendFirstPuffFreeDayNotification();
+      scheduleEndOfDayPuffFreeCheck();
+
+      scheduleDailyQuoteNotification();
+
+      scheduleDailyLocalReminder();
+
+      scheduleDailyAchievementCheck();
+    }
+  }, [user?.id]);
 
   return (
     <AuthContext.Provider
