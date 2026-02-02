@@ -5,8 +5,8 @@ import { supabase } from "../lib/supabase";
 import {
   areNotificationsEnabled,
   savePushTokenToProfile,
-  sendWelcomeBackNotification
-} from "../services/notification-service";
+  sendWelcomeBackNotification,
+} from "../services/notifications/notification-service";
 
 interface AuthContextProps {
   user: User | null;
@@ -23,11 +23,11 @@ interface AuthContextProps {
   signUp: (
     email: string,
     password: string,
-    full_name: string
+    full_name: string,
   ) => Promise<{ data: any; error: any }>;
   signIn: (
     email: string,
-    password: string
+    password: string,
   ) => Promise<{ data: any; error: any }>;
   signOut: () => Promise<void>;
 }
@@ -81,17 +81,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // setAuthInProgress(false);
           // setAuthFlow(null);
         }
-      }
+      },
     );
 
     return () => subscription.subscription.unsubscribe();
   }, []);
 
-  const signUp = async (
-    email: string,
-    password: string,
-    full_name: string
-  ) => {
+  const signUp = async (email: string, password: string, full_name: string) => {
     setLoading(true);
     setAuthFlow("register");
 
@@ -102,10 +98,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     setLoading(false);
-    
+
     // Note: Welcome notification is sent in useRegisterViewModel after profile creation
     // This ensures we have confirmed the registration was successful
-    
+
     return result;
   };
 
@@ -124,7 +120,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!result.error && result.data?.user) {
       const notificationsEnabled = await areNotificationsEnabled();
       if (notificationsEnabled) {
-        const firstName = result.data.user.user_metadata?.full_name?.split(" ")[0];
+        const firstName =
+          result.data.user.user_metadata?.full_name?.split(" ")[0];
         sendWelcomeBackNotification(firstName);
       }
       // 📲 Save push token to profile for daily notifications

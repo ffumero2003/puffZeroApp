@@ -16,17 +16,32 @@ export function useAuthGuard() {
 
   useEffect(() => {
     if (initializing) return;
-    if(authInProgress) return;
+    if (authInProgress) return;
 
     // 🔧 DEV MODE: Navegar directamente a la pantalla configurada
     const devRoute = getInitialRoute();
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/0fd0a7db-6453-4c6c-82b9-a41e6e00598d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthGuard.tsx:devMode',message:'Dev mode check',data:{devRoute,lastDevRoute:lastDevRoute.current,willNavigate:devRoute && lastDevRoute.current !== devRoute},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H4'})}).catch(()=>{});
+    fetch("http://127.0.0.1:7242/ingest/0fd0a7db-6453-4c6c-82b9-a41e6e00598d", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        location: "AuthGuard.tsx:devMode",
+        message: "Dev mode check",
+        data: {
+          devRoute,
+          lastDevRoute: lastDevRoute.current,
+          willNavigate: devRoute && lastDevRoute.current !== devRoute,
+        },
+        timestamp: Date.now(),
+        sessionId: "debug-session",
+        hypothesisId: "H4",
+      }),
+    }).catch(() => {});
     // #endregion
     if (devRoute) {
       // Only navigate if we haven't navigated to THIS specific route yet
       if (lastDevRoute.current !== devRoute) {
-        lastDevRoute.current = devRoute;  // ← Remember which route we navigated to
+        lastDevRoute.current = devRoute; // ← Remember which route we navigated to
         console.log("🔧 DEV MODE - Navegando a:", devRoute);
         router.replace(devRoute as any);
       }
@@ -38,22 +53,61 @@ export function useAuthGuard() {
     const inOnboarding = segments[0] === "(onboarding)";
     const inPaywall = segments[0] === "(paywall)";
     const inPostSignup = segments[1] === "post-signup"; // 🔥 DETECTAR POST-SIGNUP
-    
+    const inDev = segments[0] === "(dev)";
+
+    // 🔧 DEV MODE: If in (dev) routes, don't interfere
+    if (inDev) {
+      return;
+    }
     // 🔓 RUTAS PÚBLICAS (siempre accesibles)
-    const publicRoutes = ["privacy-policy", "terms-of-use", "reset-password", "verify-email", "verify-required"];
+    const publicRoutes = [
+      "privacy-policy",
+      "terms-of-use",
+      "reset-password",
+      "verify-email",
+      "verify-required",
+    ];
     const isPublicRoute = publicRoutes.includes(segments[0]);
 
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/0fd0a7db-6453-4c6c-82b9-a41e6e00598d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthGuard.tsx:publicRouteCheck',message:'Checking public route',data:{segments:segments,isPublicRoute,currentSegment:segments[0]},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+    fetch("http://127.0.0.1:7242/ingest/0fd0a7db-6453-4c6c-82b9-a41e6e00598d", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        location: "AuthGuard.tsx:publicRouteCheck",
+        message: "Checking public route",
+        data: {
+          segments: segments,
+          isPublicRoute,
+          currentSegment: segments[0],
+        },
+        timestamp: Date.now(),
+        sessionId: "debug-session",
+        hypothesisId: "H3",
+      }),
+    }).catch(() => {});
     // #endregion
 
     if (isPublicRoute) {
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/0fd0a7db-6453-4c6c-82b9-a41e6e00598d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthGuard.tsx:publicRouteAllowed',message:'Public route - allowing passage',data:{route:segments[0]},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+      fetch(
+        "http://127.0.0.1:7242/ingest/0fd0a7db-6453-4c6c-82b9-a41e6e00598d",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            location: "AuthGuard.tsx:publicRouteAllowed",
+            message: "Public route - allowing passage",
+            data: { route: segments[0] },
+            timestamp: Date.now(),
+            sessionId: "debug-session",
+            hypothesisId: "H3",
+          }),
+        },
+      ).catch(() => {});
       // #endregion
       return; // ← Dejar pasar privacy-policy, terms-of-use, reset-password, verify-email
     }
-
 
     // ════════════════════════════════════════════════════════
     // 📧 EMAIL VERIFICATION - GRACE PERIOD (3 días)
@@ -64,7 +118,8 @@ export function useAuthGuard() {
       // Google users have email_confirmed_at set, so this only affects email/password users
       const createdAt = new Date(user.created_at);
       const now = new Date();
-      const daysSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+      const daysSinceCreation =
+        (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
 
       if (daysSinceCreation > GRACE_PERIOD_DAYS) {
         // Grace period expired - must verify
@@ -82,7 +137,8 @@ export function useAuthGuard() {
     // ════════════════════════════════════════════════════════
     if (!user) {
       // Si está en (app), (paywall) o en root (/), mandarlo a onboarding
-      const inRoot = !inApp && !inAuth && !inOnboarding && !inPaywall && !isPublicRoute;
+      const inRoot =
+        !inApp && !inAuth && !inOnboarding && !inPaywall && !isPublicRoute;
       if (inApp || inPaywall || inRoot) {
         router.replace("/(onboarding)/onboarding");
         return;

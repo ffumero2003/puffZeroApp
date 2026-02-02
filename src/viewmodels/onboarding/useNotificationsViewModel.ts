@@ -2,12 +2,12 @@
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
 import {
-  registerForPushNotifications,
-  scheduleDailyLocalReminder,
-  sendDailyQuoteNotification,
-  sendWelcomeBackNotification,
-  sendWelcomeNotification
-} from "@/src/services/notification-service";
+    registerForPushNotifications,
+    scheduleDailyLocalReminder,
+    sendDailyQuoteNotification,
+    sendWelcomeBackNotification,
+    sendWelcomeNotification
+} from "@/src/services/notifications/notification-service";
 
 // 🔧 SET TO TRUE FOR TESTING
 const TEST_MODE = __DEV__;

@@ -15,7 +15,7 @@ import {
     savePushTokenToProfile,
     sendWelcomeBackNotification,
     sendWelcomeNotification
-} from "@/src/services/notification-service";
+} from "@/src/services/notifications/notification-service";
 import { components } from "@/src/styles/components";
 
 

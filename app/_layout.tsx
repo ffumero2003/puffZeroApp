@@ -6,12 +6,10 @@ import {
   Manrope_600SemiBold,
   Manrope_700Bold,
   Manrope_800ExtraBold,
-
   useFonts,
 } from "@expo-google-fonts/manrope";
 
 import Splash from "@/src/components/system/Splash";
-import { useAuthGuard } from "@/src/guards/AuthGuard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -26,9 +24,9 @@ WebBrowser.maybeCompleteAuthSession();
 
 function RootNavigation() {
   const { initializing } = useAuth();
-  
+
   // 🔥 TODO EL FLUJO EN UN SOLO LUGAR
-  useAuthGuard();
+  // useAuthGuard();
 
   useEffect(() => {
     const resetAll = async () => {
@@ -37,11 +35,10 @@ function RootNavigation() {
       await AsyncStorage.clear();
       router.replace("/(onboarding)/onboarding");
     };
-    
+
     // 🔥 DESCOMENTAR ESTA LÍNEA PARA HACER RESET:
     // resetAll();
   }, []);
-
 
   if (initializing) return <Splash />;
 
@@ -74,10 +71,9 @@ export default function RootLayout() {
       <AuthProvider>
         <OnboardingProvider>
           <StatusBar style="dark" />
-            <RootNavigation />
-          </OnboardingProvider>
-        </AuthProvider>
+          <RootNavigation />
+        </OnboardingProvider>
+      </AuthProvider>
     </SafeAreaProvider>
-    
   );
 }
