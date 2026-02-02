@@ -3,6 +3,7 @@ import { useUserData } from "@/src/hooks/useUserData";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
+import { checkandSendMilestoneNotification } from "@/src/services/notification-service";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -276,6 +277,13 @@ export function useProgressViewModel() {
 
     return () => clearInterval(interval);
   }, [calculateTimeSinceLastPuff, calculateMoneySaved]);
+
+  // Inside useProgressViewModel, add this useEffect after the other effects:
+  useEffect(() => {
+    if (profileCreatedDate && goalSpeedDays) {
+      checkandSendMilestoneNotification(profileCreatedDate, goalSpeedDays);
+    }
+  }, [profileCreatedDate, goalSpeedDays]);
 
 
   return {
