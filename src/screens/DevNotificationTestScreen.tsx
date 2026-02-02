@@ -40,7 +40,6 @@ import { scheduleDailyLocalReminder } from "@/src/services/notifications/daily-r
 import { checkandSendMilestoneNotification } from "@/src/services/notifications/milestone-notification";
 import {
   areNotificationsEnabled,
-  registerForPushNotifications,
   sendTestNotification,
 } from "@/src/services/notifications/notification-service";
 import { scheduleVerificationReminder } from "@/src/services/notifications/verification-notification";
@@ -151,22 +150,6 @@ export function DevNotificationTestScreen() {
     }
   };
 
-  const requestPermissions = async () => {
-    try {
-      showResult("Requesting permissions...");
-      const token = await registerForPushNotifications();
-      if (token) {
-        showResult(
-          `✅ Permissions granted! Token: ${token.substring(0, 20)}...`,
-        );
-      } else {
-        showResult("❌ Permissions denied or error occurred");
-      }
-    } catch (error) {
-      showResult(`❌ Error: ${error}`);
-    }
-  };
-
   const clearAllNotificationData = async () => {
     try {
       await AsyncStorage.multiRemove([
@@ -202,7 +185,7 @@ export function DevNotificationTestScreen() {
   const testScheduleAchievement = async () => {
     try {
       showResult("Scheduling daily achievement check...");
-      await scheduleDailyAchievementCheck(30);
+      await scheduleDailyAchievementCheck();
       showResult("✅ Daily achievement scheduled for 8 PM!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);

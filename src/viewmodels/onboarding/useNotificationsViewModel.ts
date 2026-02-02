@@ -1,13 +1,11 @@
 // src/viewmodels/onboarding/useNotificationsViewModel.ts
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
-import {
-    registerForPushNotifications,
-    scheduleDailyLocalReminder,
-    sendDailyQuoteNotification,
-    sendWelcomeBackNotification,
-    sendWelcomeNotification
-} from "@/src/services/notifications/notification-service";
+
+import { sendDailyQuoteNotification } from "@/src/services/notifications/daily-quote-notification";
+import { scheduleDailyLocalReminder } from "@/src/services/notifications/daily-reminder-notification";
+import { sendWelcomeBackNotification } from "@/src/services/notifications/welcome-back-notification";
+import { sendWelcomeNotification } from "@/src/services/notifications/welcome-notification";
 
 // 🔧 SET TO TRUE FOR TESTING
 const TEST_MODE = __DEV__;
@@ -16,21 +14,25 @@ export function useNotificationsViewModel() {
   const { user } = useAuth();
 
   /**
-   * Request notification permissions and register for push notifications
+   * Request notification permissions and schedule local notifications
+   * (Push tokens removed - using local notifications only)
    */
   async function requestPermission(): Promise<boolean> {
     try {
-      const token = await registerForPushNotifications();
+      // Import expo-notifications to request permission
+      const Notifications = await import("expo-notifications");
       
-      console.log("✅ Notification permission granted!");
-      console.log("📱 Push token:", token);
-
-      // If we have a token and a user, save it to their profile
-      if (token && user?.id) {
-        await savePushTokenToProfile(token);
+      // Request permission from the user
+      const { status } = await Notifications.requestPermissionsAsync();
+      
+      if (status !== "granted") {
+        console.log("⚠️ Notification permission denied");
+        return false;
       }
 
-      // Schedule local daily reminder as fallback
+      console.log("✅ Notification permission granted!");
+
+      // Schedule local daily reminder
       await scheduleDailyLocalReminder();
 
       // 🧪 TEST: Send a test notification immediately in dev mode
@@ -42,31 +44,6 @@ export function useNotificationsViewModel() {
     } catch (error) {
       console.error("❌ Error requesting notifications:", error);
       return false;
-    }
-  }
-
-  /**
-   * Save push token to user's profile in Supabase
-   */
-  async function savePushTokenToProfile(token: string): Promise<void> {
-    if (!user?.id) {
-      console.log("⚠️ No user ID, cannot save push token");
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ push_token: token })
-        .eq("user_id", user.id);
-
-      if (error) {
-        console.error("❌ Error saving push token:", error);
-      } else {
-        console.log("✅ Push token saved to profile");
-      }
-    } catch (error) {
-      console.error("❌ Error saving push token:", error);
     }
   }
 
@@ -168,6 +145,6 @@ export function useNotificationsViewModel() {
     testDailyQuoteNotification,
     testWelcomeNotification,
     testWelcomeBackNotification,
-    savePushTokenToProfile,
+    // REMOVED: savePushTokenToProfile - no longer needed
   };
 }

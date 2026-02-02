@@ -40,7 +40,7 @@ export type Database = {
           id: string
           money_per_month: number | null
           puffs_per_day: number | null
-          push_token: string | null
+    
           updated_at: string | null
           user_id: string
           why_stopped: string[] | null
@@ -55,7 +55,6 @@ export type Database = {
           id?: string
           money_per_month?: number | null
           puffs_per_day?: number | null
-          push_token?: string | null
           updated_at?: string | null
           user_id: string
           why_stopped?: string[] | null
@@ -70,7 +69,6 @@ export type Database = {
           id?: string
           money_per_month?: number | null
           puffs_per_day?: number | null
-          push_token?: string | null
           updated_at?: string | null
           user_id?: string
           why_stopped?: string[] | null

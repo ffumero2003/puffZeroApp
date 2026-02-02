@@ -10,14 +10,10 @@ import { createProfile } from "@/src/lib/profile";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
-import {
-    areNotificationsEnabled,
-    savePushTokenToProfile,
-    sendWelcomeBackNotification,
-    sendWelcomeNotification
-} from "@/src/services/notifications/notification-service";
+import { areNotificationsEnabled } from "@/src/services/notifications/notification-service";
+import { sendWelcomeBackNotification } from "@/src/services/notifications/welcome-back-notification";
+import { sendWelcomeNotification } from "@/src/services/notifications/welcome-notification";
 import { components } from "@/src/styles/components";
-
 
 type GoogleButtonProps = {
   mode: "login" | "register";
@@ -25,8 +21,8 @@ type GoogleButtonProps = {
 
 export default function GoogleButton({ mode }: GoogleButtonProps) {
   const { authInProgress, setAuthInProgress, setAuthFlow } = useAuth();
-  const { 
-    setName, 
+  const {
+    setName,
     puffs_per_day,
     money_per_month,
     currency,
@@ -34,7 +30,7 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
     goal_speed,
     why_stopped,
     worries,
-    setProfileCreatedAt
+    setProfileCreatedAt,
   } = useOnboarding();
 
   const signInWithGoogle = async () => {
@@ -62,7 +58,7 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
 
       const result = await WebBrowser.openAuthSessionAsync(
         data.url,
-        redirectTo
+        redirectTo,
       );
 
       if (result.type !== "success" || !result.url) {
@@ -79,10 +75,11 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
         throw new Error("Tokens no encontrados");
       }
 
-      const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-        access_token,
-        refresh_token,
-      });
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.setSession({
+          access_token,
+          refresh_token,
+        });
 
       if (sessionError) throw sessionError;
 
@@ -129,17 +126,12 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
           console.log("🔔 Sending welcome notification for new Google user");
           await sendWelcomeNotification();
         }
-
-        // 📲 Save push token to profile for daily notifications
-        savePushTokenToProfile(userId);
       } else if (mode === "login" && userId) {
         // 🔔 Send welcome back notification for returning user
         if (notificationsEnabled) {
           console.log("🔔 Sending welcome back notification for Google login");
           await sendWelcomeBackNotification(firstName);
         }
-        // 📲 Save push token to profile for daily notifications
-        savePushTokenToProfile(userId);
       }
 
       // 🔥 NAVEGACIÓN EXPLÍCITA SEGÚN CONTEXTO
@@ -148,13 +140,11 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
       } else {
         router.replace(ROUTES.HOME);
       }
-
     } catch (err) {
       console.error("❌ Google OAuth error:", err);
       setAuthInProgress(false);
     }
   };
-
 
   return (
     <TouchableOpacity
