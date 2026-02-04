@@ -88,7 +88,7 @@ export async function scheduleDailyAchievementCheck(): Promise<void> {  // REMOV
       },
     });
 
-    console.log(`✅ Daily achievement check scheduled for 8 PM (goal: ${dailyGoal})`);
+    //console.log(`✅ Daily achievement check scheduled for 8 PM (goal: ${dailyGoal})`);
   } catch (error) {
     console.error("❌ Error scheduling daily achievement check:", error);
   }
@@ -151,7 +151,7 @@ export async function cancelDailyAchievementCheck(): Promise<void> {
       }
     }
 
-    console.log("✅ Daily achievement check cancelled");
+    // console.log("✅ Daily achievement check cancelled");
   } catch (error) {
     console.log("⚠️ Error canceling daily achievement check:", error);
   }

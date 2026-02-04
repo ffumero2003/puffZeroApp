@@ -42,7 +42,7 @@ export async function sendWelcomeNotification(): Promise<void> {
         seconds: 2,
       },
     });
-    console.log("✅ Welcome notification scheduled");
+    // console.log("✅ Welcome notification scheduled");
   } catch (error) {
     console.error("❌ Error sending welcome notification:", error);
   }

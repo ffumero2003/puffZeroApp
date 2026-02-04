@@ -107,7 +107,7 @@ export async function checkandSendMilestoneNotification(
         });
         
         await markMilestoneSent(milestone);
-        console.log(`✅ Milestone notification sent: ${milestone}%`);
+        // console.log(`✅ Milestone notification sent: ${milestone}%`);
       } catch (error) {
         console.error(`❌ Error sending milestone notification:`, error);
       }
@@ -121,7 +121,7 @@ export async function checkandSendMilestoneNotification(
 export async function resetMilestoneNotifications(): Promise<void> {
   try {
     await AsyncStorage.removeItem(MILESTONE_NOTIFICATION_KEY);
-    console.log("✅ Milestone notifications reset");
+    // console.log("✅ Milestone notifications reset");
   } catch (error) {
     console.error("❌ Error resetting milestones:", error);
   }

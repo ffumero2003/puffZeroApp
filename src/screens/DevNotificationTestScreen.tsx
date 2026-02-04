@@ -62,9 +62,9 @@ export function DevNotificationTestScreen() {
 
   const testBasicNotification = async () => {
     try {
-      showResult("Sending basic notification...");
+      // showResult("Sending basic notification...");
       await sendTestNotification();
-      showResult("✅ Basic notification sent!");
+      // showResult("✅ Basic notification sent!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -72,9 +72,9 @@ export function DevNotificationTestScreen() {
 
   const testWelcome = async () => {
     try {
-      showResult("Sending welcome notification...");
+      // showResult("Sending welcome notification...");
       await sendWelcomeNotification();
-      showResult("✅ Welcome notification sent!");
+      // showResult("✅ Welcome notification sent!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -82,9 +82,9 @@ export function DevNotificationTestScreen() {
 
   const testWelcomeBack = async () => {
     try {
-      showResult("Sending welcome back notification...");
+      // showResult("Sending welcome back notification...");
       await sendWelcomeBackNotification("Test User");
-      showResult("✅ Welcome back notification sent!");
+      // showResult("✅ Welcome back notification sent!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -92,13 +92,13 @@ export function DevNotificationTestScreen() {
 
   const testDailyQuote = async () => {
     try {
-      showResult("Fetching quote and sending notification...");
+      // showResult("Fetching quote and sending notification...");
       // You may need to fetch the quote first from your Supabase function
       // For now, test with a hardcoded quote
       await sendDailyQuoteNotification(
-        "Cada día sin fumar es una victoria. ¡Sigue adelante!",
+        "Cada día sin fumar es una victoria. ¡Sigue adelante!"
       );
-      showResult("✅ Daily quote notification sent!");
+      // showResult("✅ Daily quote notification sent!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -106,9 +106,9 @@ export function DevNotificationTestScreen() {
 
   const testDailyReminder = async () => {
     try {
-      showResult("Scheduling daily reminder...");
+      // showResult("Scheduling daily reminder...");
       await scheduleDailyLocalReminder();
-      showResult("✅ Daily reminder scheduled for 8 AM!");
+      // showResult("✅ Daily reminder scheduled for 8 AM!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -116,9 +116,9 @@ export function DevNotificationTestScreen() {
 
   const testVerificationReminder = async () => {
     try {
-      showResult("Scheduling verification reminder...");
+      // showResult("Scheduling verification reminder...");
       await scheduleVerificationReminder();
-      showResult("✅ Verification reminder scheduled!");
+      // showResult("✅ Verification reminder scheduled!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -126,7 +126,7 @@ export function DevNotificationTestScreen() {
 
   const testMilestone = async () => {
     try {
-      showResult("Clearing milestone history and testing...");
+      // showResult("Clearing milestone history and testing...");
       // Clear previous milestones first
       await AsyncStorage.removeItem("milestone_notification_sent");
 
@@ -135,7 +135,7 @@ export function DevNotificationTestScreen() {
       fakeStartDate.setDate(fakeStartDate.getDate() - 8);
 
       await checkandSendMilestoneNotification(fakeStartDate.toISOString(), 30);
-      showResult("✅ Milestone notification sent (if threshold met)!");
+      // showResult("✅ Milestone notification sent (if threshold met)!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -144,7 +144,7 @@ export function DevNotificationTestScreen() {
   const checkPermissions = async () => {
     try {
       const enabled = await areNotificationsEnabled();
-      showResult(`Notifications enabled: ${enabled ? "✅ YES" : "❌ NO"}`);
+      // showResult(`Notifications enabled: ${enabled ? "✅ YES" : "❌ NO"}`);
     } catch (error) {
       showResult(`❌ Error checking permissions: ${error}`);
     }
@@ -165,7 +165,7 @@ export function DevNotificationTestScreen() {
       // Cancel scheduled notifications
       await cancelInactivityNotifications();
       await cancelWeeklySummaryNotification();
-      showResult("✅ All notification data cleared!");
+      // showResult("✅ All notification data cleared!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -173,10 +173,10 @@ export function DevNotificationTestScreen() {
 
   const testDailyAchievement = async () => {
     try {
-      showResult("Sending daily achievement notification...");
+      // showResult("Sending daily achievement notification...");
       // Test with 15 puffs out of 30 daily goal (50%)
       await sendDailyAchievementNotification(15, 30);
-      showResult("✅ Daily achievement notification sent!");
+      // showResult("✅ Daily achievement notification sent!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -184,9 +184,9 @@ export function DevNotificationTestScreen() {
 
   const testScheduleAchievement = async () => {
     try {
-      showResult("Scheduling daily achievement check...");
+      // showResult("Scheduling daily achievement check...");
       await scheduleDailyAchievementCheck();
-      showResult("✅ Daily achievement scheduled for 8 PM!");
+      // showResult("✅ Daily achievement scheduled for 8 PM!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -194,10 +194,10 @@ export function DevNotificationTestScreen() {
 
   const testMoneySavedMilestone = async () => {
     try {
-      showResult("Sending money saved milestone notification...");
+      // showResult("Sending money saved milestone notification...");
       // Test with CRC currency (Costa Rican Colones)
       await sendMoneySavedMilestoneNotification(50000, "CRC"); // ~$25 equivalent
-      showResult("✅ Money milestone notification sent!");
+      // showResult("✅ Money milestone notification sent!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -205,12 +205,12 @@ export function DevNotificationTestScreen() {
 
   const testCheckMoneySavedMilestone = async () => {
     try {
-      showResult("Clearing history and checking milestone...");
+      // showResult("Clearing history and checking milestone...");
       await clearMoneySavedMilestones();
 
       // Simulate having saved 30,000 CRC (~$60)
       await checkAndSendMoneySavedMilestone(30000, "CRC");
-      showResult("✅ Money milestone check complete!");
+      // showResult("✅ Money milestone check complete!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -219,9 +219,9 @@ export function DevNotificationTestScreen() {
   // ===== INACTIVITY NOTIFICATIONS =====
   const testInactivity24h = async () => {
     try {
-      showResult("Sending 24h inactivity notification...");
+      // showResult("Sending 24h inactivity notification...");
       await sendInactivityNotification(24);
-      showResult("✅ 24h inactivity notification sent!");
+      // showResult("✅ 24h inactivity notification sent!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -229,9 +229,9 @@ export function DevNotificationTestScreen() {
 
   const testInactivity48h = async () => {
     try {
-      showResult("Sending 48h inactivity notification...");
+      // showResult("Sending 48h inactivity notification...");
       await sendInactivityNotification(48);
-      showResult("✅ 48h inactivity notification sent!");
+      // showResult("✅ 48h inactivity notification sent!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -239,9 +239,9 @@ export function DevNotificationTestScreen() {
 
   const testInactivity72h = async () => {
     try {
-      showResult("Sending 72h inactivity notification...");
+      // showResult("Sending 72h inactivity notification...");
       await sendInactivityNotification(72);
-      showResult("✅ 72h inactivity notification sent!");
+      // showResult("✅ 72h inactivity notification sent!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -249,9 +249,9 @@ export function DevNotificationTestScreen() {
 
   const testScheduleInactivity = async () => {
     try {
-      showResult("Scheduling inactivity notifications...");
+      //  showResult("Scheduling inactivity notifications...");
       await scheduleInactivityNotifications();
-      showResult("✅ Inactivity notifications scheduled for 24h, 48h, 72h!");
+      // showResult("✅ Inactivity notifications scheduled for 24h, 48h, 72h!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -259,9 +259,9 @@ export function DevNotificationTestScreen() {
 
   const testUpdateActivity = async () => {
     try {
-      showResult("Updating last activity...");
+      // showResult("Updating last activity...");
       await updateLastActivity();
-      showResult("✅ Activity updated! Inactivity timers reset.");
+      // showResult("✅ Activity updated! Inactivity timers reset.");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -270,14 +270,14 @@ export function DevNotificationTestScreen() {
   // ===== WEEKLY SUMMARY NOTIFICATIONS =====
   const testWeeklySummary = async () => {
     try {
-      showResult("Sending weekly summary notification...");
+      // showResult("Sending weekly summary notification...");
       // Use a test user ID - replace with actual if needed
       await sendWeeklySummaryNotification(
         "test-user-id",
         50000, // money per month
-        "CRC", // currency
+        "CRC" // currency
       );
-      showResult("✅ Weekly summary notification sent!");
+      // showResult("✅ Weekly summary notification sent!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -285,9 +285,9 @@ export function DevNotificationTestScreen() {
 
   const testScheduleWeeklySummary = async () => {
     try {
-      showResult("Scheduling weekly summary...");
+      // showResult("Scheduling weekly summary...");
       await scheduleWeeklySummaryNotification();
-      showResult("✅ Weekly summary scheduled for Sundays at 8 PM!");
+      // showResult("✅ Weekly summary scheduled for Sundays at 8 PM!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -296,9 +296,9 @@ export function DevNotificationTestScreen() {
   // ===== FIRST PUFF-FREE DAY NOTIFICATIONS =====
   const testFirstPuffFreeDay = async () => {
     try {
-      showResult("Sending first puff-free day notification...");
+      // showResult("Sending first puff-free day notification...");
       await sendFirstPuffFreeDayNotification();
-      showResult("✅ First puff-free day notification sent!");
+      // showResult("✅ First puff-free day notification sent!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -306,10 +306,10 @@ export function DevNotificationTestScreen() {
 
   const testCheckPuffFreeDay = async () => {
     try {
-      showResult("Checking for puff-free day...");
+      // showResult("Checking for puff-free day...");
       await resetFirstPuffFreeDayTracking(); // Reset first to allow re-testing
       await checkAndSendFirstPuffFreeDayNotification();
-      showResult("✅ Puff-free day check complete!");
+      // showResult("✅ Puff-free day check complete!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -317,10 +317,10 @@ export function DevNotificationTestScreen() {
 
   const testSchedulePuffFreeCheck = async () => {
     try {
-      showResult("Scheduling end-of-day puff-free check...");
+      // showResult("Scheduling end-of-day puff-free check...");
       await resetFirstPuffFreeDayTracking();
       await scheduleEndOfDayPuffFreeCheck();
-      showResult("✅ Puff-free check scheduled for 11:59 PM!");
+      // showResult("✅ Puff-free check scheduled for 11:59 PM!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);
     }
@@ -335,9 +335,9 @@ export function DevNotificationTestScreen() {
       ]);
       await cancelInactivityNotifications();
       await cancelWeeklySummaryNotification();
-      showResult("✅ New notification data cleared!");
+      // showResult("✅ New notification data cleared!");
     } catch (error) {
-      showResult(`❌ Error: ${error}`);
+      // showResult(`❌ Error: ${error}`);
     }
   };
 
@@ -354,9 +354,9 @@ export function DevNotificationTestScreen() {
       <TouchableOpacity style={styles.button} onPress={checkPermissions}>
         <Text style={styles.buttonText}>Check Permissions</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={requestPermissions}>
+      {/* <TouchableOpacity style={styles.button} onPress={requestPermissions}>
         <Text style={styles.buttonText}>Request Permissions</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <Text style={styles.sectionTitle}>Immediate Notifications</Text>
       <TouchableOpacity style={styles.button} onPress={testBasicNotification}>

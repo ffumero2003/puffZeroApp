@@ -39,7 +39,7 @@ export async function sendVerificationReminderNotification(): Promise<void> {
         seconds: 2,
       },
     });
-    console.log("✅ Verification reminder notification sent");
+    // console.log("✅ Verification reminder notification sent");
   } catch (error) {
     console.error("❌ Error sending verification reminder:", error);
   }
@@ -70,7 +70,7 @@ export async function scheduleVerificationReminder(): Promise<void> {
         seconds: REMINDER_HOURS * 60 * 60, // Convert hours to seconds
       },
     });
-    console.log(`✅ Verification reminder scheduled for ${REMINDER_HOURS} hours from now`);
+    // console.log(`✅ Verification reminder scheduled for ${REMINDER_HOURS} hours from now`);
   } catch (error) {
     console.error("❌ Error scheduling verification reminder:", error);
   }
@@ -92,7 +92,7 @@ export async function cancelVerificationReminder(): Promise<void> {
         await Notif.cancelScheduledNotificationAsync(notification.identifier);
       }
     }
-    console.log("✅ Verification reminders cancelled");
+    // console.log("✅ Verification reminders cancelled");
   } catch (error) {
     console.log("⚠️ Error canceling verification reminder:", error);
   }

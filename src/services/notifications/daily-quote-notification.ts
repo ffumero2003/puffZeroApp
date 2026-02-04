@@ -46,7 +46,7 @@ export async function scheduleDailyQuoteNotification(): Promise<void> {
       },
     });
 
-    console.log("✅ Daily quote notification scheduled for 8 AM");
+    // console.log("✅ Daily quote notification scheduled for 8 AM");
   } catch (error) {
     console.error("❌ Error scheduling daily quote notification:", error);
   }
@@ -70,7 +70,7 @@ export async function cancelDailyQuoteNotification(): Promise<void> {
         await Notif.cancelScheduledNotificationAsync(notification.identifier);
       }
     }
-    console.log("✅ Daily quote notification cancelled");
+    // console.log("✅ Daily quote notification cancelled");
   } catch (error) {
     console.log("⚠️ Error canceling daily quote notification:", error);
   }

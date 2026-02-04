@@ -144,7 +144,7 @@ export async function checkAndSendMoneySavedMilestone(
     });
 
     await markMilestoneAchieved(milestone);
-    console.log(`✅ Money milestone notification sent: ${formatAmount(milestone, currencyCode)}`);
+    // console.log(`✅ Money milestone notification sent: ${formatAmount(milestone, currencyCode)}`);
   } catch (error) {
     console.error("❌ Error checking money milestone:", error);
   }
@@ -176,7 +176,7 @@ export async function sendMoneySavedMilestoneNotification(
       },
     });
 
-    console.log(`✅ Money milestone notification sent: ${formatAmount(amount, currencyCode)}`);
+    // console.log(`✅ Money milestone notification sent: ${formatAmount(amount, currencyCode)}`);
   } catch (error) {
     console.error("❌ Error sending money milestone notification:", error);
   }
@@ -187,7 +187,7 @@ export async function sendMoneySavedMilestoneNotification(
  */
 export async function clearMoneySavedMilestones(): Promise<void> {
   await AsyncStorage.removeItem(MONEY_MILESTONE_KEY);
-  console.log("✅ Money milestone history cleared");
+  // console.log("✅ Money milestone history cleared");
 }
 
 /**

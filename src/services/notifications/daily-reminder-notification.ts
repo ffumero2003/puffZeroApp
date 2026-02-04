@@ -62,7 +62,7 @@ export async function scheduleDailyLocalReminder(): Promise<void> {
         minute: 0,
       },
     });
-    console.log("✅ Daily local reminder scheduled for 8 AM");
+    // console.log("✅ Daily local reminder scheduled for 8 AM");
   } catch (error) {
     console.error("❌ Error scheduling daily reminder:", error);
   }

@@ -97,7 +97,7 @@ export default function AppLayout() {
         <Tabs.Screen name="home" />
         <Tabs.Screen name="progress" />
         <Tabs.Screen name="zuffy" />
-        <Tabs.Screen name="profile" />
+        <Tabs.Screen name="settings" />
       </Tabs>
     </SafeAreaView>
   );

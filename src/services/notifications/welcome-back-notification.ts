@@ -48,7 +48,7 @@ export async function sendWelcomeBackNotification(firstName?: string): Promise<v
         seconds: 2,
       },
     });
-    console.log("✅ Welcome back notification scheduled");
+    // console.log("✅ Welcome back notification scheduled");
   } catch (error) {
     console.error("❌ Error sending welcome back notification:", error);
   }

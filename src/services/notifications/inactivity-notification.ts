@@ -44,7 +44,7 @@ export async function updateLastActivity(): Promise<void> {
     await AsyncStorage.setItem(INACTIVITY_NOTIFICATIONS_SENT_KEY, JSON.stringify([]));
     // Reschedule inactivity notifications from now
     await scheduleInactivityNotifications();
-    console.log("✅ Last activity updated:", now);
+    // console.log("✅ Last activity updated:", now);
   } catch (error) {
     console.error("❌ Error updating last activity:", error);
   }
@@ -80,7 +80,7 @@ export async function scheduleInactivityNotifications(): Promise<void> {
         },
       });
 
-      console.log(`✅ Inactivity notification scheduled for ${hours} hours`);
+      // console.log(`✅ Inactivity notification scheduled for ${hours} hours`);
     }
   } catch (error) {
     console.error("❌ Error scheduling inactivity notifications:", error);
@@ -101,7 +101,7 @@ export async function cancelInactivityNotifications(): Promise<void> {
         await Notif.cancelScheduledNotificationAsync(notification.identifier);
       }
     }
-    console.log("✅ Inactivity notifications cancelled");
+    // console.log("✅ Inactivity notifications cancelled");
   } catch (error) {
     console.log("⚠️ Error canceling inactivity notifications:", error);
   }
@@ -128,7 +128,7 @@ export async function sendInactivityNotification(hours: number = 24): Promise<vo
         seconds: 2,
       },
     });
-    console.log(`✅ Inactivity notification sent (test): ${hours} hours`);
+    // console.log(`✅ Inactivity notification sent (test): ${hours} hours`);
   } catch (error) {
     console.error("❌ Error sending inactivity notification:", error);
   }

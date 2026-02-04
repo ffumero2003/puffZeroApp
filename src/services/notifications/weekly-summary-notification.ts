@@ -133,7 +133,7 @@ export async function scheduleWeeklySummaryNotification(): Promise<void> {
       },
     });
 
-    console.log("✅ Weekly summary notification scheduled for Sundays at 8 PM");
+    // console.log("✅ Weekly summary notification scheduled for Sundays at 8 PM");
   } catch (error) {
     console.error("❌ Error scheduling weekly summary:", error);
   }
@@ -156,7 +156,7 @@ export async function cancelWeeklySummaryNotification(): Promise<void> {
         await Notif.cancelScheduledNotificationAsync(notification.identifier);
       }
     }
-    console.log("✅ Weekly summary notification cancelled");
+    // console.log("✅ Weekly summary notification cancelled");
   } catch (error) {
     console.log("⚠️ Error canceling weekly summary:", error);
   }
@@ -197,7 +197,7 @@ export async function sendWeeklySummaryNotification(
       },
     });
 
-    console.log("✅ Weekly summary notification sent!");
+    // console.log("✅ Weekly summary notification sent!");
   } catch (error) {
     console.error("❌ Error sending weekly summary:", error);
   }

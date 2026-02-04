@@ -70,7 +70,7 @@ export async function checkAndSendFirstPuffFreeDayNotification(): Promise<void> 
     // Check if already sent
     const alreadySent = await wasFirstPuffFreeDaySent();
     if (alreadySent) {
-      console.log("📊 First puff-free day notification already sent");
+      // console.log("📊 First puff-free day notification already sent");
       return;
     }
 
@@ -109,7 +109,7 @@ export async function checkAndSendFirstPuffFreeDayNotification(): Promise<void> 
         });
 
         await markFirstPuffFreeDaySent();
-        console.log("✅ First puff-free day notification sent!");
+        // console.log("✅ First puff-free day notification sent!");
       }
     }
   } catch (error) {
@@ -133,7 +133,7 @@ export async function scheduleEndOfDayPuffFreeCheck(): Promise<void> {
     // Check if already sent the first puff-free day notification
     const alreadySent = await wasFirstPuffFreeDaySent();
     if (alreadySent) {
-      console.log("📊 First puff-free day already achieved, skipping schedule");
+      // console.log("📊 First puff-free day already achieved, skipping schedule");
       return;
     }
 
@@ -151,7 +151,7 @@ export async function scheduleEndOfDayPuffFreeCheck(): Promise<void> {
       },
     });
 
-    console.log("✅ End-of-day puff-free check scheduled for 11:59 PM");
+    // console.log("✅ End-of-day puff-free check scheduled for 11:59 PM");
   } catch (error) {
     console.error("❌ Error scheduling end-of-day check:", error);
   }
@@ -210,7 +210,7 @@ export async function checkCurrentDayAndNotify(): Promise<void> {
       });
 
       await markFirstPuffFreeDaySent();
-      console.log("✅ First puff-free day notification sent!");
+      // console.log("✅ First puff-free day notification sent!");
     }
   } catch (error) {
     console.error("❌ Error checking current day:", error);
@@ -240,7 +240,7 @@ export async function sendFirstPuffFreeDayNotification(): Promise<void> {
       },
     });
 
-    console.log("✅ First puff-free day notification sent (test)!");
+    // console.log("✅ First puff-free day notification sent (test)!");
   } catch (error) {
     console.error("❌ Error sending first puff-free day notification:", error);
   }
@@ -251,5 +251,5 @@ export async function sendFirstPuffFreeDayNotification(): Promise<void> {
  */
 export async function resetFirstPuffFreeDayTracking(): Promise<void> {
   await AsyncStorage.removeItem(FIRST_PUFF_FREE_DAY_SENT_KEY);
-  console.log("✅ First puff-free day tracking reset");
+  // console.log("✅ First puff-free day tracking reset");
 }
