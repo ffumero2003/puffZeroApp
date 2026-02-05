@@ -8,6 +8,7 @@ import SettingsActions from "@/src/components/app/settings/SettingsActions";
 import SettingsHeader from "@/src/components/app/settings/SettingsHeader";
 import SettingsRow from "@/src/components/app/settings/SettingsRow";
 import SettingsSection from "@/src/components/app/settings/SettingsSection";
+import { VerificationStatus } from "@/src/components/app/settings/VerificationStatus";
 import { Colors } from "@/src/constants/theme";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useSettingsViewModel } from "@/src/viewmodels/app/useSettingsViewModel";
@@ -67,13 +68,13 @@ export default function Settings() {
   // ============================================
   return (
     <View style={styles.container}>
+      <SettingsHeader />
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <SettingsHeader />
-
         {/* Profile Section */}
         <SettingsSection title="Perfil">
           {/* Correo - editable */}
@@ -110,6 +111,8 @@ export default function Settings() {
             value={vm.getWhyStoppedLabel()}
             showChevron={false}
           />
+
+          <VerificationStatus />
         </SettingsSection>
 
         {/* Notifications Section */}

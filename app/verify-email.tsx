@@ -3,14 +3,19 @@ import AppText from "@/src/components/AppText";
 import { ROUTES } from "@/src/constants/routes";
 import { Colors } from "@/src/constants/theme";
 import { supabase } from "@/src/lib/supabase";
+import { cancelVerificationReminders } from "@/src/services/notifications/verification-notification";
+import { clearPendingVerification } from "@/src/services/verification/verification-service";
 import { layout } from "@/src/styles/layout";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
+
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function VerifyEmailScreen() {
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [status, setStatus] = useState<"loading" | "success" | "error">(
+    "loading"
+  );
   const params = useLocalSearchParams();
   const didInit = useRef(false);
 
@@ -42,13 +47,17 @@ export default function VerifyEmailScreen() {
         return;
       }
 
+      // ✅ Limpiar pending verification y reminders
+      await clearPendingVerification();
+      await cancelVerificationReminders();
+      console.log("✅ Verification complete - pending cleared");
+
       setStatus("success");
 
       // Wait a moment to show success, then navigate
       setTimeout(() => {
-        router.replace(ROUTES.HOME); // Or wherever verified users should go
+        router.replace(ROUTES.HOME);
       }, 1500);
-
     } catch (err) {
       console.error("❌ Verification error:", err);
       setStatus("error");
@@ -57,11 +66,18 @@ export default function VerifyEmailScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light.background }}>
-      <View style={[layout.screenContainer, { justifyContent: "center", alignItems: "center" }]}>
+      <View
+        style={[
+          layout.screenContainer,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
         {status === "loading" && (
           <>
             <ActivityIndicator size="large" color={Colors.light.primary} />
-            <AppText style={{ marginTop: 16 }}>Verificando tu cuenta...</AppText>
+            <AppText style={{ marginTop: 16 }}>
+              Verificando tu cuenta...
+            </AppText>
           </>
         )}
 
@@ -70,15 +86,16 @@ export default function VerifyEmailScreen() {
             <AppText weight="bold" style={{ fontSize: 24, marginBottom: 8 }}>
               ¡Cuenta verificada!
             </AppText>
-            <AppText style={{ opacity: 0.7 }}>
-              Entrando a PuffZero...
-            </AppText>
+            <AppText style={{ opacity: 0.7 }}>Entrando a PuffZero...</AppText>
           </>
         )}
 
         {status === "error" && (
           <>
-            <AppText weight="bold" style={{ fontSize: 24, marginBottom: 8, color: "red" }}>
+            <AppText
+              weight="bold"
+              style={{ fontSize: 24, marginBottom: 8, color: "red" }}
+            >
               Error de verificación
             </AppText>
             <AppText style={{ opacity: 0.7, textAlign: "center" }}>

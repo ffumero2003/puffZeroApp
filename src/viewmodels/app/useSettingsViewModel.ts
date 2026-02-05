@@ -6,6 +6,12 @@ import { CURRENCY_SYMBOLS } from "@/src/constants/currency";
 import { useUserData } from "@/src/hooks/useUserData";
 import { updateProfile } from "@/src/lib/profile";
 import { supabase } from "@/src/lib/supabase";
+import {
+  scheduleVerificationReminders,
+} from "@/src/services/notifications/verification-notification";
+import {
+  storePendingEmailChange,
+} from "@/src/services/verification/verification-service";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 
@@ -98,7 +104,7 @@ export function useSettingsViewModel() {
         AsyncStorage.getItem(REMINDER_HOUR_KEY),
       ]);
 
-      console.log("📱 Loaded from AsyncStorage:", { notifEnabled, savedHour });
+      // console.log("📱 Loaded from AsyncStorage:", { notifEnabled, savedHour });
 
       // Default to true if not set
       setNotificationsEnabled(notifEnabled !== "false");
@@ -168,33 +174,44 @@ export function useSettingsViewModel() {
   // ============================================
 
   // Save email to Supabase Auth
-  async function saveEmail(newEmail: string): Promise<{ success: boolean; error?: string }> {
-    if (!isValidEmail(newEmail)) {
-      return { success: false, error: "Correo inválido" };
-    }
-
-    setSaving(true);
-
-    try {
-      const { error } = await supabase.auth.updateUser({ email: newEmail });
-
-      if (error) {
-        console.error("❌ Error updating email:", error);
-        return { success: false, error: error.message };
-      }
-
-      setEmail(newEmail);
-      console.log("✅ Email update initiated:", newEmail);
-
-      // Note: Supabase sends a confirmation email to the new address
-      return { success: true };
-    } catch (error) {
-      console.error("❌ Error saving email:", error);
-      return { success: false, error: "Error al actualizar el correo" };
-    } finally {
-      setSaving(false);
-    }
+async function saveEmail(newEmail: string): Promise<{ success: boolean; error?: string }> {
+  if (!isValidEmail(newEmail)) {
+    return { success: false, error: "Correo inválido" };
   }
+
+  // Don't proceed if it's the same email
+  if (newEmail === email) {
+    return { success: false, error: "El correo es el mismo" };
+  }
+
+  setSaving(true);
+
+  try {
+    const { error } = await supabase.auth.updateUser({ email: newEmail });
+
+    if (error) {
+      console.error("❌ Error updating email:", error);
+      return { success: false, error: error.message };
+    }
+
+    // Store pending email change
+    await storePendingEmailChange(email, newEmail);
+    await scheduleVerificationReminders("email_change");
+
+    // DON'T update local email state yet - wait for verification
+    // setEmail(newEmail); // ← Remove this line
+    
+    console.log("✅ Email change initiated:", newEmail);
+
+    // Note: Supabase sends a confirmation email to the new address
+    return { success: true };
+  } catch (error) {
+    console.error("❌ Error saving email:", error);
+    return { success: false, error: "Error al actualizar el correo" };
+  } finally {
+    setSaving(false);
+  }
+}
 
   // Save daily puff goal to Supabase
   async function savePuffsPerDay(newPuffs: number) {

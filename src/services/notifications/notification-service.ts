@@ -52,21 +52,21 @@ export async function sendTestNotification(): Promise<void> {
     return;
   }
 
-  try {
-    await Notif.scheduleNotificationAsync({
-      content: {
-        title: "🧪 Test Notification",
-        body: "¡Las notificaciones están funcionando correctamente!",
-      },
-      trigger: {
-        type: "timeInterval",
-        seconds: 2,
-      } as any,
-    });
-    console.log("✅ Test notification scheduled");
-  } catch (error) {
-    console.log("❌ Error sending test notification:", error);
-  }
+  // try {
+  //   await Notif.scheduleNotificationAsync({
+  //     content: {
+  //       title: "🧪 Test Notification",
+  //       body: "¡Las notificaciones están funcionando correctamente!",
+  //     },
+  //     trigger: {
+  //       type: "timeInterval",
+  //       seconds: 2,
+  //     } as any,
+  //   });
+  //   console.log("✅ Test notification scheduled");
+  // } catch (error) {
+  //   console.log("❌ Error sending test notification:", error);
+  // }
 
   await Notif.setNotificationChannelAsync("inactivity", {
     name: "Recordatorios de Inactividad",

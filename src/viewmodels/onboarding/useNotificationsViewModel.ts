@@ -30,7 +30,7 @@ export function useNotificationsViewModel() {
         return false;
       }
 
-      console.log("✅ Notification permission granted!");
+      // console.log("✅ Notification permission granted!");
 
       // Schedule local daily reminder
       await scheduleDailyLocalReminder();
@@ -59,7 +59,7 @@ export function useNotificationsViewModel() {
    * 🧪 Test function - sends a local notification immediately
    */
   async function sendTestNotification(): Promise<void> {
-    console.log("🧪 Sending test notification...");
+    // console.log("🧪 Sending test notification...");
 
     const Notifications = await import("expo-notifications");
 
@@ -85,7 +85,7 @@ export function useNotificationsViewModel() {
       },
     });
 
-    console.log("✅ Test notification scheduled!");
+    // console.log("✅ Test notification scheduled!");
   }
 
   /**

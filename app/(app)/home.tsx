@@ -4,10 +4,17 @@ import DayDetailModal from "@/src/components/app/home/DayDetailModal";
 import HomeHeader from "@/src/components/app/home/HomeHeader";
 import ProgressCircle from "@/src/components/app/home/ProgressCircle";
 import WeekDayCircle from "@/src/components/app/home/WeekDayCircle";
+import { usePendingVerification } from "@/src/hooks/usePendingVerification";
 // COMMENTED OUT: Invalid direct imports - these are returned by the hook, not exported
 // import { currentWeek, canGoBack, canGoForward, goToPreviousWeek, goToNextWeek } from "@/src/viewmodels/app/useHomeViewModel";
+import { VerificationModal } from "@/src/components/app/VerificationModal";
 import { Colors } from "@/src/constants/theme";
+import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
+import {
+  resendEmailChangeVerification,
+  sendVerificationEmail,
+} from "@/src/services/auth-services";
 import { useHomeViewModel } from "@/src/viewmodels/app/useHomeViewModel";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
@@ -30,13 +37,29 @@ export default function Home() {
     // goToNextWeek,
   } = useHomeViewModel();
 
+  const {
+    pending,
+    showModal,
+    daysRemaining,
+    isMandatory,
+    verificationType,
+    dismissModal,
+    recheckStatus,
+  } = usePendingVerification();
+
+  const [resending, setResending] = useState(false);
+  const [checking, setChecking] = useState(false);
   const [selectedDay, setSelectedDay] = useState<any>(null);
   const { user } = useAuth();
   const hasShownVerificationAlert = useRef(false);
 
   // Show verification reminder when entering Home (only if unverified)
   useEffect(() => {
-    if (user && !user.email_confirmed_at && !hasShownVerificationAlert.current) {
+    if (
+      user &&
+      !user.email_confirmed_at &&
+      !hasShownVerificationAlert.current
+    ) {
       hasShownVerificationAlert.current = true;
       Alert.alert(
         "Verificá tu cuenta",
@@ -46,21 +69,81 @@ export default function Home() {
     }
   }, [user]);
 
+  const handleResendEmail = async () => {
+    if (!pending) return;
+
+    setResending(true);
+
+    try {
+      let result;
+
+      if (pending.type === "email_change") {
+        // Email change: use Supabase's built-in resend
+        result = await resendEmailChangeVerification(pending.email);
+      } else {
+        // Account verification: use our custom Edge Function
+        result = await sendVerificationEmail(pending.email);
+      }
+
+      if (result.error) {
+        Alert.alert("Error", result.error.message);
+      } else {
+        Alert.alert(
+          "Email enviado",
+          "Revisá tu bandeja de entrada y carpeta de spam."
+        );
+      }
+    } catch (error) {
+      Alert.alert("Error", "No se pudo enviar el email");
+    } finally {
+      setResending(false);
+    }
+  };
+
+  // Handle "Ya verifiqué" button
+  const handleCheckVerification = async () => {
+    setChecking(true);
+
+    try {
+      // Force refresh the session to get updated user data
+      const { error: refreshError } = await supabase.auth.refreshSession();
+
+      if (refreshError) {
+        console.error("Error refreshing session:", refreshError);
+      }
+
+      // Get the updated user
+      const {
+        data: { user: updatedUser },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (error) {
+        Alert.alert("Error", "No se pudo verificar tu estado");
+        return;
+      }
+
+      console.log("Updated user email:", updatedUser?.email);
+
+      // Re-run the verification check
+      await recheckStatus();
+    } catch (error) {
+      Alert.alert("Error", "No se pudo verificar tu estado");
+    } finally {
+      setChecking(false);
+    }
+  };
+
   return (
     <>
       <View style={styles.container}>
-       
-        
-          {/* Header */}
-          {/* <View style={styles.header}> */}
-            <HomeHeader firstName={firstName} dailyGoal={dailyGoal} />
-          {/* </View> */}
+        {/* Header */}
+        {/* <View style={styles.header}> */}
+        <HomeHeader firstName={firstName} dailyGoal={dailyGoal} />
 
-          <View
-          style={[styles.scrollView, styles.content]}
-          
-        >
+        {/* </View> */}
 
+        <View style={[styles.scrollView, styles.content]}>
           {/* Week selector - current week only */}
           {currentWeek && (
             <View style={styles.daysRow}>
@@ -76,20 +159,29 @@ export default function Home() {
               ))}
             </View>
           )}
+          {showModal && pending && verificationType && (
+            <VerificationModal
+              visible={showModal}
+              type={verificationType}
+              email={pending.email}
+              daysRemaining={daysRemaining}
+              isMandatory={isMandatory}
+              onClose={dismissModal}
+              onResendEmail={handleResendEmail}
+              onCheckVerification={handleCheckVerification}
+              resending={resending}
+              checking={checking}
+            />
+          )}
 
-          {/* Motivational Quote */}
           <View style={styles.quoteContainer}>
-          <AppText
-            style={[
-              styles.quote,
-              { transform: [{ skewX: "-10deg" }] },
-            ]}
-            weight="bold"
-          >
-            {motivationalMessage}
-          </AppText>
-        </View>
-
+            <AppText
+              style={[styles.quote, { transform: [{ skewX: "-10deg" }] }]}
+              weight="bold"
+            >
+              {motivationalMessage}
+            </AppText>
+          </View>
 
           {/* Progress Circle */}
           <ProgressCircle
@@ -100,7 +192,11 @@ export default function Home() {
           />
 
           {/* Add Puff Button */}
-          <TouchableOpacity style={styles.addButton} onPress={addPuff} activeOpacity={0.8}>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={addPuff}
+            activeOpacity={0.8}
+          >
             <Ionicons name="add" size={60} color={Colors.light.textWhite} />
             <AppText weight="bold" style={styles.addButtonText}>
               Agregar Puffs
@@ -113,10 +209,10 @@ export default function Home() {
           <DayDetailModal
             visible={!!selectedDay}
             day={selectedDay.day}
-            date={new Date(selectedDay.date).toLocaleDateString('es-ES', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
+            date={new Date(selectedDay.date).toLocaleDateString("es-ES", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
             })}
             puffs={selectedDay.puffs}
             onClose={() => setSelectedDay(null)}
@@ -137,10 +233,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 10,
-    
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingBottom: 10,
   },
-  
+
   // weekContainer: {
   //   marginBottom: 0,
   // },
@@ -165,14 +262,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 6,
     paddingVertical: 6,
-    
   },
   quoteContainer: {
-    paddingVertical: 24,
+    paddingVertical: 8,
     paddingHorizontal: 18,
   },
   quote: {
-    fontSize: 22,
+    fontSize: 18,
     textAlign: "center",
     fontStyle: "italic",
     color: Colors.light.text,

@@ -72,3 +72,15 @@ export async function sendVerificationEmail(email: string) {
 
   return { error: null };
 }
+
+export async function resendEmailChangeVerification(newEmail: string) {
+  // Calling updateUser again with the same email resends the verification
+  const { error } = await supabase.auth.updateUser({ email: newEmail });
+  
+  if (error) {
+    return { error: { message: error.message } };
+  }
+  
+  return { error: null };
+}
+

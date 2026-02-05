@@ -16,6 +16,7 @@ import { StatusBar } from "expo-status-bar";
 import * as WebBrowser from "expo-web-browser";
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { useAuthGuard } from "../src/guards/AuthGuard";
 import { supabase } from "../src/lib/supabase";
 import { AuthProvider, useAuth } from "../src/providers/auth-provider";
 import { OnboardingProvider } from "../src/providers/onboarding-provider";
@@ -26,7 +27,7 @@ function RootNavigation() {
   const { initializing } = useAuth();
 
   // 🔥 TODO EL FLUJO EN UN SOLO LUGAR
-  // useAuthGuard();
+  useAuthGuard();
 
   useEffect(() => {
     const resetAll = async () => {

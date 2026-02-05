@@ -8,7 +8,11 @@ import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import FeatureItem from "@/src/components/paywall/FeatureItem";
 import SubscriptionOption from "@/src/components/paywall/SubscriptionOption";
 import { BYPASS_PAYWALL } from "@/src/config/dev";
-import { BASE_PRICES_CRC, CRC_EXCHANGE_RATES, CURRENCY_SYMBOLS } from "@/src/constants/currency";
+import {
+  BASE_PRICES_CRC,
+  CRC_EXCHANGE_RATES,
+  CURRENCY_SYMBOLS,
+} from "@/src/constants/currency";
 import { Colors } from "@/src/constants/theme";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
@@ -20,19 +24,18 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 
-
 export default function OnboardingPaywall() {
   // const [selected, setSelected] = useState<"monthly" | "yearly">("yearly");
   // const { grantAccess } = useSubscription();
-  const { 
+  const {
     name,
     goal_speed,
     puffs_per_day,
     money_per_month,
     currency,
     why_stopped,
-    completeOnboarding, 
-    resetAll
+    completeOnboarding,
+    resetAll,
   } = useOnboarding();
   const { user, setAuthFlow } = useAuth();
 
@@ -50,20 +53,19 @@ export default function OnboardingPaywall() {
   const formattedWeeklyPrice = `${currencySymbol}${weeklyPrice.toLocaleString()}`;
   const formattedYearlyPrice = `${currencySymbol}${yearlyPrice.toLocaleString()}`;
 
-  console.log("🔍 PAYWALL DEBUG:", {
-    currency,
-    userCurrency,
-    exchangeRate,
-    currencySymbol,
-    weeklyPrice,
-    formattedWeeklyPrice,
-    yearlyPrice,
-    formattedYearlyPrice,
-  });
+  // console.log("🔍 PAYWALL DEBUG:", {
+  //   currency,
+  //   userCurrency,
+  //   exchangeRate,
+  //   currencySymbol,
+  //   weeklyPrice,
+  //   formattedWeeklyPrice,
+  //   yearlyPrice,
+  //   formattedYearlyPrice,
+  // });
 
-  const displayName = name || 
-                    (user?.user_metadata?.full_name as string | undefined) || 
-                    undefined;
+  const displayName =
+    name || (user?.user_metadata?.full_name as string | undefined) || undefined;
 
   const firstName = displayName?.trim().split(" ")[0];
 
@@ -89,21 +91,21 @@ export default function OnboardingPaywall() {
     "Tu plan está diseñado para que avances paso a paso con claridad"
   );
 
-
   const trackingText =
-  "Seguí tu plan día a día sin confusión ni complicaciones";
+    "Seguí tu plan día a día sin confusión ni complicaciones";
 
-  const moneyText = money_per_month && currency ? (
-    <>
-      Empezá a ahorrar hasta{" "}
-      <AppText weight="bold" style={{ color: Colors.light.primary }}>
-        {formatMoney(money_per_month * 12, currency)}
-      </AppText>{" "}
-      cada año
-    </>
-  ) : (
-    "Convertí cada día sin fumar en dinero ahorrado"
-  );
+  const moneyText =
+    money_per_month && currency ? (
+      <>
+        Empezá a ahorrar hasta{" "}
+        <AppText weight="bold" style={{ color: Colors.light.primary }}>
+          {formatMoney(money_per_month * 12, currency)}
+        </AppText>{" "}
+        cada año
+      </>
+    ) : (
+      "Convertí cada día sin fumar en dinero ahorrado"
+    );
 
   function getWhyText(reason?: string) {
     switch (reason) {
@@ -137,104 +139,95 @@ export default function OnboardingPaywall() {
     </>
   );
 
-
-
-
   function grantAccess() {
     completeOnboarding(); // marca onboarding como terminado
     resetAll();
-    setAuthFlow(null);           // limpia datos temporales
+    setAuthFlow(null); // limpia datos temporales
     router.replace("/(app)/home");
   }
 
-    
   return (
     <ScreenWrapper>
-        <View style={layout.screenContainer}>
-          <View >   
-              {/* Header */}
-            <OnboardingHeader showProgress={false} showBack={false} />
+      <View style={layout.screenContainer}>
+        <View>
+          {/* Header */}
+          <OnboardingHeader showProgress={false} showBack={false} />
 
-            <AppText style={layout.titleCenter} weight="bold">
-              {firstName ? (
-                <>
-                  Hey{" "}
-                  <AppText weight="bold" style={{ color: Colors.light.primary }}>
-                    {firstName}
-                  </AppText>
-                  , desbloqueá Puff
-                </>
-              ) : (
-                <>Hey, desbloqueá PuffHOME</>
-              )}
-              <AppText weight="bold" style={{ color: Colors.light.primary }}>
-                Zero
-              </AppText>{" "}
-              para llegar a tu mejor versión.
-            </AppText>
+          <AppText style={layout.titleCenter} weight="bold">
+            {firstName ? (
+              <>
+                Hey{" "}
+                <AppText weight="bold" style={{ color: Colors.light.primary }}>
+                  {firstName}
+                </AppText>
+                , desbloqueá Puff
+              </>
+            ) : (
+              <>Hey, desbloqueá PuffHOME</>
+            )}
+            <AppText weight="bold" style={{ color: Colors.light.primary }}>
+              Zero
+            </AppText>{" "}
+            para llegar a tu mejor versión.
+          </AppText>
 
-              <View style={styles.featureContainer}>
+          <View style={styles.featureContainer}>
+            <FeatureItem icon={Statistics} text={puffsText} />
+            <FeatureItem icon={Target} text={planText} />
+            <FeatureItem icon={Fire} text={whyText} />
+            <FeatureItem icon={Check} text={moneyText} />
+          </View>
 
-                <FeatureItem icon={Statistics} text={puffsText}/> 
-                <FeatureItem icon={Target} text={planText} /> 
-                <FeatureItem icon={Fire} text={whyText} /> 
-                <FeatureItem icon={Check} text={moneyText} /> 
-            </View>
-
-
-            <View style={styles.featureContainer}>
-                <SubscriptionOption
-                  title="Acceso semanal"
-                  subtitle="3 días de prueba gratis"
-                  price={formattedWeeklyPrice}  // Dynamic now
-                  strikePrice={true}
-                  highlight="Mejor oferta"
-                  badge="GRATIS"
-                  selected={plan === "weekly"}
-                  onPress={() => setPlan("weekly")}
-                />
-
-                <SubscriptionOption
-                  title="Acceso anual"
-                  subtitle="3 días de prueba gratis"
-                  price={formattedYearlyPrice}  // Dynamic now
-                  strikePrice={false}
-                  badge="Ahorra 90%"
-                  selected={plan === "yearly"}
-                  onPress={() => setPlan("yearly")}
-                />
-            </View>
-
-            <ContinueButton
-              text="Continuar"
-              onPress={grantAccess}
-              style={layout.bottomButtonContainer}
+          <View style={styles.featureContainer}>
+            <SubscriptionOption
+              title="Acceso semanal"
+              subtitle="3 días de prueba gratis"
+              price={formattedWeeklyPrice} // Dynamic now
+              strikePrice={true}
+              highlight="Mejor oferta"
+              badge="GRATIS"
+              selected={plan === "weekly"}
+              onPress={() => setPlan("weekly")}
             />
 
-            {/* 🔧 DEV: Skip paywall button - visible when BYPASS_PAYWALL = false but still in dev */}
-            {__DEV__ && !BYPASS_PAYWALL && (
-              <TouchableOpacity
-                style={styles.devSkipButton}
-                onPress={grantAccess}
-                activeOpacity={0.7}
-              >
-                <AppText weight="bold" style={styles.devSkipText}>
-                  🔧 SKIP PAYWALL (DEV)
-                </AppText>
-              </TouchableOpacity>
-            )}
-              
-          </View> 
-        
-                
+            <SubscriptionOption
+              title="Acceso anual"
+              subtitle="3 días de prueba gratis"
+              price={formattedYearlyPrice} // Dynamic now
+              strikePrice={false}
+              badge="Ahorra 90%"
+              selected={plan === "yearly"}
+              onPress={() => setPlan("yearly")}
+            />
+          </View>
+
+          <ContinueButton
+            text="Continuar"
+            onPress={grantAccess}
+            style={layout.bottomButtonContainer}
+          />
+
+          {/* 🔧 DEV: Skip paywall button - visible when BYPASS_PAYWALL = false but still in dev */}
+          {__DEV__ && !BYPASS_PAYWALL && (
+            <TouchableOpacity
+              style={styles.devSkipButton}
+              onPress={grantAccess}
+              activeOpacity={0.7}
+            >
+              <AppText weight="bold" style={styles.devSkipText}>
+                🔧 SKIP PAYWALL (DEV)
+              </AppText>
+            </TouchableOpacity>
+          )}
         </View>
-      </ScreenWrapper>
-    );
+      </View>
+    </ScreenWrapper>
+  );
 }
 
 const styles = StyleSheet.create({
   featureContainer: {
-    marginTop: 25
+    marginTop: 25,
   },
 
   devSkipButton: {
@@ -250,4 +243,4 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 14,
   },
-})
+});

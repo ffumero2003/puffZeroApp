@@ -29,11 +29,11 @@ interface AuthContextProps {
   signUp: (
     email: string,
     password: string,
-    full_name: string,
+    full_name: string
   ) => Promise<{ data: any; error: any }>;
   signIn: (
     email: string,
-    password: string,
+    password: string
   ) => Promise<{ data: any; error: any }>;
   signOut: () => Promise<void>;
 }
@@ -87,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // setAuthInProgress(false);
           // setAuthFlow(null);
         }
-      },
+      }
     );
 
     return () => subscription.subscription.unsubscribe();

@@ -6,8 +6,9 @@ import { sendVerificationEmail } from "@/src/services/auth-services";
 import {
   areNotificationsEnabled,
 } from "@/src/services/notifications/notification-service";
-import { scheduleVerificationReminder } from "@/src/services/notifications/verification-notification";
+import { scheduleVerificationReminders } from "@/src/services/notifications/verification-notification";
 import { sendWelcomeNotification } from "@/src/services/notifications/welcome-notification";
+import { storePendingAccountVerification } from "@/src/services/verification/verification-service";
 import { Alert } from "react-native";
 
 type RegisterPayload = {
@@ -83,12 +84,6 @@ export function useRegisterViewModel() {
 
 
 
-    // 📧 Send verification email
-    const { error: emailError } = await sendVerificationEmail(email);
-    if (emailError) {
-      console.error("❌ Error sending verification email:", emailError);
-      // Don't block registration, just warn
-    }
 
     // Alert.alert(
     //   "Verificá tu cuenta",
@@ -103,9 +98,19 @@ export function useRegisterViewModel() {
     //   [{ text: "OK" }]
     // );
 
-    // ⏰ Schedule verification reminder for 1.5 days
+    // 📧 Send verification email
+    const { error: accountVerificationError } = await sendVerificationEmail(email);
+    if (accountVerificationError) {
+      console.error("❌ Error sending account verification email:", accountVerificationError);
+      // Don't block registration, just warn
+    }
+    
+    // 📝 Store pending account verification
+    await storePendingAccountVerification(email);
+
+    // ⏰ Schedule verification reminders for day 3 and day 5
     if (notificationsEnabled) {
-      await scheduleVerificationReminder();
+      await scheduleVerificationReminders("account");
     }
 
 return true;
