@@ -7,9 +7,9 @@ import OnboardingOptionCard from "@/src/components/onboarding/OnboardingOptionCa
 import TitleBlock from "@/src/components/onboarding/TitleBlock";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { layout } from "@/src/styles/layout";
-import { router } from "expo-router";
-
 import { useGoalViewModel } from "@/src/viewmodels/onboarding/useGoalViewModel";
+import * as Haptics from "expo-haptics";
+import { router } from "expo-router";
 
 const GOAL_OPTIONS = [
   {
@@ -23,7 +23,6 @@ const GOAL_OPTIONS = [
     text: "Quiero dejar el vape definitivamente y no volver a depender de él",
   },
 ];
-
 
 export default function OnboardingGoal() {
   const [selected, setSelected] = useState<string | null>(null);
@@ -58,7 +57,10 @@ export default function OnboardingGoal() {
                 title={opt.badge}
                 description={opt.text}
                 selected={selected === opt.id}
-                onPress={() => setSelected(opt.id)}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setSelected(opt.id);
+                }}
               />
             ))}
           </View>

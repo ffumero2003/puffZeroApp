@@ -9,6 +9,7 @@ import { layout } from "@/src/styles/layout";
 
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { useMotivationViewModel } from "@/src/viewmodels/onboarding/useMotivationViewModel";
+import * as Haptics from "expo-haptics";
 
 const MOTIVATION_OPTIONS = [
   { id: "salud", title: "Salud ❤️" },
@@ -50,7 +51,10 @@ export default function OnboardingMotivation() {
             <OnboardingWhiteButton
               key={opt.id}
               title={opt.title}
-              onPress={() => handleSelect(opt.id)}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                handleSelect(opt.id);
+              }}
             />
           ))}
         </ScrollView>

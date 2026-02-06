@@ -5,6 +5,7 @@
 import AppText from "@/src/components/AppText";
 import { Colors } from "@/src/constants/theme";
 import { QUICK_ACTION_PROMPTS } from "@/src/services/zuffy-ai-service";
+import * as Haptics from "expo-haptics";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
@@ -18,7 +19,7 @@ type Props = {
 const QUICK_ACTIONS = [
   {
     id: "howToFeel",
-    label: "¿Cómo debería sentirme?",
+    label: "¿Cómo debo sentirme?",
     emoji: "🌟",
     prompt: QUICK_ACTION_PROMPTS.howToFeel,
   },
@@ -48,7 +49,10 @@ export default function ZuffyQuickActions({ onActionPress, disabled }: Props) {
             pressed && styles.chipPressed,
             disabled && styles.chipDisabled,
           ]}
-          onPress={() => onActionPress(action.prompt)}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            onActionPress(action.prompt);
+          }}
           disabled={disabled}
         >
           {/* numberOfLines={1} prevents text from wrapping to multiple lines */}
@@ -79,7 +83,7 @@ const styles = StyleSheet.create({
   },
   chip: {
     backgroundColor: Colors.light.secondary,
-    paddingHorizontal: 4,
+    paddingHorizontal: 6,
     paddingVertical: 8,
     borderRadius: 20,
     // Subtle border for definition
@@ -87,7 +91,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.light.border,
   },
   chipHalf: {
-    width: "48%",
+    width: "49%",
     // No flexWrap needed here - that's for containers, not items
   },
 
@@ -107,7 +111,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   chipText: {
-    fontSize: 12,
+    fontSize: 13,
     color: Colors.light.text,
     textAlign: "center",
   },

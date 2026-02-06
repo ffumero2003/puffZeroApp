@@ -9,6 +9,7 @@ import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
 import { layout } from "@/src/styles/layout";
 import { useSpeedPlanViewModel } from "@/src/viewmodels/onboarding/useSpeedPlanViewModel";
+import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 
 const OPTIONS = [
@@ -20,7 +21,8 @@ const OPTIONS = [
   {
     id: "21",
     title: "21 DÍAS — NUEVO HÁBITO  💪",
-    description: "Ideal para empezar a cambiar tu relación con el vape paso a paso.",
+    description:
+      "Ideal para empezar a cambiar tu relación con el vape paso a paso.",
   },
   {
     id: "30",
@@ -44,11 +46,11 @@ export default function OnboardingSpeedPlan() {
   const { submitSpeed } = useSpeedPlanViewModel();
 
   const handleContinue = (speed: string) => {
-  const ok = submitSpeed(speed);
-  if (ok) {
-    router.push(ROUTES.ONBOARDING_MOTIVATION);
-  }
-};
+    const ok = submitSpeed(speed);
+    if (ok) {
+      router.push(ROUTES.ONBOARDING_MOTIVATION);
+    }
+  };
 
   return (
     <ScreenWrapper>
@@ -74,7 +76,10 @@ export default function OnboardingSpeedPlan() {
                 title={opt.title}
                 description={opt.description}
                 selected={selected === opt.id}
-                onPress={() => setSelected(opt.id)}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setSelected(opt.id);
+                }}
               />
             ))}
           </ScrollView>

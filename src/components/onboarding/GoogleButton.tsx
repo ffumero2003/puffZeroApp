@@ -13,6 +13,7 @@ import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { areNotificationsEnabled } from "@/src/services/notifications/notification-service";
 import { sendWelcomeBackNotification } from "@/src/services/notifications/welcome-back-notification";
 import { components } from "@/src/styles/components";
+import * as Haptics from "expo-haptics";
 
 type GoogleButtonProps = {
   mode: "login" | "register";
@@ -144,7 +145,10 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
       style={components.googleBtn}
       activeOpacity={0.7}
       disabled={authInProgress}
-      onPress={signInWithGoogle}
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        signInWithGoogle();
+      }}
     >
       {authInProgress ? (
         <ActivityIndicator color="#fff" />

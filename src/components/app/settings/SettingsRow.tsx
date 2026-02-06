@@ -11,6 +11,7 @@ interface SettingsRowProps {
   onPress?: () => void;
   showChevron?: boolean;
   rightElement?: React.ReactNode; // For custom elements like Switch
+  isLast?: boolean;
 }
 
 export default function SettingsRow({
@@ -19,11 +20,16 @@ export default function SettingsRow({
   onPress,
   showChevron = true,
   rightElement,
+  isLast = false,
 }: SettingsRowProps) {
   const Container = onPress ? TouchableOpacity : View;
 
   return (
-    <Container style={styles.row} onPress={onPress} activeOpacity={0.6}>
+    <Container
+      style={[styles.row, isLast && { borderBottomWidth: 0 }]}
+      onPress={onPress}
+      activeOpacity={0.6}
+    >
       <AppText style={styles.label}>{label}</AppText>
 
       {/* Right side: either custom element or value with chevron */}

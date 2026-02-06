@@ -134,6 +134,7 @@ export default function Settings() {
                 thumbColor="#fff"
               />
             }
+            isLast={true}
           />
         </SettingsSection>
 
@@ -147,7 +148,12 @@ export default function Settings() {
             label="Términos y Condiciones"
             onPress={() => router.push("/terms-of-use")}
           />
-          <SettingsRow label="Versión" value="1.0.0" showChevron={false} />
+          <SettingsRow
+            label="Versión"
+            value="1.0.0"
+            showChevron={false}
+            isLast={true}
+          />
         </SettingsSection>
 
         {/* Action Buttons */}

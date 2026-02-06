@@ -240,6 +240,7 @@ export default function Home() {
               year: "numeric",
             })}
             puffs={selectedDay.puffs}
+            dailyGoal={dailyGoal} // <-- ADD THIS LINE
             onClose={() => setSelectedDay(null)}
           />
         )}

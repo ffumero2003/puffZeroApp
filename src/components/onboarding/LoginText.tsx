@@ -2,8 +2,8 @@
 import AppText from "@/src/components/AppText";
 import { ROUTES } from "@/src/constants/routes";
 import { components } from "@/src/styles/components";
+import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-
 export default function LoginText() {
   return (
     <AppText style={components.footer}>
@@ -11,7 +11,10 @@ export default function LoginText() {
       <AppText
         weight="extrabold"
         style={components.link}
-        onPress={() => router.push(ROUTES.LOGIN)}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          router.push(ROUTES.LOGIN);
+        }}
       >
         Ingresar
       </AppText>

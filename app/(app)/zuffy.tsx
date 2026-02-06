@@ -6,6 +6,7 @@ import ZuffyChatBubble from "@/src/components/app/zuffy/ZuffyChatBubble";
 import ZuffyChatInput from "@/src/components/app/zuffy/ZuffyChatInput";
 import ZuffyHeader from "@/src/components/app/zuffy/ZuffyHeader";
 import ZuffyQuickActions from "@/src/components/app/zuffy/ZuffyQuickActions";
+import ZuffyTypingIndicator from "@/src/components/app/zuffy/ZuffyTypingIndicator";
 import AppText from "@/src/components/AppText";
 import { Colors } from "@/src/constants/theme";
 import { useZuffyViewModel } from "@/src/viewmodels/app/useZuffyViewModel";
@@ -108,13 +109,8 @@ export default function Zuffy() {
               ))}
 
               {/* Typing indicator when Zuffy is thinking */}
-              {isLoading && (
-                <View style={styles.typingIndicator}>
-                  <AppText style={styles.typingText}>
-                    Zuffy está escribiendo...
-                  </AppText>
-                </View>
-              )}
+              {/* Animated three-dot typing indicator when Zuffy is thinking */}
+              {isLoading && <ZuffyTypingIndicator />}
             </Pressable>
           )}
         </ScrollView>
@@ -162,14 +158,5 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: Colors.light.primary,
     textAlign: "center",
-  },
-  typingIndicator: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-  },
-  typingText: {
-    fontSize: 14,
-    color: Colors.light.textMuted,
-    fontStyle: "italic",
   },
 });

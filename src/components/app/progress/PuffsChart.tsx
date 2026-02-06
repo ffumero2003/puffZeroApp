@@ -37,12 +37,10 @@ export default function PuffsChart({
   // Limit labels for readability
   const maxLabels = 6;
   const labelStep = Math.max(1, Math.ceil(data.length / maxLabels));
-  
-  const labels = data.map((d, i) => 
-    i % labelStep === 0 ? String(d.x) : ""
-  );
-  
-  const values = data.map(d => d.y);
+
+  const labels = data.map((d, i) => (i % labelStep === 0 ? String(d.x) : ""));
+
+  const values = data.map((d) => d.y);
 
   // If no data, show placeholder
   if (daysSinceStart < 7) {
@@ -82,10 +80,8 @@ export default function PuffsChart({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        
-        
         <View style={styles.rangeSelector}>
-          {ranges.map(range => (
+          {ranges.map((range) => (
             <TouchableOpacity
               key={range.key}
               style={[
@@ -127,7 +123,7 @@ export default function PuffsChart({
               },
             ],
           }}
-          width={screenWidth - 60}
+          width={screenWidth - 50}
           height={200}
           chartConfig={chartConfig}
           bezier
@@ -142,11 +138,21 @@ export default function PuffsChart({
 
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: Colors.light.primary }]} />
+          <View
+            style={[
+              styles.legendDot,
+              { backgroundColor: Colors.light.primary },
+            ]}
+          />
           <AppText style={styles.legendText}>Consumo real</AppText>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendLine, { backgroundColor: Colors.light.danger }]} />
+          <View
+            style={[
+              styles.legendLine,
+              { backgroundColor: Colors.light.danger },
+            ]}
+          />
           <AppText style={styles.legendText}>Meta diaria ({dailyGoal})</AppText>
         </View>
       </View>
@@ -159,6 +165,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
     borderRadius: 16,
     padding: 16,
+    marginHorizontal: 10,
+    borderWidth: 2,
+    borderColor: Colors.light.secondary,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -183,7 +192,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.secondary,
     borderRadius: 8,
     padding: 2,
-    
   },
   rangeButton: {
     paddingHorizontal: 12,
@@ -213,7 +221,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.light.secondary,
     borderRadius: 12,
-    
   },
   emptyText: {
     color: Colors.light.text,

@@ -1,5 +1,10 @@
 import { router } from "expo-router";
-import { Keyboard, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import {
+  Keyboard,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 
 import AppText from "@/src/components/AppText";
 import AuthHeader from "@/src/components/auth/AuthHeader";
@@ -8,9 +13,9 @@ import GoogleButton from "@/src/components/onboarding/GoogleButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import SeparatorRow from "@/src/components/onboarding/SeparatorRow";
 import UnderlineInput from "@/src/components/onboarding/UnderlineInput";
-
 import { layout } from "@/src/styles/layout";
 import { useLoginViewModel } from "@/src/viewmodels/auth/useLoginViewModel";
+import * as Haptics from "expo-haptics";
 
 import { ROUTES } from "@/src/constants/routes";
 
@@ -33,7 +38,7 @@ export default function Login() {
       router.replace(ROUTES.HOME);
     }
   };
- 
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={layout.containerAuth}>
@@ -73,7 +78,10 @@ export default function Login() {
 
         {/* Forgot password */}
         <TouchableOpacity
-          onPress={() => router.push("/(auth)/forgot-password")}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push("/(auth)/forgot-password");
+          }}
           style={layout.forgotContainer}
         >
           <AppText weight="bold" style={layout.forgotLink}>
@@ -97,7 +105,10 @@ export default function Login() {
             <AppText
               weight="bold"
               style={layout.linkLogin}
-              onPress={() => router.push("/privacy-policy")}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push("/privacy-policy");
+              }}
             >
               Política de Privacidad
             </AppText>{" "}
@@ -105,7 +116,10 @@ export default function Login() {
             <AppText
               weight="bold"
               style={layout.linkLogin}
-              onPress={() => router.push("/terms-of-use")}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push("/terms-of-use");
+              }}
             >
               Términos de Uso
             </AppText>

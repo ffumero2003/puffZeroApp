@@ -1,14 +1,21 @@
 import BackArrow from "@/assets/images/icons/back.png";
 import { Colors } from "@/src/constants/theme";
 import { components } from "@/src/styles/components";
+import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { useEffect, useRef } from "react";
-import { Animated, Image, TouchableOpacity, View, ViewStyle } from "react-native";
+import {
+  Animated,
+  Image,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from "react-native";
 
 interface Props {
-  step?: number;        // opcional para login
-  total?: number;       // opcional para login
-  showBack?: boolean;   // mostrar botón back
+  step?: number; // opcional para login
+  total?: number; // opcional para login
+  showBack?: boolean; // mostrar botón back
   showProgress?: boolean; // mostrar u ocultar progress bar
   style?: ViewStyle;
 }
@@ -18,7 +25,7 @@ export default function OnboardingHeader({
   total = 1,
   showBack = true,
   showProgress = true,
-  style
+  style,
 }: Props) {
   const progress = useRef(new Animated.Value(0)).current;
 
@@ -41,9 +48,14 @@ export default function OnboardingHeader({
 
   return (
     <View style={[components.wrapper, style]}>
-      
       {showBack && (
-        <TouchableOpacity onPress={() => router.back()} style={components.backButton}>
+        <TouchableOpacity
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.back();
+          }}
+          style={components.backButton}
+        >
           <Image
             source={BackArrow}
             style={{ width: 30, height: 30, tintColor: Colors.light.text }}
@@ -53,11 +65,11 @@ export default function OnboardingHeader({
 
       {showProgress && (
         <View style={components.progressContainer}>
-          <Animated.View style={[components.progressFill, { width: widthInterpolated }]} />
+          <Animated.View
+            style={[components.progressFill, { width: widthInterpolated }]}
+          />
         </View>
       )}
-
     </View>
   );
 }
-

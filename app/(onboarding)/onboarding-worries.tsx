@@ -11,6 +11,7 @@ import { router } from "expo-router";
 
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { useWorriesViewModel } from "@/src/viewmodels/onboarding/useWorriesViewModel";
+import * as Haptics from "expo-haptics";
 
 const CONCERNS = [
   { id: "ansiedad", title: "Ansiedad 🧊" },
@@ -62,7 +63,10 @@ export default function OnboardingWorries() {
                 key={item.id}
                 title={item.title}
                 selected={selected.includes(item.id)}
-                onPress={() => toggleSelect(item.id)}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  toggleSelect(item.id);
+                }}
               />
             ))}
           </ScrollView>
@@ -71,7 +75,10 @@ export default function OnboardingWorries() {
         <ContinueButton
           text="Continuar"
           disabled={selected.length === 0}
-          onPress={() => handleContinue(selected)}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            handleContinue(selected);
+          }}
           style={layout.bottomButtonContainer}
         />
       </View>

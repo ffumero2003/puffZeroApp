@@ -147,7 +147,7 @@ export const layout = StyleSheet.create({
   },
   bigImage: {
     width: "100%",
-    height: 510,
+    height: 450,
   },
 
  
