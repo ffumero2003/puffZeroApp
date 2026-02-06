@@ -1,6 +1,6 @@
 // src/services/notifications/first-puff-free-day-notification.ts
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { areNotificationsEnabled, getNotifications } from "./notification-service";
+import { getNotifications } from "./notification-service";
 
 const FIRST_PUFF_FREE_DAY_SENT_KEY = "first_puff_free_day_notification_sent";
 const TODAY_PUFFS_KEY = "todayPuffs";
@@ -63,8 +63,7 @@ export async function checkAndSendFirstPuffFreeDayNotification(): Promise<void> 
   const Notif = await getNotifications();
   if (!Notif) return;
 
-  const enabled = await areNotificationsEnabled();
-  if (!enabled) return;
+
 
   try {
     // Check if already sent
@@ -124,9 +123,7 @@ export async function scheduleEndOfDayPuffFreeCheck(): Promise<void> {
   const Notif = await getNotifications();
   if (!Notif) return;
 
-  const enabled = await areNotificationsEnabled();
-  if (!enabled) return;
-
+  
   await cancelEndOfDayPuffFreeCheck();
 
   try {
@@ -183,8 +180,7 @@ export async function checkCurrentDayAndNotify(): Promise<void> {
   const Notif = await getNotifications();
   if (!Notif) return;
 
-  const enabled = await areNotificationsEnabled();
-  if (!enabled) return;
+ 
 
   try {
     const alreadySent = await wasFirstPuffFreeDaySent();

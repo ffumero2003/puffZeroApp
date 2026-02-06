@@ -1,6 +1,6 @@
 // src/services/notifications/daily-achievement-notification.ts
 import { supabase } from "../../lib/supabase";
-import { getNotifications } from "./notification-service";
+import { areNotificationsEnabled, getNotifications } from "./notification-service";
 
 const TODAY_PUFFS_KEY = "todayPuffs";
 
@@ -47,6 +47,13 @@ function getAchievementMessage(todayPuffs: number, dailyGoal: number): { title: 
  * Fetches the user's daily goal (puffs_per_day) from their profile
  */
 export async function scheduleDailyAchievementCheck(): Promise<void> {  // REMOVE dailyGoal parameter
+  // Check if user has daily reminders enabled
+  const enabled = await areNotificationsEnabled();
+  if (!enabled) {
+    console.log("⏭️ Daily achievement skipped - notifications disabled");
+    return;
+  }
+
   const Notif = await getNotifications();
   if (!Notif) return;
 

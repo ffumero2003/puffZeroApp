@@ -17,7 +17,6 @@ import { useEffect, useState } from "react";
 
 // Keys for AsyncStorage
 const NOTIFICATIONS_ENABLED_KEY = "notifications_enabled";
-const REMINDER_HOUR_KEY = "reminder_hour";
 
 // ============================================
 // Validation constants
@@ -55,7 +54,6 @@ export function useSettingsViewModel() {
   const [email, setEmail] = useState<string>("");
   const [puffsPerDay, setPuffsPerDay] = useState<number>(0);
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(true);
-  const [reminderHour, setReminderHour] = useState<number>(8); // Default 8 AM
 
   // Read-only fields (loaded from profile)
   const [currency, setCurrency] = useState<string>("CRC");
@@ -99,24 +97,14 @@ export function useSettingsViewModel() {
   // Load notification settings from AsyncStorage
   async function loadAsyncSettings() {
     try {
-      const [notifEnabled, savedHour] = await Promise.all([
-        AsyncStorage.getItem(NOTIFICATIONS_ENABLED_KEY),
-        AsyncStorage.getItem(REMINDER_HOUR_KEY),
-      ]);
+      const notifEnabled = await AsyncStorage.getItem(NOTIFICATIONS_ENABLED_KEY);
 
-      // console.log("📱 Loaded from AsyncStorage:", { notifEnabled, savedHour });
+
 
       // Default to true if not set
       setNotificationsEnabled(notifEnabled !== "false");
 
-      // Load saved hour or default to 8
-      if (savedHour) {
-        const parsedHour = parseInt(savedHour, 10);
-        if (!isNaN(parsedHour)) {
-          setReminderHour(parsedHour);
-          console.log("⏰ Reminder hour loaded:", parsedHour);
-        }
-      }
+      
     } catch (error) {
       console.error("Error loading settings from AsyncStorage:", error);
     } finally {
@@ -242,37 +230,20 @@ async function saveEmail(newEmail: string): Promise<{ success: boolean; error?: 
     }
   }
 
-  // Save reminder hour (AsyncStorage)
-  async function saveReminderHour(hour: number) {
-    setReminderHour(hour);
-
-    try {
-      await AsyncStorage.setItem(REMINDER_HOUR_KEY, hour.toString());
-      console.log("✅ Reminder hour saved:", hour);
-
-      // TODO: Reschedule the daily notification with new hour
-    } catch (error) {
-      console.error("❌ Error saving reminder hour:", error);
-    }
-  }
+  
 
   // ============================================
   // Helpers
   // ============================================
 
-  // Format hour for display (e.g., "8:00 AM")
-  function formatHour(hour: number): string {
-    const period = hour >= 12 ? "PM" : "AM";
-    const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-    return `${displayHour}:00 ${period}`;
-  }
+
 
   return {
     // Editable state
     email,
     puffsPerDay,
     notificationsEnabled,
-    reminderHour,
+  
 
     // Read-only state
     currency,
@@ -288,7 +259,7 @@ async function saveEmail(newEmail: string): Promise<{ success: boolean; error?: 
     saveEmail,
     savePuffsPerDay,
     toggleNotifications,
-    saveReminderHour,
+ 
 
     // Validation
     isValidPuffs,
@@ -299,6 +270,5 @@ async function saveEmail(newEmail: string): Promise<{ success: boolean; error?: 
     getFormattedMoney,
     getGoalLabel,
     getWhyStoppedLabel,
-    formatHour,
   };
 }

@@ -1,7 +1,7 @@
 // src/services/notifications/money-saved-milestone-notification.ts
 import { CRC_EXCHANGE_RATES, CURRENCY_SYMBOLS } from "@/src/constants/currency";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { areNotificationsEnabled, getNotifications } from "./notification-service";
+import { getNotifications } from "./notification-service";
 
 const MONEY_MILESTONE_KEY = "money_milestone_achieved";
 
@@ -111,9 +111,6 @@ export async function checkAndSendMoneySavedMilestone(
 ): Promise<void> {
   const Notif = await getNotifications();
   if (!Notif) return;
-
-  const enabled = await areNotificationsEnabled();
-  if (!enabled) return;
 
   try {
     const milestone = await getNextMilestoneToNotify(currentSaved, currencyCode);

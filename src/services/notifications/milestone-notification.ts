@@ -1,6 +1,6 @@
 // src/services/notifications/milestone-notification.ts
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { areNotificationsEnabled, getNotifications } from "./notification-service";
+import { getNotifications } from "./notification-service";
 
 
 const MILESTONE_NOTIFICATION_KEY = "milestone_notification_sent";
@@ -75,9 +75,7 @@ export async function checkandSendMilestoneNotification(
   const Notif = await getNotifications();
   if(!Notif) return;
 
-  // Check if notifications are enabled
-  const enabled = await areNotificationsEnabled();
-  if (!enabled) return;
+ 
 
   // calculate percentage
   const now = new Date();

@@ -1,6 +1,6 @@
 // src/services/notifications/inactivity-notification.ts
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { areNotificationsEnabled, getNotifications } from "./notification-service";
+import { getNotifications } from "./notification-service";
 
 const LAST_ACTIVITY_KEY = "last_activity_timestamp";
 const INACTIVITY_NOTIFICATIONS_SENT_KEY = "inactivity_notifications_sent";
@@ -57,8 +57,6 @@ export async function scheduleInactivityNotifications(): Promise<void> {
   const Notif = await getNotifications();
   if (!Notif) return;
 
-  const enabled = await areNotificationsEnabled();
-  if (!enabled) return;
 
   await cancelInactivityNotifications();
 

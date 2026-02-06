@@ -2,7 +2,7 @@
 import { CURRENCY_SYMBOLS } from "@/src/constants/currency";
 import { supabase } from "@/src/lib/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { areNotificationsEnabled, getNotifications } from "./notification-service";
+import { getNotifications } from "./notification-service";
 
 const PROFILE_CREATED_KEY = "profile_created_at";
 
@@ -112,8 +112,7 @@ export async function scheduleWeeklySummaryNotification(): Promise<void> {
   const Notif = await getNotifications();
   if (!Notif) return;
 
-  const enabled = await areNotificationsEnabled();
-  if (!enabled) return;
+  
 
   await cancelWeeklySummaryNotification();
 

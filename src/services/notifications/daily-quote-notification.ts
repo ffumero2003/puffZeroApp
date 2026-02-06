@@ -1,6 +1,6 @@
 // src/services/notifications/daily-quote-notification.ts
 import { supabase } from "@/src/lib/supabase"; // To fetch quote from generate-quote edge function
-import { getNotifications } from "./notification-service";
+import { areNotificationsEnabled, getNotifications } from "./notification-service";
 
 // ============================================
 // CURRENT: Sends notification immediately (for testing)
@@ -10,6 +10,13 @@ export async function sendDailyQuoteNotification(quote: string): Promise<void> {
 }
 
 export async function scheduleDailyQuoteNotification(): Promise<void> {
+  // Check if user has daily reminders enabled
+  const enabled = await areNotificationsEnabled();
+  if (!enabled) {
+    console.log("⏭️ Daily reminder skipped - notifications disabled");
+    return;
+  }
+
   const Notif = await getNotifications();
   if (!Notif) return;
 

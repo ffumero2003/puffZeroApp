@@ -1,5 +1,5 @@
 // src/services/notifications/daily-reminder-notification.ts
-import { getNotifications } from "./notification-service";
+import { areNotificationsEnabled, getNotifications } from "./notification-service";
 
 // ============================================
 // Message variations for daily reminder
@@ -40,6 +40,13 @@ function getRandomReminderMessage(): { title: string; body: string } {
  * Picks a random message from the variations
  */
 export async function scheduleDailyLocalReminder(): Promise<void> {
+  // Check if user has daily reminders enabled
+  const enabled = await areNotificationsEnabled();
+  if (!enabled) {
+    console.log("⏭️ Daily reminder skipped - notifications disabled");
+    return;
+  }
+
   const Notif = await getNotifications();
   if (!Notif) return;
 

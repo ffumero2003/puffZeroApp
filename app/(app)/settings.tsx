@@ -3,7 +3,6 @@
 
 import EmailInputModal from "@/src/components/app/settings/EmailInputModal";
 import InputModal from "@/src/components/app/settings/InputModal";
-import PickerModal from "@/src/components/app/settings/PickerModal";
 import SettingsActions from "@/src/components/app/settings/SettingsActions";
 import SettingsHeader from "@/src/components/app/settings/SettingsHeader";
 import SettingsRow from "@/src/components/app/settings/SettingsRow";
@@ -29,7 +28,6 @@ export default function Settings() {
 
   // Modal visibility states
   const [showEmailModal, setShowEmailModal] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
   const [showPuffsModal, setShowPuffsModal] = useState(false);
 
   // ============================================
@@ -71,14 +69,6 @@ export default function Settings() {
       </View>
     );
   }
-
-  // ============================================
-  // Generate time picker options (6 AM - 10 PM)
-  // ============================================
-  const timeOptions = Array.from({ length: 17 }, (_, i) => ({
-    label: vm.formatHour(i + 6),
-    value: i + 6,
-  }));
 
   // ============================================
   // Render
@@ -145,13 +135,6 @@ export default function Settings() {
               />
             }
           />
-          {vm.notificationsEnabled && (
-            <SettingsRow
-              label="Hora del Recordatorio"
-              value={vm.formatHour(vm.reminderHour)}
-              onPress={() => setShowTimePicker(true)}
-            />
-          )}
         </SettingsSection>
 
         {/* About Section */}
@@ -184,16 +167,6 @@ export default function Settings() {
         onClose={() => setShowEmailModal(false)}
         onSave={vm.saveEmail}
         initialValue={vm.email}
-      />
-
-      {/* Time Picker */}
-      <PickerModal
-        visible={showTimePicker}
-        onClose={() => setShowTimePicker(false)}
-        title="Hora del Recordatorio"
-        options={timeOptions}
-        selectedValue={vm.reminderHour}
-        onValueChange={vm.saveReminderHour}
       />
 
       {/* Puffs Input - with validation */}
