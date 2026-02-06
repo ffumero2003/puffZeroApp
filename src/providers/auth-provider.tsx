@@ -80,6 +80,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       (event, session) => {
         console.log("🔐 Auth event:", event);
 
+        // Don't update user/session state for PASSWORD_RECOVERY events
+        // The reset-password screen handles this flow independently
+        if (event === "PASSWORD_RECOVERY") {
+          return;
+        }
+
         setSession(session);
         setUser(session?.user ?? null);
 

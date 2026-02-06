@@ -10,7 +10,13 @@ import {
 import { layout } from "@/src/styles/layout";
 import { useResetPasswordViewModel } from "@/src/viewmodels/auth/useResetPasswordViewModel";
 import { useState } from "react";
-import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View } from "react-native";
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ROUTES } from "@/src/constants/routes";
@@ -19,30 +25,20 @@ import { router } from "expo-router";
 export default function ResetPasswordScreen() {
   const [passwordError, setPasswordError] = useState("");
   const [confirmError, setConfirmError] = useState("");
-  const {
-    password,
-    confirm,
-    loading,
-    setPassword,
-    setConfirm,
-    submit,
-  } = useResetPasswordViewModel();
+  const { password, confirm, loading, setPassword, setConfirm, submit, ready } =
+    useResetPasswordViewModel();
   const canSubmit =
-  password.length > 0 &&
-  confirm.length > 0 &&
-  password === confirm &&
-  !loading;
-
+    password.length > 0 &&
+    confirm.length > 0 &&
+    password === confirm &&
+    !loading;
 
   const handleSubmit = async () => {
     const ok = await submit();
     if (ok) {
-      router.replace(ROUTES.LOGIN); 
+      router.replace(ROUTES.LOGIN);
     }
   };
-
-  
-
 
   const onPasswordChange = (value: string) => {
     setPassword(value);
@@ -58,10 +54,26 @@ export default function ResetPasswordScreen() {
     setConfirmError(validateConfirmPassword(password, value));
   };
 
+  // Don't render the form until tokens are validated
+  // This prevents a flash of the reset screen on app reload
+  if (!ready) {
+    return (
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: Colors.light.background }}
+        edges={["top"]}
+      />
+    );
+  }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light.background }} edges={["top"]}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: Colors.light.background }}
+      edges={["top"]}
+    >
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={layout.screenContainer}>
             <View>
@@ -85,13 +97,11 @@ export default function ResetPasswordScreen() {
                 secureTextEntry
               />
 
-
               {passwordError && (
                 <AppText style={layout.errorText} weight="extrabold">
                   {passwordError}
                 </AppText>
               )}
-
 
               <UnderlineInput
                 placeholder="Confirmar contraseña"
@@ -105,8 +115,6 @@ export default function ResetPasswordScreen() {
                   {confirmError}
                 </AppText>
               )}
-
-
             </View>
 
             <ContinueButton
@@ -115,7 +123,6 @@ export default function ResetPasswordScreen() {
               disabled={!canSubmit}
               style={layout.bottomButtonContainer}
             />
-
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>

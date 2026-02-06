@@ -20,24 +20,7 @@ export function useAuthGuard() {
 
     // 🔧 DEV MODE: Navegar directamente a la pantalla configurada
     const devRoute = getInitialRoute();
-    // #region agent log
-    fetch("http://127.0.0.1:7242/ingest/0fd0a7db-6453-4c6c-82b9-a41e6e00598d", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        location: "AuthGuard.tsx:devMode",
-        message: "Dev mode check",
-        data: {
-          devRoute,
-          lastDevRoute: lastDevRoute.current,
-          willNavigate: devRoute && lastDevRoute.current !== devRoute,
-        },
-        timestamp: Date.now(),
-        sessionId: "debug-session",
-        hypothesisId: "H4",
-      }),
-    }).catch(() => {});
-    // #endregion
+
     if (devRoute) {
       // Only navigate if we haven't navigated to THIS specific route yet
       if (lastDevRoute.current !== devRoute) {
@@ -68,46 +51,6 @@ export function useAuthGuard() {
       "verify-required",
     ];
     const isPublicRoute = publicRoutes.includes(segments[0]);
-
-    // #region agent log
-    fetch("http://127.0.0.1:7242/ingest/0fd0a7db-6453-4c6c-82b9-a41e6e00598d", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        location: "AuthGuard.tsx:publicRouteCheck",
-        message: "Checking public route",
-        data: {
-          segments: segments,
-          isPublicRoute,
-          currentSegment: segments[0],
-        },
-        timestamp: Date.now(),
-        sessionId: "debug-session",
-        hypothesisId: "H3",
-      }),
-    }).catch(() => {});
-    // #endregion
-
-    if (isPublicRoute) {
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7242/ingest/0fd0a7db-6453-4c6c-82b9-a41e6e00598d",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            location: "AuthGuard.tsx:publicRouteAllowed",
-            message: "Public route - allowing passage",
-            data: { route: segments[0] },
-            timestamp: Date.now(),
-            sessionId: "debug-session",
-            hypothesisId: "H3",
-          }),
-        },
-      ).catch(() => {});
-      // #endregion
-      return; // ← Dejar pasar privacy-policy, terms-of-use, reset-password, verify-email
-    }
 
     // ════════════════════════════════════════════════════════
     // 📧 EMAIL VERIFICATION - GRACE PERIOD (3 días)

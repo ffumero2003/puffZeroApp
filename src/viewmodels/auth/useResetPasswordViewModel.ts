@@ -10,6 +10,7 @@ export function useResetPasswordViewModel() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
+  const [ready, setReady] = useState(false); 
 
   const params = useLocalSearchParams();
   const didInit = useRef(false);
@@ -47,6 +48,7 @@ export function useResetPasswordViewModel() {
       return false;
     }
 
+    setReady(true);
     return true;
   }
 
@@ -54,20 +56,14 @@ export function useResetPasswordViewModel() {
 
 
   useEffect(() => {
-    // #region agent log
-    console.log('🔍 [H1] useEffect triggered', { didInitCurrent: didInit.current, params: JSON.stringify(params) });
-    fetch('http://127.0.0.1:7242/ingest/0fd0a7db-6453-4c6c-82b9-a41e6e00598d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useResetPasswordViewModel.ts:useEffect',message:'useEffect triggered',data:{didInitCurrent:didInit.current,params:JSON.stringify(params)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
-    // #endregion
+  
     if (didInit.current) return;
     didInit.current = true;
 
     const access = params.access_token as string | undefined;
     const refresh = params.refresh_token as string | undefined;
 
-    // #region agent log
-    console.log('🔍 [H1] Token check', { hasAccess: !!access, hasRefresh: !!refresh, isDevMode: isDevMode() });
-    fetch('http://127.0.0.1:7242/ingest/0fd0a7db-6453-4c6c-82b9-a41e6e00598d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useResetPasswordViewModel.ts:useEffect:tokens',message:'Token check',data:{hasAccess:!!access,hasRefresh:!!refresh,isDevMode:isDevMode()},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
-    // #endregion
+   
 
     if (!access || !refresh) {
       if (!isDevMode()) {
@@ -76,10 +72,7 @@ export function useResetPasswordViewModel() {
       return;
     }
 
-    // #region agent log
-    console.log('🔍 [H2] Calling hydrateSessionFromUrl');
-    fetch('http://127.0.0.1:7242/ingest/0fd0a7db-6453-4c6c-82b9-a41e6e00598d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useResetPasswordViewModel.ts:useEffect:hydrate',message:'Calling hydrateSessionFromUrl',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
-    // #endregion
+   
 
     hydrateSessionFromUrl(
       `puffzero://reset-password?access_token=${access}&refresh_token=${refresh}`
@@ -108,9 +101,8 @@ export function useResetPasswordViewModel() {
 
     const { error } = await supabase.auth.updateUser({ password });
 
-    setLoading(false);
-
     if (error) {
+      setLoading(false);
       if (
         error.message.toLowerCase().includes("different") ||
         error.message.toLowerCase().includes("old password")
@@ -125,16 +117,23 @@ export function useResetPasswordViewModel() {
       return false;
     }
 
-    // 🔒 SOLO SI TODO SALIÓ BIEN
+    // Mark recovery as used BEFORE signing out
     recoveryUsed.current = true;
 
-    // 🔥 CERRAR SESIÓN DE RECOVERY
+    // Sign out the recovery session and WAIT for it to fully complete
     await supabase.auth.signOut();
 
+    // Also explicitly clear any persisted session from AsyncStorage
+    // This ensures no stale recovery session survives app restart
+    const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
+    await AsyncStorage.removeItem("sb-ifjbatvmxeujewbrfjzg-auth-token");
+
+    setLoading(false);
 
     Alert.alert("Listo", "Tu contraseña fue actualizada.");
     return true;
   }
+
 
 
 
@@ -145,5 +144,6 @@ export function useResetPasswordViewModel() {
     setPassword,
     setConfirm,
     submit,
+    ready,
   };
 }
