@@ -3,7 +3,7 @@
 
 import AppText from "@/src/components/AppText";
 import { Colors } from "@/src/constants/theme";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 
 interface SettingsActionsProps {
   onLogout: () => void;
@@ -14,6 +14,20 @@ export default function SettingsActions({
   onLogout,
   onDeleteAccount,
 }: SettingsActionsProps) {
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Eliminar Cuenta",
+      "¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: onDeleteAccount, // Only calls delete if user confirms
+        },
+      ]
+    );
+  };
   return (
     <View style={styles.container}>
       {/* Logout Button */}
@@ -30,7 +44,7 @@ export default function SettingsActions({
       {/* Delete Account Button */}
       <TouchableOpacity
         style={styles.deleteButton}
-        onPress={onDeleteAccount}
+        onPress={handleDeleteAccount}
         activeOpacity={0.7}
       >
         <AppText weight="bold" style={styles.deleteText}>

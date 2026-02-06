@@ -84,3 +84,31 @@ export async function resendEmailChangeVerification(newEmail: string) {
   return { error: null };
 }
 
+
+// Calls the delete-account edge function to erase all user data + auth account
+export async function deleteAccount(userId: string) {
+  const res = await fetch(
+    "https://ifjbatvmxeujewbrfjzg.supabase.co/functions/v1/delete-account",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // 🔒 SUPABASE EDGE GUARD (OBLIGATORIO)
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        // 🔐 TU PROPIA SEGURIDAD
+        "x-internal-key": INTERNAL_SECRET,
+      },
+      body: JSON.stringify({ user_id: userId }),
+    }
+  );
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    console.log("DELETE ACCOUNT ERROR:", data);
+    return { error: { message: data.error ?? "Error eliminando cuenta" } };
+  }
+
+  return { error: null };
+}
+

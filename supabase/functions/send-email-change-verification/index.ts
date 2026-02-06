@@ -10,7 +10,7 @@ serve(async (req: Request): Promise<Response> => {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  console.log("🔥 Function hit - Email Change Verification");
+  
 
   try {
     const body = await req.json();

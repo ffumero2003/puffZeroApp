@@ -11,6 +11,7 @@ import SettingsSection from "@/src/components/app/settings/SettingsSection";
 import { VerificationStatus } from "@/src/components/app/settings/VerificationStatus";
 import { Colors } from "@/src/constants/theme";
 import { useAuth } from "@/src/providers/auth-provider";
+import { deleteAccount } from "@/src/services/auth-services";
 import { useSettingsViewModel } from "@/src/viewmodels/app/useSettingsViewModel";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -23,7 +24,7 @@ import {
 } from "react-native";
 
 export default function Settings() {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const vm = useSettingsViewModel();
 
   // Modal visibility states
@@ -39,9 +40,25 @@ export default function Settings() {
     router.replace("/(onboarding)/onboarding");
   };
 
-  const handleDeleteAccount = () => {
-    // TODO: Implement account deletion with confirmation
-    console.log("Delete account pressed");
+  const handleDeleteAccount = async () => {
+    try {
+      const userId = user?.id;
+      if (!userId) return;
+
+      // Call edge function to delete all user data + auth account
+      const { error } = await deleteAccount(userId);
+
+      if (error) {
+        console.error("❌ Failed to delete account:", error.message);
+        return;
+      }
+
+      // Sign out locally and go to onboarding
+      await signOut();
+      router.replace("/(onboarding)/onboarding");
+    } catch (error) {
+      console.error("❌ Error deleting account:", error);
+    }
   };
 
   // ============================================
