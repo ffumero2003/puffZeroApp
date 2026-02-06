@@ -5,14 +5,23 @@ import { getInitialRoute, shouldBypassPaywall } from "../config/dev";
 import { useAuth } from "../providers/auth-provider";
 
 export function useAuthGuard() {
-  const { user, initializing, authFlow, authInProgress } = useAuth();
+  const { user, initializing, authFlow, authInProgress, isPremium } = useAuth();
   const segments = useSegments();
   const lastDevRoute = useRef<string | null>(null);
 
-  // 🔥 VARIABLE DE PAYWALL
-  // - shouldBypassPaywall() = BYPASS_PAYWALL en dev.ts (independiente)
-  // - En PROD: TODO conectar con tu sistema de pagos real (RevenueCat, etc.)
-  const hasPremium = shouldBypassPaywall();
+  // ═══════════════════════════════════════════════════════════════
+  // PAYWALL VARIABLE
+  // ═══════════════════════════════════════════════════════════════
+  // - shouldBypassPaywall() reads BYPASS_PAYWALL from dev.ts
+  //   → Set BYPASS_PAYWALL = true in dev.ts to skip paywall while developing
+  //   → Set BYPASS_PAYWALL = false to test the real paywall flow
+  // - isPremium comes from auth-provider (real subscription state)
+  //   → Gets set to true after a successful purchase
+  //   → Gets checked from your payment system on app load
+  // - In PROD (__DEV__ = false): shouldBypassPaywall() is always false,
+  //   so only isPremium matters
+  // ═══════════════════════════════════════════════════════════════
+  const hasPremium = shouldBypassPaywall() || isPremium;
 
   useEffect(() => {
     if (initializing) return;
@@ -22,9 +31,8 @@ export function useAuthGuard() {
     const devRoute = getInitialRoute();
 
     if (devRoute) {
-      // Only navigate if we haven't navigated to THIS specific route yet
       if (lastDevRoute.current !== devRoute) {
-        lastDevRoute.current = devRoute; // ← Remember which route we navigated to
+        lastDevRoute.current = devRoute;
         console.log("🔧 DEV MODE - Navegando a:", devRoute);
         router.replace(devRoute as any);
       }
@@ -35,76 +43,55 @@ export function useAuthGuard() {
     const inAuth = segments[0] === "(auth)";
     const inOnboarding = segments[0] === "(onboarding)";
     const inPaywall = segments[0] === "(paywall)";
-    const inPostSignup = segments[1] === "post-signup"; // 🔥 DETECTAR POST-SIGNUP
+    const inPostSignup = segments[1] === "post-signup";
     const inDev = segments[0] === "(dev)";
 
     // 🔧 DEV MODE: If in (dev) routes, don't interfere
     if (inDev) {
       return;
     }
+
     // 🔓 RUTAS PÚBLICAS (siempre accesibles)
+    // NOTE: verify-required removed — VerificationModal handles email
+    // verification with a 7-day countdown inside the app screens
     const publicRoutes = [
       "privacy-policy",
       "terms-of-use",
       "reset-password",
       "verify-email",
-      "verify-required",
     ];
     const isPublicRoute = publicRoutes.includes(segments[0]);
 
     // ════════════════════════════════════════════════════════
-    // 📧 EMAIL VERIFICATION - GRACE PERIOD (3 días)
-    // ════════════════════════════════════════════════════════
-    const GRACE_PERIOD_DAYS = 3;
-
-    if (user && !user.email_confirmed_at) {
-      // Google users have email_confirmed_at set, so this only affects email/password users
-      const createdAt = new Date(user.created_at);
-      const now = new Date();
-      const daysSinceCreation =
-        (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
-
-      if (daysSinceCreation > GRACE_PERIOD_DAYS) {
-        // Grace period expired - must verify
-        if (segments[0] !== "verify-required") {
-          router.replace("/verify-required");
-          return;
-        }
-        return; // Already on verify-required, stay there
-      }
-      // Within grace period - let them continue using the app
-    }
-
-    // ════════════════════════════════════════════════════════
     // TIPO 1: Usuario SIN sesión (nuevo o logout)
+    // → Va al onboarding. Puede ir a auth o quedarse en onboarding.
     // ════════════════════════════════════════════════════════
     if (!user) {
-      // Si está en (app), (paywall) o en root (/), mandarlo a onboarding
       const inRoot =
         !inApp && !inAuth && !inOnboarding && !inPaywall && !isPublicRoute;
       if (inApp || inPaywall || inRoot) {
         router.replace("/(onboarding)/onboarding");
         return;
       }
-      // Si está en (auth) o (onboarding), dejarlo ahí
       return;
     }
 
     // ════════════════════════════════════════════════════════
     // TIPO 2: Usuario CON sesión que acaba de REGISTRARSE
+    // → Debe completar el post-signup flow antes de todo
     // ════════════════════════════════════════════════════════
     if (user && authFlow === "register") {
-      // 🔥 Si viene del registro, DEBE estar en post-signup O paywall O app
       if (!inPostSignup && !inOnboarding && !inPaywall && !inApp) {
         router.replace("/(onboarding)/post-signup/step-review");
         return;
       }
-      // Si está en post-signup, paywall o app, dejarlo navegar libremente
       return;
     }
 
     // ════════════════════════════════════════════════════════
-    // TIPO 3: Usuario CON sesión (login o ya completó onboarding)
+    // TIPO 3: Usuario CON sesión activa (login o returning)
+    // → Si tiene premium → (app)/home
+    // → Si NO tiene premium → (paywall)/paywall (no puede salir)
     // ════════════════════════════════════════════════════════
     if (user) {
       // Si está en (auth) o en onboarding (pero NO post-signup), sacarlo
@@ -117,7 +104,7 @@ export function useAuthGuard() {
         return;
       }
 
-      // Si NO tiene premium, bloquearlo en paywall (excepto si está en post-signup)
+      // Si NO tiene premium, bloquearlo en paywall (excepto post-signup)
       if (!hasPremium && !inPaywall && !inPostSignup) {
         router.replace("/(paywall)/paywall");
         return;
@@ -129,5 +116,5 @@ export function useAuthGuard() {
         return;
       }
     }
-  }, [user, initializing, segments, authFlow]);
+  }, [user, initializing, segments, authFlow, isPremium]);
 }

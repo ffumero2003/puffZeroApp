@@ -36,7 +36,7 @@ export default function Paywall() {
     completeOnboarding,
     resetAll,
   } = useOnboarding();
-  const { user, setAuthFlow } = useAuth();
+  const { user, setAuthFlow, setIsPremium } = useAuth();
 
   // Calculate converted prices
   const userCurrency = currency || "CRC";
@@ -139,9 +139,15 @@ export default function Paywall() {
   );
 
   function grantAccess() {
-    completeOnboarding(); // marca onboarding como terminado
-    resetAll(); // limpia datos temporales
-    setAuthFlow(null); // 🔥 Resetea el authFlow para que AuthGuard no bloquee
+    // ┌─────────────────────────────────────────────────────────┐
+    // │ PRODUCTION: This should ONLY be called after a          │
+    // │ successful RevenueCat/payment purchase confirmation.     │
+    // │ Right now it grants access directly for dev purposes.    │
+    // └─────────────────────────────────────────────────────────┘
+    setIsPremium(true); // Mark user as premium → AuthGuard lets them into (app)
+    completeOnboarding(); // Mark onboarding as completed
+    resetAll(); // Clear temporary onboarding data
+    setAuthFlow(null); // Reset authFlow so AuthGuard doesn't block
     router.replace("/(app)/home");
   }
 

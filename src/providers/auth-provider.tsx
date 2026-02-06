@@ -26,6 +26,14 @@ interface AuthContextProps {
   authInProgress: boolean;
   setAuthInProgress: (v: boolean) => void;
 
+  // ═══════════════════════════════════════════════
+  // NEW: Premium/subscription state
+  // This is what the AuthGuard checks to decide
+  // if user goes to (app) or gets stuck in (paywall)
+  // ═══════════════════════════════════════════════
+  isPremium: boolean;
+  setIsPremium: (v: boolean) => void;
+
   signUp: (
     email: string,
     password: string,
@@ -50,6 +58,10 @@ const AuthContext = createContext<AuthContextProps>({
   authInProgress: false,
   setAuthInProgress: () => {},
 
+  // NEW: default to false (no premium)
+  isPremium: false,
+  setIsPremium: () => {},
+
   signUp: async () => ({ data: null, error: null }),
   signIn: async () => ({ data: null, error: null }),
   signOut: async () => {},
@@ -62,6 +74,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [authInProgress, setAuthInProgress] = useState(false);
   const [authFlow, setAuthFlow] = useState<"login" | "register" | null>(null);
+
+  // NEW: premium state — starts false, gets set to true after purchase
+  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
     const loadSession = async () => {
@@ -98,6 +113,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => subscription.subscription.unsubscribe();
   }, []);
+
+  // ═══════════════════════════════════════════════════════════════
+  // NEW: Check premium status whenever user session loads/changes
+  // ═══════════════════════════════════════════════════════════════
+  useEffect(() => {
+    if (!user?.id) {
+      // No user = no premium
+      setIsPremium(false);
+      return;
+    }
+
+    const checkPremiumStatus = async () => {
+      // ┌─────────────────────────────────────────────────────────┐
+      // │ PRODUCTION: Uncomment ONE of these when you integrate   │
+      // │ your real payment system                                │
+      // └─────────────────────────────────────────────────────────┘
+      // ── OPTION A: RevenueCat ──
+      // const customerInfo = await Purchases.getCustomerInfo();
+      // const isActive = customerInfo.entitlements.active["premium"] !== undefined;
+      // setIsPremium(isActive);
+      // ── OPTION B: Supabase profiles table ──
+      // const { data } = await supabase
+      //   .from("profiles")
+      //   .select("is_premium")
+      //   .eq("id", user.id)
+      //   .single();
+      // setIsPremium(data?.is_premium ?? false);
+      // ── OPTION C: Supabase user metadata ──
+      // setIsPremium(user.user_metadata?.is_premium === true);
+      // FOR NOW: do nothing, isPremium stays false
+      // The dev bypass in AuthGuard handles it during development
+    };
+
+    checkPremiumStatus();
+  }, [user?.id]);
 
   const signUp = async (email: string, password: string, full_name: string) => {
     setLoading(true);
@@ -144,6 +194,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     setAuthFlow(null);
     setAuthInProgress(false);
+    setIsPremium(false); // NEW: reset premium on logout
     await supabase.auth.signOut();
   };
 
@@ -181,6 +232,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         authInProgress,
         setAuthInProgress,
+
+        // NEW: expose premium state
+        isPremium,
+        setIsPremium,
 
         signUp,
         signIn,
