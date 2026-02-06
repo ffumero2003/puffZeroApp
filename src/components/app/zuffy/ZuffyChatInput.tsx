@@ -105,7 +105,8 @@ Props) {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
-    paddingVertical: 5,
+    paddingTop: 10,
+    paddingBottom: 4,
     borderRadius: 50,
     backgroundColor: Colors.light.background,
   },

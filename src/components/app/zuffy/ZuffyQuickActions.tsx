@@ -56,6 +56,7 @@ export default function ZuffyQuickActions({ onActionPress, disabled }: Props) {
           <AppText
             numberOfLines={1}
             // ellipsizeMode="tail"
+            weight="bold"
             style={[styles.chipText, disabled && styles.chipTextDisabled]}
           >
             {action.label}

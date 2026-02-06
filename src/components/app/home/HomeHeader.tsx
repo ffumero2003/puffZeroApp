@@ -17,15 +17,12 @@ export default function HomeHeader({ firstName, dailyGoal }: HomeHeaderProps) {
           Hola, {firstName} 👋
         </AppText>
         <AppText style={styles.subtitle}>
-          Tu meta diaria: {dailyGoal} puffs
+          Tu meta diaria: <AppText weight="bold">{dailyGoal} puffs</AppText>
         </AppText>
       </View>
 
       <View style={styles.cloudIcon}>
-        <Image 
-            source={Logo} 
-            style={styles.cloudIcon} 
-            resizeMode="contain" />
+        <Image source={Logo} style={styles.cloudIcon} resizeMode="contain" />
       </View>
     </View>
   );
@@ -38,7 +35,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "90%",
-    
   },
   textContainer: {
     flex: 1,
@@ -49,11 +45,10 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.light.textSecondary,
   },
   cloudIcon: {
-    
     marginLeft: 12,
     height: 85,
     width: 85,

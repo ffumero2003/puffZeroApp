@@ -17,6 +17,7 @@ import {
 } from "@/src/services/auth-services";
 import { useHomeViewModel } from "@/src/viewmodels/app/useHomeViewModel";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -215,7 +216,10 @@ export default function Home() {
           {/* Add Puff Button */}
           <TouchableOpacity
             style={styles.addButton}
-            onPress={addPuff}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+              addPuff();
+            }}
             activeOpacity={0.8}
           >
             <Ionicons name="add" size={60} color={Colors.light.textWhite} />
@@ -281,8 +285,8 @@ const styles = StyleSheet.create({
   daysRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 6,
-    paddingVertical: 6,
+    gap: 2,
+    paddingVertical: 10,
   },
   quoteContainer: {
     paddingVertical: 8,

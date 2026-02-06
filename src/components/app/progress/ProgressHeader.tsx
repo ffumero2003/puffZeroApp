@@ -8,7 +8,9 @@ interface ProgressHeaderProps {
   timeSinceLastPuff: string;
 }
 
-export default function ProgressHeader({ timeSinceLastPuff }: ProgressHeaderProps) {
+export default function ProgressHeader({
+  timeSinceLastPuff,
+}: ProgressHeaderProps) {
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
@@ -16,16 +18,13 @@ export default function ProgressHeader({ timeSinceLastPuff }: ProgressHeaderProp
           Tu Progreso
         </AppText>
         <AppText style={styles.subtitle}>
-          Última actualización: {timeSinceLastPuff}
+          Última actualización:{" "}
+          <AppText weight="bold">{timeSinceLastPuff}</AppText>
         </AppText>
       </View>
 
       <View style={styles.logoContainer}>
-        <Image 
-          source={Logo} 
-          style={styles.logo} 
-          resizeMode="contain" 
-        />
+        <Image source={Logo} style={styles.logo} resizeMode="contain" />
       </View>
     </View>
   );
@@ -38,7 +37,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "90%",
-    
   },
   textContainer: {
     flex: 1,
@@ -49,7 +47,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.light.textSecondary,
     opacity: 0.7,
   },

@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.light.textSecondary,
     opacity: 0.7,
   },
