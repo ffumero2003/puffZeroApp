@@ -9,28 +9,25 @@ export async function sendDailyQuoteNotification(quote: string): Promise<void> {
   // ... existing code stays the same
 }
 
-// ============================================
-// NEW: Schedule daily quote notification for 8 AM every day
-// Uses Expo's CALENDAR trigger type for recurring daily notifications
-// ============================================
 export async function scheduleDailyQuoteNotification(): Promise<void> {
   const Notif = await getNotifications();
   if (!Notif) return;
 
-  // Cancel any existing daily quote notifications first
-  // This prevents duplicate notifications if called multiple times
   await cancelDailyQuoteNotification();
 
   try {
-    // Fetch today's quote from your generate-quote edge function
-    // This calls Supabase, which either returns cached quote or generates new one via OpenAI
+    // Fetch the global daily quote from the edge function
     const { data, error } = await supabase.functions.invoke("generate-quote");
-    
-    // Fallback quote if the edge function fails
+
     const quote = data?.quote || "Cada día es una nueva oportunidad para ser mejor.";
 
-    // Schedule notification for 8:00 AM daily
-    // CALENDAR trigger fires at a specific time each day
+    // Schedule for tomorrow 8 AM (one-shot, not repeating).
+    // Each app open reschedules with a new quote from the edge function,
+    // so the user always gets a fresh quote in their notification.
+    const tomorrow8AM = new Date();
+    tomorrow8AM.setDate(tomorrow8AM.getDate() + 1);
+    tomorrow8AM.setHours(8, 0, 0, 0);
+
     await Notif.scheduleNotificationAsync({
       content: {
         title: "💨 Tu frase del día",
@@ -39,18 +36,15 @@ export async function scheduleDailyQuoteNotification(): Promise<void> {
         data: { type: "daily_quote" },
       },
       trigger: {
-        type: Notif.SchedulableTriggerInputTypes.CALENDAR,
-        hour: 8,      // 8 AM
-        minute: 0,    // :00
-        repeats: true, // Fire every day at this time
+        type: Notif.SchedulableTriggerInputTypes.DATE,
+        date: tomorrow8AM,
       },
     });
-
-    // console.log("✅ Daily quote notification scheduled for 8 AM");
   } catch (error) {
     console.error("❌ Error scheduling daily quote notification:", error);
   }
 }
+
 
 // ============================================
 // NEW: Cancel scheduled daily quote notifications

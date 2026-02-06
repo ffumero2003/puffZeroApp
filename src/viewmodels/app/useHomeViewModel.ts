@@ -176,12 +176,7 @@ export function useHomeViewModel() {
     }
   }, [profileLoading]);
 
-  // Reload quote when puffs change significantly (every 5 puffs or when reaching limits)
-  useEffect(() => {
-    if (todayPuffs > 0 && (todayPuffs % 5 === 0 || todayPuffs === dailyGoal)) {
-      loadMotivationalMessage();
-    }
-  }, [todayPuffs, dailyGoal]);
+  
 
   //   // Send welcome notification once when user first lands on Home
   // useEffect(() => {
