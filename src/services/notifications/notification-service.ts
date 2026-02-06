@@ -35,9 +35,26 @@ export async function getNotifications() {
 /**
  * Check if notifications are enabled
  */
+/**
+ * Check if notifications are enabled
+ * Checks both the in-app preference (AsyncStorage) AND actual OS permission
+ */
 export async function areNotificationsEnabled(): Promise<boolean> {
+  // First check the in-app preference
   const enabled = await AsyncStorage.getItem(NOTIFICATIONS_ENABLED_KEY);
-  return enabled === "true";
+  if (enabled === "false") return false;
+
+  // Then check the actual OS permission status
+  try {
+    const Notif = await getNotifications();
+    if (!Notif) return false;
+
+    const { status } = await Notif.getPermissionsAsync();
+    return status === "granted";
+  } catch (error) {
+    console.error("Error checking notification permissions:", error);
+    return false;
+  }
 }
 
 

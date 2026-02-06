@@ -175,6 +175,44 @@ export function useHomeViewModel() {
     }
   }, [todayPuffs, dailyGoal]);
 
+  //   // Send welcome notification once when user first lands on Home
+  // useEffect(() => {
+  //   async function handleWelcomeNotification() {
+  //     try {
+  //       // Check if we already sent the welcome notification
+  //       const alreadySent = await AsyncStorage.getItem("welcomeNotificationSent");
+  //       if (alreadySent) return;
+
+  //       const notificationsEnabled = await areNotificationsEnabled();
+  //       if (!notificationsEnabled) return;
+
+  //       await sendWelcomeNotification();
+  //       await AsyncStorage.setItem("welcomeNotificationSent", "true");
+  //     } catch (error) {
+  //       console.error("Error sending welcome notification:", error);
+  //     }
+  //   }
+
+  //   handleWelcomeNotification();
+  // }, []); // Runs once on mount
+
+    // Send welcome notification every time user enters Home (TESTING)
+  // useEffect(() => {
+  //   async function handleWelcomeNotification() {
+  //     try {
+  //       // Skip areNotificationsEnabled check — it's never set during onboarding
+  //       await sendWelcomeNotification();
+  //     } catch (error) {
+  //       console.error("Error sending welcome notification:", error);
+  //     }
+  //   }
+
+  //   handleWelcomeNotification();
+  // }, []);
+
+
+
+
   const addPuff = useCallback(async () => {
     const now = new Date();
     const newPuffCount = todayPuffs + 1;

@@ -1,5 +1,7 @@
 // usePersonalizedPlanViewModel.ts
 import { useOnboarding } from "@/src/providers/onboarding-provider";
+import { areNotificationsEnabled } from "@/src/services/notifications/notification-service";
+import { sendWelcomeNotification } from "@/src/services/notifications/welcome-notification";
 import { buildPuffsPlan, sampleChartData } from "@/src/utils/charts";
 import { useEffect, useState } from "react";
 
@@ -50,6 +52,23 @@ export function usePersonalizedPlanViewModel() {
       const fullPlan = buildPuffsPlan(puffs_per_day, days);
       setPuffsChart(sampleChartData(fullPlan, 12));
     }
+  }, []);
+
+  // Send welcome notification when personalized plan screen mounts
+  // This runs for both register and login flows
+  useEffect(() => {
+    async function handleWelcomeNotification() {
+      try {
+        const notificationsEnabled = await areNotificationsEnabled();
+        if (!notificationsEnabled) return;
+
+        await sendWelcomeNotification();
+      } catch (error) {
+        console.error("Error sending welcome notification:", error);
+      }
+    }
+
+    handleWelcomeNotification();
   }, []);
 
   function finishFlow() {

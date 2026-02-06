@@ -12,7 +12,6 @@ import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { areNotificationsEnabled } from "@/src/services/notifications/notification-service";
 import { sendWelcomeBackNotification } from "@/src/services/notifications/welcome-back-notification";
-import { sendWelcomeNotification } from "@/src/services/notifications/welcome-notification";
 import { components } from "@/src/styles/components";
 
 type GoogleButtonProps = {
@@ -58,7 +57,7 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
 
       const result = await WebBrowser.openAuthSessionAsync(
         data.url,
-        redirectTo,
+        redirectTo
       );
 
       if (result.type !== "success" || !result.url) {
@@ -119,12 +118,6 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
         if (profile?.created_at) {
           console.log("✅ Perfil creado con created_at:", profile.created_at);
           setProfileCreatedAt(profile.created_at);
-        }
-
-        // 🔔 Send welcome notification for new user
-        if (notificationsEnabled) {
-          console.log("🔔 Sending welcome notification for new Google user");
-          await sendWelcomeNotification();
         }
       } else if (mode === "login" && userId) {
         // 🔔 Send welcome back notification for returning user

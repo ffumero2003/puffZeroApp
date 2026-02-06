@@ -3,11 +3,8 @@ import { createProfile } from "@/src/lib/profile";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { sendVerificationEmail } from "@/src/services/auth-services";
-import {
-  areNotificationsEnabled,
-} from "@/src/services/notifications/notification-service";
+import { areNotificationsEnabled } from "@/src/services/notifications/notification-service";
 import { scheduleVerificationReminders } from "@/src/services/notifications/verification-notification";
-import { sendWelcomeNotification } from "@/src/services/notifications/welcome-notification";
 import { storePendingAccountVerification } from "@/src/services/verification/verification-service";
 import { Alert } from "react-native";
 
@@ -75,12 +72,7 @@ export function useRegisterViewModel() {
 
     setProfileCreatedAt(profile.created_at);
 
-    // 🔔 Send welcome notification for new user
-    const notificationsEnabled = await areNotificationsEnabled();
-    if (notificationsEnabled) {
-      console.log("🔔 Sending welcome notification for new user");
-      await sendWelcomeNotification();
-    }
+    
 
 
 
@@ -109,6 +101,7 @@ export function useRegisterViewModel() {
     await storePendingAccountVerification(email);
 
     // ⏰ Schedule verification reminders for day 3 and day 5
+    const notificationsEnabled = await areNotificationsEnabled();
     if (notificationsEnabled) {
       await scheduleVerificationReminders("account");
     }

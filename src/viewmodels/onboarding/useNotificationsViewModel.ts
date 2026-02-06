@@ -1,14 +1,13 @@
 // src/viewmodels/onboarding/useNotificationsViewModel.ts
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
-
 import { sendDailyQuoteNotification } from "@/src/services/notifications/daily-quote-notification";
 import { scheduleDailyLocalReminder } from "@/src/services/notifications/daily-reminder-notification";
 import { sendWelcomeBackNotification } from "@/src/services/notifications/welcome-back-notification";
 import { sendWelcomeNotification } from "@/src/services/notifications/welcome-notification";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// 🔧 SET TO TRUE FOR TESTING
-const TEST_MODE = __DEV__;
+
 
 export function useNotificationsViewModel() {
   const { user } = useAuth();
@@ -32,15 +31,14 @@ export function useNotificationsViewModel() {
 
       // console.log("✅ Notification permission granted!");
 
-      // Schedule local daily reminder
+            // Schedule local daily reminder
       await scheduleDailyLocalReminder();
 
-      // 🧪 TEST: Send a test notification immediately in dev mode
-      if (TEST_MODE) {
-        await sendTestNotification();
-      }
+      // Persist that notifications are enabled so other services can check
+      await AsyncStorage.setItem("notifications_enabled", "true");
 
       return true;
+
     } catch (error) {
       console.error("❌ Error requesting notifications:", error);
       return false;
@@ -58,35 +56,35 @@ export function useNotificationsViewModel() {
   /**
    * 🧪 Test function - sends a local notification immediately
    */
-  async function sendTestNotification(): Promise<void> {
-    // console.log("🧪 Sending test notification...");
+  // async function sendTestNotification(): Promise<void> {
+  //   // console.log("🧪 Sending test notification...");
 
-    const Notifications = await import("expo-notifications");
+  //   const Notifications = await import("expo-notifications");
 
-    Notifications.setNotificationHandler({
-      handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: false,
-        shouldShowBanner: true,
-        shouldShowList: true,
-      }),
-    });
+  //   Notifications.setNotificationHandler({
+  //     handleNotification: async () => ({
+        
+  //       shouldPlaySound: true,
+  //       shouldSetBadge: false,
+  //       shouldShowBanner: true,
+  //       shouldShowList: true,
+  //     }),
+  //   });
 
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "💨 PuffZero Test",
-        body: "¡Las notificaciones funcionan! 🎉",
-        sound: true,
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-        seconds: 2,
-      },
-    });
+  //   await Notifications.scheduleNotificationAsync({
+  //     content: {
+  //       title: "💨 PuffZero Test",
+  //       body: "¡Las notificaciones funcionan! 🎉",
+  //       sound: true,
+  //     },
+  //     trigger: {
+  //       type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+  //       seconds: 2,
+  //     },
+  //   });
 
-    // console.log("✅ Test notification scheduled!");
-  }
+  //   // console.log("✅ Test notification scheduled!");
+  // }
 
   /**
    * 🧪 Test function - fetch today's AI quote and show as notification
@@ -141,7 +139,6 @@ export function useNotificationsViewModel() {
   return {
     requestPermission,
     skipPermission,
-    sendTestNotification,
     testDailyQuoteNotification,
     testWelcomeNotification,
     testWelcomeBackNotification,
