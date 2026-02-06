@@ -18,7 +18,13 @@ import {
 import { useHomeViewModel } from "@/src/viewmodels/app/useHomeViewModel";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
-import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function Home() {
   const {
@@ -35,6 +41,7 @@ export default function Home() {
     addPuff,
     // goToPreviousWeek,
     // goToNextWeek,
+    loading,
   } = useHomeViewModel();
 
   const {
@@ -133,6 +140,20 @@ export default function Home() {
       setChecking(false);
     }
   };
+
+  // Show loading spinner until profile, puff count, and quote are all ready
+  if (loading) {
+    return (
+      <View
+        style={[
+          styles.container,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
+        <ActivityIndicator size="large" color={Colors.light.primary} />
+      </View>
+    );
+  }
 
   return (
     <>

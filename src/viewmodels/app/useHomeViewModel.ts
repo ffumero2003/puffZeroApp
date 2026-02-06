@@ -7,9 +7,13 @@ import { updateLastActivity } from "@/src/services/notifications/inactivity-noti
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-const LAST_PUFF_TIME_KEY = "lastPuffTime";
-const TODAY_PUFFS_KEY = "todayPuffs";
-const TODAY_DATE_KEY = "todayDate";
+// Keys are now scoped per user so switching accounts doesn't show stale data
+const getStorageKeys = (userId: string) => ({
+  lastPuffTime: `lastPuffTime_${userId}`,
+  todayPuffs: `todayPuffs_${userId}`,
+  todayDate: `todayDate_${userId}`,
+});
+
 
 type DayPuffs = {
   date: string;
@@ -31,6 +35,8 @@ export function useHomeViewModel() {
   const [lastPuffTime, setLastPuffTime] = useState<Date | null>(null);
   const [motivationalMessage, setMotivationalMessage] = useState("");
   const [currentWeek, setCurrentWeek] = useState<WeekData | null>(null);
+  const [puffsLoading, setPuffsLoading] = useState(true);
+
 
 
   // Memoize firstName to avoid recalculation and fix TypeScript issue
@@ -62,53 +68,55 @@ export function useHomeViewModel() {
     return "hace un momento";
   }, [lastPuffTime]);
 
-  // Load persisted data from AsyncStorage on mount
   const loadPersistedData = useCallback(async () => {
-    try {
-      const [storedLastPuff, storedTodayPuffs, storedDate] = await Promise.all([
-        AsyncStorage.getItem(LAST_PUFF_TIME_KEY),
-        AsyncStorage.getItem(TODAY_PUFFS_KEY),
-        AsyncStorage.getItem(TODAY_DATE_KEY),
-      ]);
+  // Skip if no user logged in — keys require a userId
+  if (!user?.id) return;
 
-      // Check if we need to reset for a new day
-      const today = new Date().toDateString();
-      if (storedDate !== today) {
-        // Reset for new day
-        await AsyncStorage.setItem(TODAY_DATE_KEY, today);
-        await AsyncStorage.setItem(TODAY_PUFFS_KEY, "0");
-        setTodayPuffs(0);
-      } else if (storedTodayPuffs) {
-        setTodayPuffs(parseInt(storedTodayPuffs, 10));
-      }
+  const keys = getStorageKeys(user.id);
 
-      if (storedLastPuff) {
-        setLastPuffTime(new Date(storedLastPuff));
-      }
+  try {
+    const [storedLastPuff, storedTodayPuffs, storedDate] = await Promise.all([
+      AsyncStorage.getItem(keys.lastPuffTime),
+      AsyncStorage.getItem(keys.todayPuffs),
+      AsyncStorage.getItem(keys.todayDate),
+    ]);
 
-      // Also try to load from Supabase for the most recent puff
-      if (user?.id) {
-        const { data } = await supabase
-          .from("puffs")
-          .select("timestamp")
-          .eq("user_id", user.id)
-          .order("timestamp", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        if (data?.timestamp) {
-          const supabaseLastPuff = new Date(data.timestamp);
-          // Use the more recent one
-          if (!storedLastPuff || supabaseLastPuff > new Date(storedLastPuff)) {
-            setLastPuffTime(supabaseLastPuff);
-            await AsyncStorage.setItem(LAST_PUFF_TIME_KEY, supabaseLastPuff.toISOString());
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error loading persisted data:", error);
+    const today = new Date().toDateString();
+    if (storedDate !== today) {
+      await AsyncStorage.setItem(keys.todayDate, today);
+      await AsyncStorage.setItem(keys.todayPuffs, "0");
+      setTodayPuffs(0);
+    } else if (storedTodayPuffs) {
+      setTodayPuffs(parseInt(storedTodayPuffs, 10));
     }
-  }, [user?.id]);
+
+    if (storedLastPuff) {
+      setLastPuffTime(new Date(storedLastPuff));
+    }
+
+    const { data } = await supabase
+      .from("puffs")
+      .select("timestamp")
+      .eq("user_id", user.id)
+      .order("timestamp", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (data?.timestamp) {
+      const supabaseLastPuff = new Date(data.timestamp);
+      if (!storedLastPuff || supabaseLastPuff > new Date(storedLastPuff)) {
+        setLastPuffTime(supabaseLastPuff);
+        await AsyncStorage.setItem(keys.lastPuffTime, supabaseLastPuff.toISOString());
+      }
+    }
+  } catch (error) {
+    console.error("Error loading persisted data:", error);
+  } finally {
+    // Mark puffs data as loaded regardless of success/failure
+    setPuffsLoading(false);
+  }
+}, [user?.id]);
+
 
   // Generate current week data only
   const generateCurrentWeek = useCallback(() => {
@@ -214,54 +222,58 @@ export function useHomeViewModel() {
 
 
   const addPuff = useCallback(async () => {
-    const now = new Date();
-    const newPuffCount = todayPuffs + 1;
-    
-    // Update state immediately for UI responsiveness
-    setTodayPuffs(newPuffCount);
-    setLastPuffTime(now);
-    
-    // Persist to AsyncStorage
-    try {
-      await Promise.all([
-        AsyncStorage.setItem(TODAY_PUFFS_KEY, newPuffCount.toString()),
-        AsyncStorage.setItem(LAST_PUFF_TIME_KEY, now.toISOString()),
-        AsyncStorage.setItem(TODAY_DATE_KEY, now.toDateString()),
-      ]);
-    } catch (error) {
-      console.error("Error saving to AsyncStorage:", error);
-    }
+  if (!user?.id) return;
 
-    // Save to Supabase
-    if (user?.id) {
-      try {
-        const { error } = await supabase.from("puffs").insert({
-          user_id: user.id,
-          timestamp: now.toISOString(),
-          count: 1,
-        });
-        
-        if (error) {
-          console.error("Error saving puff to Supabase:", error);
-        }
-      } catch (error) {
-        console.error("Error inserting puff:", error);
-      }
-    }
+  const keys = getStorageKeys(user.id);
+  const now = new Date();
+  const newPuffCount = todayPuffs + 1;
 
-    await updateLastActivity();
-  }, [todayPuffs, user?.id]);
+  // Update state immediately for UI responsiveness
+  setTodayPuffs(newPuffCount);
+  setLastPuffTime(now);
+
+  // Persist to AsyncStorage (now user-scoped)
+  try {
+    await Promise.all([
+      AsyncStorage.setItem(keys.todayPuffs, newPuffCount.toString()),
+      AsyncStorage.setItem(keys.lastPuffTime, now.toISOString()),
+      AsyncStorage.setItem(keys.todayDate, now.toDateString()),
+    ]);
+  } catch (error) {
+    console.error("Error saving to AsyncStorage:", error);
+  }
+
+  // Save to Supabase
+  try {
+    const { error } = await supabase.from("puffs").insert({
+      user_id: user.id,
+      timestamp: now.toISOString(),
+      count: 1,
+    });
+
+    if (error) {
+      console.error("Error saving puff to Supabase:", error);
+    }
+  } catch (error) {
+    console.error("Error inserting puff:", error);
+  }
+
+  await updateLastActivity();
+}, [todayPuffs, user?.id]);
+
 
   return {
-    firstName,
-    dailyGoal,
-    todayPuffs,
-    percentage,
-    timeSinceLastPuff: getTimeSinceLastPuff(),
-    lastPuffTime,
-    motivationalMessage,
-    currentWeek,
-    addPuff,
-    loading: profileLoading,
-  };
+  firstName,
+  dailyGoal,
+  todayPuffs,
+  percentage,
+  timeSinceLastPuff: getTimeSinceLastPuff(),
+  lastPuffTime,
+  motivationalMessage,
+  currentWeek,
+  addPuff,
+  // Home is ready only when BOTH profile and puffs data have loaded
+  loading: profileLoading || puffsLoading,
+};
+
 }
