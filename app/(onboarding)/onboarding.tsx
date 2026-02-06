@@ -8,12 +8,9 @@ import { Image, View } from "react-native";
 import HomePage from "@/assets/images/onboarding/onboarding-home-page.png";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
-import { useOnboardingViewModel } from "@/src/viewmodels/onboarding/useOnboardingViewModel";
 import { router } from "expo-router";
 
 export default function Onboarding() {
-  const { showLogin } = useOnboardingViewModel();
-
   //onboarding
   function goToProgress() {
     router.push(ROUTES.ONBOARDING_PROGRESS);
@@ -46,7 +43,6 @@ export default function Onboarding() {
             style={layout.bottomButtonContainer}
           />
 
-          {showLogin && <LoginText />}
           <LoginText />
         </View>
       </View>

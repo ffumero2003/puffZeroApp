@@ -2,25 +2,19 @@ import { Image, View } from "react-native";
 
 import AppText from "@/src/components/AppText";
 import ContinueButton from "@/src/components/onboarding/ContinueButton";
-import LoginText from "@/src/components/onboarding/LoginText";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import { layout } from "@/src/styles/layout";
-import { useOnboardingViewModel } from "@/src/viewmodels/onboarding/useOnboardingViewModel";
 
 import MoneySaved from "@/assets/images/onboarding/onboarding-money-saved.png";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
 import { router } from "expo-router";
 
-
 export default function OnboardingMoneySaved() {
-  const { showLogin } = useOnboardingViewModel()
-
-   //onboarding money saved
-    function goToGraph() {
-      router.push(ROUTES.ONBOARDING_GRAPH)
-    }
-  
+  //onboarding money saved
+  function goToGraph() {
+    router.push(ROUTES.ONBOARDING_GRAPH);
+  }
 
   return (
     <ScreenWrapper>
@@ -49,8 +43,6 @@ export default function OnboardingMoneySaved() {
             onPress={goToGraph}
             style={layout.bottomButtonContainer}
           />
-
-          {showLogin && <LoginText />}
         </View>
       </View>
     </ScreenWrapper>

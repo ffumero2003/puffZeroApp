@@ -2,10 +2,8 @@ import { Image, View } from "react-native";
 
 import AppText from "@/src/components/AppText";
 import ContinueButton from "@/src/components/onboarding/ContinueButton";
-import LoginText from "@/src/components/onboarding/LoginText";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import { layout } from "@/src/styles/layout";
-import { useOnboardingViewModel } from "@/src/viewmodels/onboarding/useOnboardingViewModel";
 
 import Graph from "@/assets/images/onboarding/onboarding-graph.png";
 
@@ -14,15 +12,11 @@ import { ROUTES } from "@/src/constants/routes";
 import { router } from "expo-router";
 
 export default function OnboardingGraph() {
-  const { showLogin } = useOnboardingViewModel();
-
-
   //onboarding money saved
   function goToPuffCount() {
-    router.push(ROUTES.ONBOARDING_PUFFS)
+    router.push(ROUTES.ONBOARDING_PUFFS);
   }
 
- 
   return (
     <ScreenWrapper>
       <View style={layout.screenContainer}>
@@ -50,8 +44,6 @@ export default function OnboardingGraph() {
             onPress={goToPuffCount}
             style={layout.bottomButtonContainer}
           />
-
-          {showLogin && <LoginText />}
         </View>
       </View>
     </ScreenWrapper>

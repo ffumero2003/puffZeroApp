@@ -8,12 +8,9 @@ import { Image, View } from "react-native";
 import ProgressScreen from "@/assets/images/onboarding/onboarding-progress-page.png";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
-import { useOnboardingViewModel } from "@/src/viewmodels/onboarding/useOnboardingViewModel";
 import { router } from "expo-router";
 
 export default function OnboardingProgress() {
-  const { showLogin } = useOnboardingViewModel();
-
   //onboarding progress
   function goToZuffy() {
     router.push(ROUTES.ONBOARDING_ZUFFY);
@@ -41,7 +38,7 @@ export default function OnboardingProgress() {
             style={layout.bottomButtonContainer}
           />
 
-          {showLogin && <LoginText />}
+          <LoginText />
         </View>
       </View>
     </ScreenWrapper>

@@ -28,10 +28,8 @@ export default function OnboardingWorries() {
   const { submitWorries } = useWorriesViewModel();
 
   const toggleSelect = (id: string) => {
-    setSelected(prev =>
-      prev.includes(id)
-        ? prev.filter(item => item !== id)
-        : [...prev, id]
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
 
@@ -59,7 +57,7 @@ export default function OnboardingWorries() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 20 }}
           >
-            {CONCERNS.map(item => (
+            {CONCERNS.map((item) => (
               <MultiSelectButton
                 key={item.id}
                 title={item.title}

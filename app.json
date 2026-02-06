@@ -18,20 +18,22 @@
       "bundleIdentifier": "com.anonymous.puffzero"
     },
     "android": {
-        "package": "com.anonymous.puffzero",
-        "intentFilters": [
-          {
-            "action": "VIEW",
-            "data": [
-              {
-                "scheme": "puffzero"
-              }
-            ],
-            "category": ["BROWSABLE", "DEFAULT"]
-          }
-        ]
-      },
-
+      "package": "com.anonymous.puffzero",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "puffzero"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
+    },
     "web": {
       "output": "static",
       "favicon": "./assets/images/logo-puff-zero.png"
@@ -43,7 +45,8 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
