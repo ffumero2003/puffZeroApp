@@ -124,38 +124,68 @@ export function useHomeViewModel() {
 }, [user?.id]);
 
 
-  // Generate current week data only
-  const generateCurrentWeek = useCallback(() => {
-    const today = new Date();
-    
-    // Get start of current week (Sunday)
-    const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - today.getDay());
-    
-    const days: DayPuffs[] = [];
-    const dayNames = ["Dom", "Lun", "Mar", "Mier", "Jue", "Vie", "Sab"];
-    
-    for (let i = 0; i < 7; i++) {
-      const currentDay = new Date(weekStart);
-      currentDay.setDate(weekStart.getDate() + i);
+  // Generate current week data — now fetches historical puffs from Supabase
+const generateCurrentWeek = useCallback(async () => {
+  const today = new Date();
+  
+  // Get start of current week (Sunday)
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - today.getDay());
+  weekStart.setHours(0, 0, 0, 0); // start of day
+  
+  // End of week (Saturday 23:59:59)
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+  weekEnd.setHours(23, 59, 59, 999);
+  
+  // --- Fetch this week's puffs from Supabase ---
+  const puffsByDate: Record<string, number> = {};
+  
+  if (user?.id) {
+    try {
+      const { data, error } = await supabase
+        .from("puffs")
+        .select("timestamp, count")
+        .eq("user_id", user.id)
+        .gte("timestamp", weekStart.toISOString())
+        .lte("timestamp", weekEnd.toISOString());
       
-      const isToday = currentDay.toDateString() === today.toDateString();
-      
-      days.push({
-        date: currentDay.toISOString(),
-        day: dayNames[i],
-        puffs: isToday ? todayPuffs : 0,
-        isToday,
-      });
+      if (!error && data) {
+        // Aggregate puff counts by date string (e.g. "Mon Feb 03 2026")
+        for (const puff of data) {
+          const dateKey = new Date(puff.timestamp).toDateString();
+          puffsByDate[dateKey] = (puffsByDate[dateKey] || 0) + (puff.count || 1);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching week puffs:", error);
     }
+  }
+  
+  const days: DayPuffs[] = [];
+  const dayNames = ["Dom", "Lun", "Mar", "Mier", "Jue", "Vie", "Sab"];
+  
+  for (let i = 0; i < 7; i++) {
+    const currentDay = new Date(weekStart);
+    currentDay.setDate(weekStart.getDate() + i);
     
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
+    const isToday = currentDay.toDateString() === today.toDateString();
+    const dateKey = currentDay.toDateString();
     
-    const weekLabel = `${weekStart.getDate()}-${weekEnd.getDate()} ${weekStart.toLocaleDateString('es-ES', { month: 'long' })}, ${weekStart.getFullYear()}`;
-    
-    setCurrentWeek({ weekLabel, days });
-  }, [todayPuffs]);
+    days.push({
+      date: currentDay.toISOString(),
+      day: dayNames[i],
+      // For today: use local state (most up-to-date); for other days: use Supabase data
+      puffs: isToday ? todayPuffs : (puffsByDate[dateKey] || 0),
+      isToday,
+    });
+  }
+  
+  const weekLabel = `${weekStart.getDate()}-${weekEnd.getDate()} ${weekStart.toLocaleDateString('es-ES', { month: 'long' })}, ${weekStart.getFullYear()}`;
+  
+  setCurrentWeek({ weekLabel, days });
+}, [todayPuffs, user?.id]); // added user?.id as dependency since we now query Supabase
+
 
   // Load AI-generated motivational message
   const loadMotivationalMessage = useCallback(async () => {

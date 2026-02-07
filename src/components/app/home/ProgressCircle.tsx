@@ -35,7 +35,7 @@ export default function ProgressCircle({
           strokeWidth={strokeWidth}
           fill="none"
         />
-        
+
         {/* Progress circle */}
         <Circle
           cx={size / 2}
@@ -54,17 +54,32 @@ export default function ProgressCircle({
 
       <View style={styles.content}>
         <AppText style={styles.percentageLabel}>
-          Le has dado al <AppText weight="extrabold" style={{ color: Colors.light.primary, fontSize: 20 }}>{percentage}%</AppText> de tu límite
+          Le has dado al{" "}
+          <AppText
+            weight="extrabold"
+            style={{ color: Colors.light.primary, fontSize: 20 }}
+          >
+            {percentage}%
+          </AppText>{" "}
+          de tu límite
         </AppText>
-        
+
         <AppText weight="bold" style={styles.puffsCount}>
-          <AppText weight="extrabold" style={{ color: Colors.light.primary, fontSize: 36 }}>{currentPuffs}/{totalPuffs} </AppText>
+          <AppText
+            weight="extrabold"
+            style={{ color: Colors.light.primary, fontSize: 36 }}
+          >
+            {currentPuffs}/{totalPuffs}{" "}
+          </AppText>
           Puffs
         </AppText>
-        
+
         <View style={styles.lastTimeContainer}>
           <AppText style={styles.lastTime}>
-            Última vez: <AppText weight="extrabold" style={{ color: Colors.light.primary }}>{lastPuffTime}</AppText>
+            Última vez:{" "}
+            <AppText weight="extrabold" style={{ color: Colors.light.primary }}>
+              {lastPuffTime}
+            </AppText>
           </AppText>
         </View>
       </View>
@@ -79,7 +94,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   svg: {
-    transform: [{ rotateZ: '0deg' }],
+    transform: [{ rotateZ: "0deg" }],
   },
   content: {
     position: "absolute",
@@ -88,7 +103,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   percentageLabel: {
-    fontSize: 14,
+    fontSize: 12,
     textAlign: "center",
     color: Colors.light.text,
     marginBottom: 12,
@@ -101,7 +116,7 @@ const styles = StyleSheet.create({
   lastTimeContainer: {
     alignItems: "center",
     justifyContent: "center",
-    
+
     backgroundColor: Colors.light.secondary,
     paddingHorizontal: 5,
     paddingVertical: 5,
