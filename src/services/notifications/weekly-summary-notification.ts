@@ -106,37 +106,59 @@ async function getTotalMoneySaved(
 }
 
 /**
- * Schedule weekly summary notification for Sundays at 8 PM
+ * Schedule weekly summary notification for Sundays at 6 PM with real data.
+ * Call this on app open so the notification always has the latest stats.
  */
 export async function scheduleWeeklySummaryNotification(): Promise<void> {
   const Notif = await getNotifications();
   if (!Notif) return;
 
-  
-
   await cancelWeeklySummaryNotification();
 
   try {
+    // Get user data to build real summary
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) return;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("money_per_month, currency")
+      .eq("user_id", user.id)
+      .single();
+
+    const moneyPerMonth = profile?.money_per_month || 0;
+    const currencyCode = profile?.currency || "CRC";
+
+    // Calculate real stats
+    const avgPuffs = await getAveragePuffsLast7Days(user.id);
+    const moneySaved = await getTotalMoneySaved(user.id, moneyPerMonth);
+
+    const message = getWeeklySummaryMessage(avgPuffs, moneySaved, currencyCode);
+
     await Notif.scheduleNotificationAsync({
       content: {
-        title: "📊 Resumen semanal",
-        body: "Tu resumen de la semana está listo. ¡Revisa tu progreso!",
+        title: message.title,
+        body: message.body,
         sound: true,
-        data: { type: "weekly_summary_trigger" },
+        data: {
+          type: "weekly_summary_trigger",
+          avgPuffsPerDay: avgPuffs,
+          totalMoneySaved: moneySaved,
+          currencyCode,
+        },
       },
       trigger: {
         type: Notif.SchedulableTriggerInputTypes.WEEKLY,
-        weekday: 1, // Sunday (1 = Sunday in expo-notifications)
-        hour: 18, // 8 PM
+        weekday: 1, // Sunday
+        hour: 18, // 6 PM
         minute: 0,
       },
     });
-
-    // console.log("✅ Weekly summary notification scheduled for Sundays at 8 PM");
   } catch (error) {
     console.error("❌ Error scheduling weekly summary:", error);
   }
 }
+
 
 /**
  * Cancel weekly summary notification

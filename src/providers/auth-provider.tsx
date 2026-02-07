@@ -3,7 +3,7 @@ import { sendWelcomeBackNotification } from "@/src/services/notifications/welcom
 import { Session, User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
-import { scheduleDailyAchievementCheck } from "../services/notifications/daily-achievement-notification";
+import { checkAndSendDailyAchievementOnOpen } from "../services/notifications/daily-achievement-notification";
 import { scheduleDailyQuoteNotification } from "../services/notifications/daily-quote-notification";
 import { scheduleDailyLocalReminder } from "../services/notifications/daily-reminder-notification";
 import {
@@ -215,7 +215,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       scheduleDailyLocalReminder();
 
-      scheduleDailyAchievementCheck();
+      // scheduleDailyAchievementCheck();
+      checkAndSendDailyAchievementOnOpen(user.id);
     }
   }, [user?.id]);
 

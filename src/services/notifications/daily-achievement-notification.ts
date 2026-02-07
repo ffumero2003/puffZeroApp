@@ -1,6 +1,7 @@
 // src/services/notifications/daily-achievement-notification.ts
-import { supabase } from "../../lib/supabase";
-import { areNotificationsEnabled, getNotifications } from "./notification-service";
+import { supabase } from "@/src/lib/supabase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getNotifications } from "./notification-service";
 
 const TODAY_PUFFS_KEY = "todayPuffs";
 
@@ -39,67 +40,49 @@ function getAchievementMessage(todayPuffs: number, dailyGoal: number): { title: 
   return messages[Math.floor(Math.random() * messages.length)];
 }
 
+
 /**
- * Schedule daily achievement check at 8 PM
+ * Schedule daily achievement notification at 11:59 PM with real puff data.
+ * Call this every time puffs change so the notification always has the latest data.
  */
-/**
- * Schedule daily achievement check at 8 PM
- * Fetches the user's daily goal (puffs_per_day) from their profile
- */
-export async function scheduleDailyAchievementCheck(): Promise<void> {  // REMOVE dailyGoal parameter
-  // Check if user has daily reminders enabled
+export async function scheduleDailyAchievementCheck(
+  todayPuffs: number,
+  dailyGoal: number
+): Promise<void> {
+  const { areNotificationsEnabled } = await import("./notification-service");
   const enabled = await areNotificationsEnabled();
-  if (!enabled) {
-    console.log("⏭️ Daily achievement skipped - notifications disabled");
-    return;
-  }
+  if (!enabled) return;
 
   const Notif = await getNotifications();
   if (!Notif) return;
 
-  // Cancel any existing achievement notifications first
+  // Cancel previous scheduled one so we replace it with updated data
   await cancelDailyAchievementCheck();
 
   try {
-    // Get the current user's ID
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user?.id) {
-      console.log("⚠️ No user found, skipping daily achievement scheduling");
-      return;
-    }
+    // Only schedule if user is within their goal
+    if (todayPuffs > dailyGoal) return;
 
-    // Fetch the user's daily goal from their profile
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("puffs_per_day")
-      .eq("user_id", user.id)
-      .single();
-
-    const dailyGoal = profile?.puffs_per_day;
-    if (!dailyGoal) {
-      console.log("⚠️ No daily goal set, skipping daily achievement scheduling");
-      return;
-    }
+    const message = getAchievementMessage(todayPuffs, dailyGoal);
 
     await Notif.scheduleNotificationAsync({
       content: {
-        title: "🎯 Revisión diaria",
-        body: "Verificando tu progreso del día...",
+        title: message.title,
+        body: message.body,
         sound: true,
-        data: { type: "daily_achievement_check", dailyGoal },
+        data: { type: "daily_achievement_check", todayPuffs, dailyGoal },
       },
       trigger: {
         type: Notif.SchedulableTriggerInputTypes.DAILY,
-        hour: 20, // 8 PM
-        minute: 0,
+        hour: 23, // 11:59 PM
+        minute: 59,
       },
     });
-
-    //console.log(`✅ Daily achievement check scheduled for 8 PM (goal: ${dailyGoal})`);
   } catch (error) {
     console.error("❌ Error scheduling daily achievement check:", error);
   }
 }
+
 
 /**
  * Send immediate achievement notification (for testing)
@@ -138,6 +121,62 @@ export async function sendDailyAchievementNotification(
     console.error("❌ Error sending daily achievement notification:", error);
   }
 }
+
+/**
+ * Check yesterday's puffs on app open and send achievement notification if applicable.
+ * Only sends once per day, and only if the user was under their daily goal.
+ */
+const ACHIEVEMENT_LAST_SENT_KEY = "daily_achievement_last_sent_date";
+
+export async function checkAndSendDailyAchievementOnOpen(userId: string): Promise<void> {
+  const Notif = await getNotifications();
+  if (!Notif) return;
+
+  try {
+    // Check if we already sent today
+    const lastSentDate = await AsyncStorage.getItem(ACHIEVEMENT_LAST_SENT_KEY);
+    const today = new Date().toDateString();
+    if (lastSentDate === today) {
+      return; // Already sent today, skip
+    }
+
+    // Read yesterday's stored puff data (user-scoped keys)
+    const storedDate = await AsyncStorage.getItem(`todayDate_${userId}`);
+    const storedPuffs = await AsyncStorage.getItem(`todayPuffs_${userId}`);
+
+    if (!storedDate) return;
+
+    // Only send if it's a new day (storedDate is yesterday)
+    if (storedDate === today) return; // Data is from today, not yesterday yet
+
+    const yesterdayPuffs = parseInt(storedPuffs || "0", 10);
+
+    // Fetch daily goal from Supabase
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) return;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("puffs_per_day")
+      .eq("user_id", user.id)
+      .single();
+
+    const dailyGoal = profile?.puffs_per_day;
+    if (!dailyGoal) return;
+
+    // Only send if user was under or equal to their daily goal
+    if (yesterdayPuffs > dailyGoal) return;
+
+    // Send the real achievement notification with actual data
+    await sendDailyAchievementNotification(yesterdayPuffs, dailyGoal);
+
+    // Mark as sent today so we don't send again
+    await AsyncStorage.setItem(ACHIEVEMENT_LAST_SENT_KEY, today);
+  } catch (error) {
+    console.error("❌ Error checking daily achievement on open:", error);
+  }
+}
+
 
 /**
  * Cancel scheduled daily achievement check

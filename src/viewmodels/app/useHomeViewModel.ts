@@ -3,6 +3,7 @@ import { useUserData } from "@/src/hooks/useUserData";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
 import { fetchAIQuote } from "@/src/services/ai-quotes-service";
+import { scheduleDailyAchievementCheck } from "@/src/services/notifications/daily-achievement-notification";
 import { updateLastActivity } from "@/src/services/notifications/inactivity-notification";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -82,13 +83,18 @@ export function useHomeViewModel() {
     ]);
 
     const today = new Date().toDateString();
-    if (storedDate !== today) {
-      await AsyncStorage.setItem(keys.todayDate, today);
-      await AsyncStorage.setItem(keys.todayPuffs, "0");
-      setTodayPuffs(0);
-    } else if (storedTodayPuffs) {
+        if (storedDate !== today) {
+        await AsyncStorage.setItem(keys.todayDate, today);
+        await AsyncStorage.setItem(keys.todayPuffs, "0");
+        setTodayPuffs(0);
+        // Schedule tonight's notification starting at 0 puffs
+        scheduleDailyAchievementCheck(0, profile?.puffs_per_day || 200);
+      } else if (storedTodayPuffs) {
       setTodayPuffs(parseInt(storedTodayPuffs, 10));
+      // Schedule tonight's 11:59 PM notification with current puff data on app open
+      scheduleDailyAchievementCheck(parseInt(storedTodayPuffs, 10), profile?.puffs_per_day || 200);
     }
+
 
     if (storedLastPuff) {
       setLastPuffTime(new Date(storedLastPuff));
@@ -254,6 +260,9 @@ export function useHomeViewModel() {
   }
 
   await updateLastActivity();
+
+  scheduleDailyAchievementCheck(newPuffCount, dailyGoal);
+
 }, [todayPuffs, user?.id]);
 
 

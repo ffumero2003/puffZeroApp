@@ -117,42 +117,16 @@ export async function checkAndSendFirstPuffFreeDayNotification(): Promise<void> 
 }
 
 /**
- * Schedule end-of-day check for puff-free day (at 11:59 PM)
+ * Schedule end-of-day check for puff-free day
+ * NOTE: Removed scheduled notification since it can't evaluate puff data at trigger time.
+ * The actual check happens via checkAndSendFirstPuffFreeDayNotification() on app open.
  */
 export async function scheduleEndOfDayPuffFreeCheck(): Promise<void> {
-  const Notif = await getNotifications();
-  if (!Notif) return;
-
-  
-  await cancelEndOfDayPuffFreeCheck();
-
-  try {
-    // Check if already sent the first puff-free day notification
-    const alreadySent = await wasFirstPuffFreeDaySent();
-    if (alreadySent) {
-      // console.log("📊 First puff-free day already achieved, skipping schedule");
-      return;
-    }
-
-    await Notif.scheduleNotificationAsync({
-      content: {
-        title: "🎯 Verificando tu día",
-        body: "Revisando si completaste un día libre de puffs...",
-        sound: false,
-        data: { type: "puff_free_day_check" },
-      },
-      trigger: {
-        type: Notif.SchedulableTriggerInputTypes.DAILY,
-        hour: 23,
-        minute: 59,
-      },
-    });
-
-    // console.log("✅ End-of-day puff-free check scheduled for 11:59 PM");
-  } catch (error) {
-    console.error("❌ Error scheduling end-of-day check:", error);
-  }
+  // No-op: the puff-free day check is handled on app open
+  // via checkAndSendFirstPuffFreeDayNotification()
+  return;
 }
+
 
 /**
  * Cancel end-of-day puff-free check
