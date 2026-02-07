@@ -9,18 +9,6 @@ export function useAuthGuard() {
   const segments = useSegments();
   const lastDevRoute = useRef<string | null>(null);
 
-  // ═══════════════════════════════════════════════════════════════
-  // PAYWALL VARIABLE
-  // ═══════════════════════════════════════════════════════════════
-  // - shouldBypassPaywall() reads BYPASS_PAYWALL from dev.ts
-  //   → Set BYPASS_PAYWALL = true in dev.ts to skip paywall while developing
-  //   → Set BYPASS_PAYWALL = false to test the real paywall flow
-  // - isPremium comes from auth-provider (real subscription state)
-  //   → Gets set to true after a successful purchase
-  //   → Gets checked from your payment system on app load
-  // - In PROD (__DEV__ = false): shouldBypassPaywall() is always false,
-  //   so only isPremium matters
-  // ═══════════════════════════════════════════════════════════════
   const hasPremium = shouldBypassPaywall() || isPremium;
 
   useEffect(() => {
@@ -46,14 +34,16 @@ export function useAuthGuard() {
     const inPostSignup = segments[1] === "post-signup";
     const inDev = segments[0] === "(dev)";
 
+    // NEW: Detect if user is at the root index (no group segment)
+    // This happens on fresh app open / reload before any redirect
+    const inRoot = !inApp && !inAuth && !inOnboarding && !inPaywall && !inDev;
+
     // 🔧 DEV MODE: If in (dev) routes, don't interfere
     if (inDev) {
       return;
     }
 
     // 🔓 RUTAS PÚBLICAS (siempre accesibles)
-    // NOTE: verify-required removed — VerificationModal handles email
-    // verification with a 7-day countdown inside the app screens
     const publicRoutes = [
       "privacy-policy",
       "terms-of-use",
@@ -67,8 +57,6 @@ export function useAuthGuard() {
     // → Va al onboarding. Puede ir a auth o quedarse en onboarding.
     // ════════════════════════════════════════════════════════
     if (!user) {
-      const inRoot =
-        !inApp && !inAuth && !inOnboarding && !inPaywall && !isPublicRoute;
       if (inApp || inPaywall || inRoot) {
         router.replace("/(onboarding)/onboarding");
         return;
@@ -91,11 +79,13 @@ export function useAuthGuard() {
     // ════════════════════════════════════════════════════════
     // TIPO 3: Usuario CON sesión activa (login o returning)
     // → Si tiene premium → (app)/home
-    // → Si NO tiene premium → (paywall)/paywall (no puede salir)
+    // → Si NO tiene premium → (paywall)/paywall
     // ════════════════════════════════════════════════════════
     if (user) {
-      // Si está en (auth) o en onboarding (pero NO post-signup), sacarlo
-      if ((inAuth || inOnboarding) && !inPostSignup) {
+      // NEW: If user is at root index or in auth/onboarding, send them
+      // to the right place. This is the key fix — on app reload,
+      // the user lands at root index and needs to be redirected.
+      if ((inAuth || inOnboarding || inRoot) && !inPostSignup) {
         if (hasPremium) {
           router.replace("/(app)/home");
         } else {

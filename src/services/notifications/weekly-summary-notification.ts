@@ -127,7 +127,7 @@ export async function scheduleWeeklySummaryNotification(): Promise<void> {
       trigger: {
         type: Notif.SchedulableTriggerInputTypes.WEEKLY,
         weekday: 1, // Sunday (1 = Sunday in expo-notifications)
-        hour: 20, // 8 PM
+        hour: 18, // 8 PM
         minute: 0,
       },
     });

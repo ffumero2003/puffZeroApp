@@ -7,11 +7,13 @@ import SettingsActions from "@/src/components/app/settings/SettingsActions";
 import SettingsHeader from "@/src/components/app/settings/SettingsHeader";
 import SettingsRow from "@/src/components/app/settings/SettingsRow";
 import SettingsSection from "@/src/components/app/settings/SettingsSection";
+import SupportModal from "@/src/components/app/settings/SupportModal";
 import { VerificationStatus } from "@/src/components/app/settings/VerificationStatus";
 import { Colors } from "@/src/constants/theme";
 import { useAuth } from "@/src/providers/auth-provider";
 import { deleteAccount } from "@/src/services/auth-services";
 import { useSettingsViewModel } from "@/src/viewmodels/app/useSettingsViewModel";
+
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -29,6 +31,7 @@ export default function Settings() {
   // Modal visibility states
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showPuffsModal, setShowPuffsModal] = useState(false);
+  const [showSupportModal, setShowSupportModal] = useState(false);
 
   // ============================================
   // Handlers
@@ -149,6 +152,11 @@ export default function Settings() {
             onPress={() => router.push("/terms-of-use")}
           />
           <SettingsRow
+            label="Contactar Soporte"
+            onPress={() => setShowSupportModal(true)}
+          />
+
+          <SettingsRow
             label="Versión"
             value="1.0.0"
             showChevron={false}
@@ -186,6 +194,12 @@ export default function Settings() {
         validate={vm.isValidPuffs}
         errorMessage="Debe estar entre 20 y 1000 puffs"
         minValueHint={vm.getPuffsHint()}
+      />
+
+      {/* Support Contact */}
+      <SupportModal
+        visible={showSupportModal}
+        onClose={() => setShowSupportModal(false)}
       />
     </View>
   );

@@ -33,7 +33,7 @@ export async function scheduleDailyQuoteNotification(): Promise<void> {
     // so the user always gets a fresh quote in their notification.
     const tomorrow8AM = new Date();
     tomorrow8AM.setDate(tomorrow8AM.getDate() + 1);
-    tomorrow8AM.setHours(8, 0, 0, 0);
+    tomorrow8AM.setHours(8, 30, 0, 0);
 
     await Notif.scheduleNotificationAsync({
       content: {
