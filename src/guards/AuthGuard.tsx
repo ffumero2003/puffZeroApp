@@ -5,7 +5,14 @@ import { getInitialRoute, shouldBypassPaywall } from "../config/dev";
 import { useAuth } from "../providers/auth-provider";
 
 export function useAuthGuard() {
-  const { user, initializing, authFlow, authInProgress, isPremium } = useAuth();
+  const {
+    user,
+    initializing,
+    authFlow,
+    authInProgress,
+    isPremium,
+    postSignupCompleted,
+  } = useAuth();
   const segments = useSegments();
   const lastDevRoute = useRef<string | null>(null);
 
@@ -34,16 +41,11 @@ export function useAuthGuard() {
     const inPostSignup = segments[1] === "post-signup";
     const inDev = segments[0] === "(dev)";
 
-    // NEW: Detect if user is at the root index (no group segment)
-    // This happens on fresh app open / reload before any redirect
     const inRoot = !inApp && !inAuth && !inOnboarding && !inPaywall && !inDev;
 
-    // 🔧 DEV MODE: If in (dev) routes, don't interfere
-    if (inDev) {
-      return;
-    }
+    if (inDev) return;
 
-    // 🔓 RUTAS PÚBLICAS (siempre accesibles)
+    // 🔓 RUTAS PÚBLICAS
     const publicRoutes = [
       "privacy-policy",
       "terms-of-use",
@@ -51,14 +53,10 @@ export function useAuthGuard() {
       "verify-email",
     ];
     const isPublicRoute = publicRoutes.includes(segments[0]);
-
-    if (isPublicRoute) {
-      return;
-    }
+    if (isPublicRoute) return;
 
     // ════════════════════════════════════════════════════════
-    // TIPO 1: Usuario SIN sesión (nuevo o logout)
-    // → Va al onboarding. Puede ir a auth o quedarse en onboarding.
+    // TIPO 1: Usuario SIN sesión
     // ════════════════════════════════════════════════════════
     if (!user) {
       if (inApp || inPaywall || inRoot) {
@@ -69,26 +67,23 @@ export function useAuthGuard() {
     }
 
     // ════════════════════════════════════════════════════════
-    // TIPO 2: Usuario CON sesión que acaba de REGISTRARSE
-    // → Debe completar el post-signup flow antes de todo
+    // TIPO 2: Usuario CON sesión que NO ha completado post-signup
+    // This now works on app restart because postSignupCompleted is persisted
     // ════════════════════════════════════════════════════════
-    if (user && authFlow === "register") {
-      if (!inPostSignup && !inOnboarding && !inPaywall && !inApp) {
+    if (user && !postSignupCompleted) {
+      // If they're not already in the post-signup flow, send them there
+      if (!inPostSignup) {
         router.replace("/(onboarding)/post-signup/step-review");
         return;
       }
+      // If they're already in post-signup, let them continue
       return;
     }
 
     // ════════════════════════════════════════════════════════
-    // TIPO 3: Usuario CON sesión activa (login o returning)
-    // → Si tiene premium → (app)/home
-    // → Si NO tiene premium → (paywall)/paywall
+    // TIPO 3: Usuario CON sesión activa y post-signup completado
     // ════════════════════════════════════════════════════════
     if (user) {
-      // NEW: If user is at root index or in auth/onboarding, send them
-      // to the right place. This is the key fix — on app reload,
-      // the user lands at root index and needs to be redirected.
       if ((inAuth || inOnboarding || inRoot) && !inPostSignup) {
         if (hasPremium) {
           router.replace("/(app)/home");
@@ -98,17 +93,15 @@ export function useAuthGuard() {
         return;
       }
 
-      // Si NO tiene premium, bloquearlo en paywall (excepto post-signup)
       if (!hasPremium && !inPaywall && !inPostSignup) {
         router.replace("/(paywall)/paywall");
         return;
       }
 
-      // Si tiene premium pero está en paywall, mandarlo a home
       if (hasPremium && inPaywall) {
         router.replace("/(app)/home");
         return;
       }
     }
-  }, [user, initializing, segments, authFlow, isPremium]);
+  }, [user, initializing, segments, authFlow, isPremium, postSignupCompleted]);
 }

@@ -34,7 +34,13 @@ const ThemeContext = createContext<ThemeContextType>({
 });
 
 // Provider component - wrap your app with this
-export function ThemeProvider({ children }: { children: ReactNode }) {
+export function ThemeProvider({
+  children,
+  onReady,
+}: {
+  children: ReactNode;
+  onReady?: () => void;
+}) {
   const [themePreference, setThemePreferenceState] =
     useState<ThemePreference>("system");
   const [loaded, setLoaded] = useState(false);
@@ -65,6 +71,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         console.error("Error loading theme preference:", error);
       } finally {
         setLoaded(true);
+        onReady?.();
       }
     })();
   }, []);

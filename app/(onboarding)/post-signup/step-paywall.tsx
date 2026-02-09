@@ -37,7 +37,7 @@ export default function OnboardingPaywall() {
     completeOnboarding,
     resetAll,
   } = useOnboarding();
-  const { user, setAuthFlow, setIsPremium } = useAuth();
+  const { user, setAuthFlow, setIsPremium, setPostSignupCompleted } = useAuth();
 
   const { formatMoney } = useOnboardingPaywallViewModel();
   const [plan, setPlan] = useState<"weekly" | "yearly">("yearly");
@@ -141,11 +141,11 @@ export default function OnboardingPaywall() {
   );
 
   function grantAccess() {
-    // Same as above — in production, only call after confirmed purchase
     setIsPremium(true);
     completeOnboarding();
     resetAll();
     setAuthFlow(null);
+    setPostSignupCompleted(true);
     router.replace("/(app)/home");
   }
 

@@ -19,6 +19,9 @@ import { deleteAccount } from "@/src/services/auth-services";
 import { useSettingsViewModel } from "@/src/viewmodels/app/useSettingsViewModel";
 
 import { ROUTES } from "@/src/constants/routes";
+import { supabase } from "@/src/lib/supabase";
+import { useOnboarding } from "@/src/providers/onboarding-provider";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -37,6 +40,7 @@ const THEME_LABELS: Record<string, string> = {
 };
 
 export default function Settings() {
+  const { resetAll } = useOnboarding();
   const { signOut, user } = useAuth();
   const vm = useSettingsViewModel();
   // NEW: Get theme preference and setter
@@ -64,6 +68,7 @@ export default function Settings() {
       const userId = user?.id;
       if (!userId) return;
 
+      // Step 1: Call the edge function to delete all user data from Supabase
       const { error } = await deleteAccount(userId);
 
       if (error) {
@@ -71,7 +76,28 @@ export default function Settings() {
         return;
       }
 
-      await signOut();
+      // Step 2: Clear ALL local AsyncStorage keys tied to this user
+      // This prevents stale data from leaking to a new account on the same device
+      await AsyncStorage.multiRemove([
+        "postSignupCompleted",
+        "onboardingCompleted",
+        "onboarding_name",
+        "profile_created_at",
+        "notifications_enabled",
+        "theme_preference",
+      ]);
+
+      // Step 3: Reset the in-memory onboarding state
+      resetAll();
+
+      // Step 4: Sign out from Supabase (clears session token locally)
+      // We call supabase.auth.signOut() directly instead of the signOut()
+      // from auth provider, because signOut() sets postSignupCompleted to true,
+      // which we just cleared. We want it to stay cleared.
+      await supabase.auth.signOut();
+
+      // Step 5: Navigate to onboarding - AuthGuard will also do this
+      // since user becomes null, but we do it explicitly for immediate feedback
       router.replace("/(onboarding)/onboarding");
     } catch (error) {
       console.error("❌ Error deleting account:", error);

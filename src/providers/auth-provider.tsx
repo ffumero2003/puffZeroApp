@@ -1,5 +1,6 @@
 // src/providers/auth-provider.tsx
 import { sendWelcomeBackNotification } from "@/src/services/notifications/welcome-back-notification";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Session, User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { AppState } from "react-native";
@@ -27,6 +28,9 @@ interface AuthContextProps {
   authInProgress: boolean;
   setAuthInProgress: (v: boolean) => void;
 
+  postSignupCompleted: boolean;
+  setPostSignupCompleted: (v: boolean) => void;
+
   // ═══════════════════════════════════════════════
   // NEW: Premium/subscription state
   // This is what the AuthGuard checks to decide
@@ -53,6 +57,9 @@ const AuthContext = createContext<AuthContextProps>({
   loading: true,
   initializing: true,
 
+  postSignupCompleted: false,
+  setPostSignupCompleted: () => {},
+
   authFlow: null,
   setAuthFlow: () => {},
 
@@ -69,6 +76,8 @@ const AuthContext = createContext<AuthContextProps>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [postSignupCompleted, setPostSignupCompletedState] = useState(true);
+
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [initializing, setInitializing] = useState(true);
@@ -78,6 +87,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // NEW: premium state — starts false, gets set to true after purchase
   const [isPremium, setIsPremium] = useState(false);
+
+  useEffect(() => {
+    const loadPostSignupFlag = async () => {
+      const flag = await AsyncStorage.getItem("postSignupCompleted");
+      // If the flag has never been set (null), default to true
+      // (existing users who already completed onboarding won't have this key)
+      setPostSignupCompletedState(flag === null ? true : flag === "true");
+    };
+    loadPostSignupFlag();
+  }, []);
 
   useEffect(() => {
     const loadSession = async () => {
@@ -114,6 +133,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => subscription.subscription.unsubscribe();
   }, []);
+
+  const setPostSignupCompleted = async (v: boolean) => {
+    setPostSignupCompletedState(v);
+    await AsyncStorage.setItem("postSignupCompleted", v.toString());
+  };
 
   // ═══════════════════════════════════════════════════════════════
   // NEW: Check premium status whenever user session loads/changes
@@ -160,11 +184,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       options: { data: { full_name } },
     });
 
+    // NEW: When a user registers, mark post-signup as not completed
+    // This persists so even if app restarts, they'll go back to post-signup
+    if (!result.error) {
+      await setPostSignupCompleted(false);
+    }
+
     setLoading(false);
-
-    // Note: Welcome notification is sent in useRegisterViewModel after profile creation
-    // This ensures we have confirmed the registration was successful
-
     return result;
   };
 
@@ -195,7 +221,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     setAuthFlow(null);
     setAuthInProgress(false);
-    setIsPremium(false); // NEW: reset premium on logout
+    setIsPremium(false);
+    // NEW: Reset post-signup flag on logout
+    await setPostSignupCompleted(true); // true so next login doesn't get stuck
     await supabase.auth.signOut();
   };
 
@@ -248,6 +276,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signUp,
         signIn,
         signOut,
+
+        postSignupCompleted,
+        setPostSignupCompleted,
       }}
     >
       {children}

@@ -9,6 +9,8 @@ import {
   useFonts,
 } from "@expo-google-fonts/manrope";
 
+import * as SplashScreen from "expo-splash-screen";
+
 import Splash from "@/src/components/system/Splash";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, Stack } from "expo-router";
@@ -23,6 +25,7 @@ import { OnboardingProvider } from "../src/providers/onboarding-provider";
 import { ThemeProvider, useTheme } from "../src/providers/theme-provider";
 
 WebBrowser.maybeCompleteAuthSession();
+SplashScreen.preventAutoHideAsync();
 
 function RootNavigation() {
   const { initializing } = useAuth();
@@ -76,7 +79,7 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <ThemeProvider>
+      <ThemeProvider onReady={() => SplashScreen.hideAsync()}>
         <AuthProvider>
           <OnboardingProvider>
             <RootNavigation />
