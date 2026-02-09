@@ -3,7 +3,7 @@
 // Supports validation with error messages
 
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { useEffect, useState } from "react";
 import {
   Modal,
@@ -38,6 +38,7 @@ export default function InputModal({
   errorMessage = "Valor inválido",
   minValueHint,
 }: InputModalProps) {
+  const colors = useThemeColors();
   const [tempValue, setTempValue] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -84,38 +85,57 @@ export default function InputModal({
     >
       <Pressable style={styles.overlay} onPress={onClose}>
         {/* Prevent close when pressing modal content */}
-        <Pressable style={styles.content}>
-          <AppText weight="bold" style={styles.title}>
+        <Pressable style={[styles.content, { backgroundColor: colors.card }]}>
+          <AppText weight="bold" style={[styles.title, { color: colors.text }]}>
             {title}
           </AppText>
 
           {/* Hint text (e.g., minimum value) */}
           {minValueHint && (
-            <AppText style={styles.hint}>{minValueHint}</AppText>
+            <AppText style={[styles.hint, { color: colors.textMuted }]}>
+              {minValueHint}
+            </AppText>
           )}
 
           <TextInput
-            style={[styles.input, error && styles.inputError]}
+            style={[
+              styles.input,
+              error && styles.inputError,
+              { color: colors.text, borderColor: colors.border },
+            ]}
             value={tempValue}
             onChangeText={handleChange}
             keyboardType="number-pad"
             placeholder={placeholder}
-            placeholderTextColor={Colors.light.textMuted}
+            placeholderTextColor={colors.textMuted}
             autoFocus
           />
 
           {/* Error message */}
-          {error && <AppText style={styles.errorText}>{error}</AppText>}
+          {error && (
+            <AppText style={[styles.errorText, { color: colors.danger }]}>
+              {error}
+            </AppText>
+          )}
 
           <View style={styles.buttons}>
-            <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+            <TouchableOpacity
+              style={[styles.cancelButton, { backgroundColor: colors.card }]}
+              onPress={onClose}
+            >
               <AppText weight="medium" style={styles.cancelText}>
                 Cancelar
               </AppText>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <AppText weight="bold" style={styles.saveText}>
+            <TouchableOpacity
+              style={[styles.saveButton, { backgroundColor: colors.primary }]}
+              onPress={handleSave}
+            >
+              <AppText
+                weight="bold"
+                style={[styles.saveText, { color: colors.textWhite }]}
+              >
                 Guardar
               </AppText>
             </TouchableOpacity>
@@ -134,7 +154,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   content: {
-    backgroundColor: "#fff",
     borderRadius: 16,
     padding: 24,
     width: "85%",
@@ -142,31 +161,24 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    color: Colors.light.text,
     textAlign: "center",
   },
   hint: {
     fontSize: 14,
-    color: Colors.light.textMuted,
     textAlign: "center",
     marginTop: 8,
   },
   input: {
     borderWidth: 2,
-    borderColor: Colors.light.border,
     borderRadius: 12,
     padding: 16,
     fontSize: 18,
     marginTop: 16,
-    color: Colors.light.text,
     textAlign: "center",
   },
-  inputError: {
-    borderColor: Colors.light.danger,
-  },
+  inputError: {},
   errorText: {
     fontSize: 14,
-    color: Colors.light.danger,
     textAlign: "center",
     marginTop: 8,
   },
@@ -182,16 +194,13 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     fontSize: 16,
-    color: Colors.light.textMuted,
   },
   saveButton: {
-    backgroundColor: Colors.light.primary,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 10,
   },
   saveText: {
     fontSize: 16,
-    color: "#fff",
   },
 });

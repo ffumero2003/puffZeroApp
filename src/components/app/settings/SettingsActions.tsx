@@ -1,8 +1,7 @@
 // src/components/app/settings/SettingsActions.tsx
-// Logout and Delete Account buttons
-
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+// NEW: Dynamic colors
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 
 interface SettingsActionsProps {
@@ -14,6 +13,9 @@ export default function SettingsActions({
   onLogout,
   onDeleteAccount,
 }: SettingsActionsProps) {
+  // NEW: Dynamic colors
+  const colors = useThemeColors();
+
   const handleDeleteAccount = () => {
     Alert.alert(
       "Eliminar Cuenta",
@@ -23,16 +25,17 @@ export default function SettingsActions({
         {
           text: "Eliminar",
           style: "destructive",
-          onPress: onDeleteAccount, // Only calls delete if user confirms
+          onPress: onDeleteAccount,
         },
       ]
     );
   };
+
   return (
     <View style={styles.container}>
-      {/* Logout Button */}
+      {/* NEW: Dynamic button background color */}
       <TouchableOpacity
-        style={styles.logoutButton}
+        style={[styles.logoutButton, { backgroundColor: colors.primary }]}
         onPress={onLogout}
         activeOpacity={0.7}
       >
@@ -41,9 +44,8 @@ export default function SettingsActions({
         </AppText>
       </TouchableOpacity>
 
-      {/* Delete Account Button */}
       <TouchableOpacity
-        style={styles.deleteButton}
+        style={[styles.deleteButton, { backgroundColor: colors.danger }]}
         onPress={handleDeleteAccount}
         activeOpacity={0.7}
       >
@@ -62,7 +64,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   logoutButton: {
-    backgroundColor: Colors.light.primary,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
@@ -72,7 +73,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   deleteButton: {
-    backgroundColor: Colors.light.danger,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",

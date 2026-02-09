@@ -1,4 +1,6 @@
-import { Colors, Fonts } from "@/src/constants/theme";
+import { Fonts } from "@/src/constants/theme";
+// NEW: Import useThemeColors instead of static Colors
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { Text, TextProps } from "react-native";
 
 type FontWeightOption =
@@ -15,14 +17,21 @@ interface AppTextProps extends TextProps {
   children: React.ReactNode;
 }
 
-export default function AppText({ weight = "regular", style, children, ...props }: AppTextProps) {
+export default function AppText({
+  weight = "regular",
+  style,
+  children,
+  ...props
+}: AppTextProps) {
+  const colors = useThemeColors();
+
   return (
     <Text
       {...props}
       style={[
         {
           fontFamily: Fonts[weight],
-          color: Colors.light.text,
+          color: colors.text,
         },
         style,
       ]}

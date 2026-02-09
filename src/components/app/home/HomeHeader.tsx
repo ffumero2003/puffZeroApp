@@ -1,7 +1,7 @@
 // src/components/app/home/HomeHeader.tsx
 import Logo from "@/assets/images/logo-puff-zero.png";
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { Image, StyleSheet, View } from "react-native";
 
 interface HomeHeaderProps {
@@ -10,13 +10,15 @@ interface HomeHeaderProps {
 }
 
 export default function HomeHeader({ firstName, dailyGoal }: HomeHeaderProps) {
+  const colors = useThemeColors();
+
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
-        <AppText weight="bold" style={styles.title}>
+        <AppText weight="bold" style={[styles.title, { color: colors.text }]}>
           Hola, {firstName} 👋
         </AppText>
-        <AppText style={styles.subtitle}>
+        <AppText style={[styles.subtitle, { color: colors.textSecondary }]}>
           Tu meta diaria: <AppText weight="bold">{dailyGoal} puffs</AppText>
         </AppText>
       </View>
@@ -41,12 +43,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    color: Colors.light.text,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: Colors.light.textSecondary,
   },
   cloudIcon: {
     marginLeft: 12,

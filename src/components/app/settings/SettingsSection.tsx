@@ -1,8 +1,7 @@
 // src/components/app/settings/SettingsSection.tsx
-// Reusable section container with title
-
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+// NEW: Dynamic colors
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { StyleSheet, View } from "react-native";
 
 interface SettingsSectionProps {
@@ -14,9 +13,16 @@ export default function SettingsSection({
   title,
   children,
 }: SettingsSectionProps) {
+  // NEW: Dynamic colors
+  const colors = useThemeColors();
+
   return (
-    <View style={styles.section}>
-      <AppText weight="semibold" style={styles.sectionTitle}>
+    // NEW: Dynamic card background and shadow
+    <View style={[styles.section, { backgroundColor: colors.card }]}>
+      <AppText
+        weight="semibold"
+        style={[styles.sectionTitle, { color: colors.textMuted }]}
+      >
         {title}
       </AppText>
       {children}
@@ -26,7 +32,6 @@ export default function SettingsSection({
 
 const styles = StyleSheet.create({
   section: {
-    backgroundColor: "#fff",
     marginHorizontal: 16,
     marginBottom: 16,
     borderRadius: 16,
@@ -39,7 +44,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 14,
-    color: Colors.light.textMuted,
     marginLeft: 16,
     marginTop: 8,
     marginBottom: 4,

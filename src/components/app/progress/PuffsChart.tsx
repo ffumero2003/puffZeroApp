@@ -1,6 +1,6 @@
 // src/components/app/progress/PuffsChart.tsx
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 
@@ -28,27 +28,30 @@ export default function PuffsChart({
   onRangeChange,
   daysSinceStart,
 }: PuffsChartProps) {
+  const colors = useThemeColors();
   const ranges: { key: TimeRange; label: string }[] = [
     { key: "7days", label: "7 días" },
     { key: "30days", label: "30 días" },
     { key: "all", label: "Uso Histórico" },
   ];
 
-  // Limit labels for readability
   const maxLabels = 6;
   const labelStep = Math.max(1, Math.ceil(data.length / maxLabels));
-
   const labels = data.map((d, i) => (i % labelStep === 0 ? String(d.x) : ""));
-
   const values = data.map((d) => d.y);
 
-  // If no data, show placeholder
   if (daysSinceStart < 7) {
     return (
-      <View style={styles.container}>
-        {/* Your range selector header here */}
-        <View style={styles.emptyChart}>
-          <AppText style={styles.emptyText} weight="bold">
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+      >
+        <View
+          style={[styles.emptyChart, { backgroundColor: colors.secondary }]}
+        >
+          <AppText style={{ color: colors.text, fontSize: 16 }} weight="bold">
             Vuelve en {7 - daysSinceStart} días para ver tu progreso
           </AppText>
         </View>
@@ -56,46 +59,59 @@ export default function PuffsChart({
     );
   }
 
+  // Chart config uses dynamic colors
   const chartConfig = {
-    backgroundColor: "#FFF",
-    backgroundGradientFrom: "#FFF",
-    backgroundGradientTo: "#FFF",
+    backgroundColor: colors.card,
+    backgroundGradientFrom: colors.card,
+    backgroundGradientTo: colors.card,
     decimalPlaces: 0,
-    color: (opacity = 1) => `rgba(89, 116, 255, ${opacity})`,
-    labelColor: () => Colors.light.textMuted,
+    color: (opacity = 1) => `rgba(${hexToRgb(colors.primary)}, ${opacity})`,
+    labelColor: () => colors.textMuted,
     style: {
       borderRadius: 16,
     },
     propsForDots: {
       r: "4",
       strokeWidth: "2",
-      stroke: Colors.light.primary,
+      stroke: colors.primary,
     },
     propsForBackgroundLines: {
       strokeDasharray: "4,4",
-      stroke: Colors.light.border,
+      stroke: colors.border,
     },
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.card, borderColor: colors.secondary },
+      ]}
+    >
       <View style={styles.header}>
-        <View style={styles.rangeSelector}>
+        <View
+          style={[styles.rangeSelector, { backgroundColor: colors.secondary }]}
+        >
           {ranges.map((range) => (
             <TouchableOpacity
               key={range.key}
               style={[
                 styles.rangeButton,
-                selectedRange === range.key && styles.rangeButtonActive,
+                selectedRange === range.key && {
+                  backgroundColor: colors.primary,
+                },
               ]}
               onPress={() => onRangeChange(range.key)}
             >
               <AppText
                 weight={selectedRange === range.key ? "bold" : "regular"}
-                style={[
-                  styles.rangeButtonText,
-                  selectedRange === range.key && styles.rangeButtonTextActive,
-                ]}
+                style={{
+                  fontSize: 12,
+                  color:
+                    selectedRange === range.key
+                      ? colors.textWhite
+                      : colors.text,
+                }}
               >
                 {range.label}
               </AppText>
@@ -111,13 +127,13 @@ export default function PuffsChart({
             datasets: [
               {
                 data: values.length > 0 ? values : [0],
-                color: (opacity = 1) => `rgba(89, 116, 255, ${opacity})`,
+                color: (opacity = 1) =>
+                  `rgba(${hexToRgb(colors.primary)}, ${opacity})`,
                 strokeWidth: 2,
               },
-              // Goal line
               {
                 data: Array(Math.max(values.length, 1)).fill(dailyGoal),
-                color: () => Colors.light.danger,
+                color: () => colors.danger,
                 strokeWidth: 2,
                 withDots: false,
               },
@@ -139,35 +155,42 @@ export default function PuffsChart({
       <View style={styles.legend}>
         <View style={styles.legendItem}>
           <View
-            style={[
-              styles.legendDot,
-              { backgroundColor: Colors.light.primary },
-            ]}
+            style={[styles.legendDot, { backgroundColor: colors.primary }]}
           />
-          <AppText style={styles.legendText}>Consumo real</AppText>
+          <AppText style={{ fontSize: 11, color: colors.textMuted }}>
+            Consumo real
+          </AppText>
         </View>
         <View style={styles.legendItem}>
           <View
-            style={[
-              styles.legendLine,
-              { backgroundColor: Colors.light.danger },
-            ]}
+            style={[styles.legendLine, { backgroundColor: colors.danger }]}
           />
-          <AppText style={styles.legendText}>Meta diaria ({dailyGoal})</AppText>
+          <AppText style={{ fontSize: 11, color: colors.textMuted }}>
+            Meta diaria ({dailyGoal})
+          </AppText>
         </View>
       </View>
     </View>
   );
 }
 
+// Helper: converts "#5974FF" → "89, 116, 255" for rgba() strings
+function hexToRgb(hex: string): string {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!result) return "0, 0, 0";
+  return `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(
+    result[3],
+    16
+  )}`;
+}
+
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#FFF",
+    marginTop: 5,
     borderRadius: 16,
     padding: 16,
     marginHorizontal: 10,
     borderWidth: 2,
-    borderColor: Colors.light.secondary,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -184,12 +207,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    color: Colors.light.text,
     flex: 1,
   },
   rangeSelector: {
     flexDirection: "row",
-    backgroundColor: Colors.light.secondary,
     borderRadius: 8,
     padding: 2,
   },
@@ -197,16 +218,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
-  },
-  rangeButtonActive: {
-    backgroundColor: Colors.light.primary,
-  },
-  rangeButtonText: {
-    fontSize: 12,
-    color: Colors.light.text,
-  },
-  rangeButtonTextActive: {
-    color: Colors.light.textWhite,
   },
   chartContainer: {
     alignItems: "center",
@@ -219,12 +230,7 @@ const styles = StyleSheet.create({
     height: 200,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Colors.light.secondary,
     borderRadius: 12,
-  },
-  emptyText: {
-    color: Colors.light.text,
-    fontSize: 16,
   },
   legend: {
     flexDirection: "row",
@@ -246,9 +252,5 @@ const styles = StyleSheet.create({
     width: 16,
     height: 3,
     borderRadius: 2,
-  },
-  legendText: {
-    fontSize: 11,
-    color: Colors.light.textMuted,
   },
 });

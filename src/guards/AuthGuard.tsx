@@ -52,6 +52,10 @@ export function useAuthGuard() {
     ];
     const isPublicRoute = publicRoutes.includes(segments[0]);
 
+    if (isPublicRoute) {
+      return;
+    }
+
     // ════════════════════════════════════════════════════════
     // TIPO 1: Usuario SIN sesión (nuevo o logout)
     // → Va al onboarding. Puede ir a auth o quedarse en onboarding.

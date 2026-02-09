@@ -1,17 +1,20 @@
 // src/components/app/progress/ProgressHeader.tsx
 import Logo from "@/assets/images/logo-puff-zero.png";
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { Image, StyleSheet, View } from "react-native";
 
 export default function ZuffyHeader() {
+  const colors = useThemeColors();
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
-        <AppText weight="bold" style={styles.title}>
+        <AppText weight="bold" style={[styles.title, { color: colors.text }]}>
           Zuffy 💬
         </AppText>
-        <AppText style={styles.subtitle}>Tu Acompañante en el proceso</AppText>
+        <AppText style={[styles.subtitle, { color: colors.textSecondary }]}>
+          Tu Acompañante en el proceso
+        </AppText>
       </View>
 
       <View style={styles.logoContainer}>
@@ -34,12 +37,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    color: Colors.light.text,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: Colors.light.textSecondary,
     opacity: 0.7,
   },
   logoContainer: {

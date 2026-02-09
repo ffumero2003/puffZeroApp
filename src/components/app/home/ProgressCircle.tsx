@@ -1,6 +1,7 @@
 // src/components/home/ProgressCircle.tsx
 import AppText from "@/src/components/AppText";
 import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { StyleSheet, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 
@@ -17,6 +18,7 @@ export default function ProgressCircle({
   totalPuffs,
   lastPuffTime,
 }: Props) {
+  const colors = useThemeColors();
   const size = 280;
   const strokeWidth = 20;
   const radius = (size - strokeWidth) / 2;
@@ -31,7 +33,7 @@ export default function ProgressCircle({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={Colors.light.secondary}
+          stroke={colors.secondary}
           strokeWidth={strokeWidth}
           fill="none"
         />
@@ -41,7 +43,7 @@ export default function ProgressCircle({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={Colors.light.primary}
+          stroke={colors.primary}
           strokeWidth={strokeWidth}
           fill="none"
           strokeDasharray={circumference}
@@ -53,31 +55,39 @@ export default function ProgressCircle({
       </Svg>
 
       <View style={styles.content}>
-        <AppText style={styles.percentageLabel}>
+        <AppText style={[styles.percentageLabel, { color: colors.text }]}>
           Le has dado al{" "}
           <AppText
             weight="extrabold"
-            style={{ color: Colors.light.primary, fontSize: 20 }}
+            style={{ color: colors.primary, fontSize: 20 }}
           >
             {percentage}%
           </AppText>{" "}
           de tu límite
         </AppText>
 
-        <AppText weight="bold" style={styles.puffsCount}>
+        <AppText
+          weight="bold"
+          style={[styles.puffsCount, { color: colors.text }]}
+        >
           <AppText
             weight="extrabold"
-            style={{ color: Colors.light.primary, fontSize: 36 }}
+            style={{ color: colors.primary, fontSize: 36 }}
           >
             {currentPuffs}/{totalPuffs}{" "}
           </AppText>
           Puffs
         </AppText>
 
-        <View style={styles.lastTimeContainer}>
-          <AppText style={styles.lastTime}>
+        <View
+          style={[
+            styles.lastTimeContainer,
+            { backgroundColor: colors.secondary },
+          ]}
+        >
+          <AppText style={[styles.lastTime, { color: colors.textSecondary }]}>
             Última vez:{" "}
-            <AppText weight="extrabold" style={{ color: Colors.light.primary }}>
+            <AppText weight="extrabold" style={{ color: colors.primary }}>
               {lastPuffTime}
             </AppText>
           </AppText>
@@ -105,7 +115,7 @@ const styles = StyleSheet.create({
   percentageLabel: {
     fontSize: 12,
     textAlign: "center",
-    color: Colors.light.text,
+
     marginBottom: 12,
   },
   puffsCount: {
@@ -117,13 +127,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
 
-    backgroundColor: Colors.light.secondary,
     paddingHorizontal: 5,
     paddingVertical: 5,
     borderRadius: 10,
   },
   lastTime: {
     fontSize: 12,
-    color: Colors.light.textSecondary,
   },
 });

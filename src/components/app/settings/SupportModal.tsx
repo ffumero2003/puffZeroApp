@@ -2,8 +2,8 @@
 // Modal for contacting support - sends name + message to your email
 
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
 import { SUPABASE_ANON_KEY } from "@/src/lib/supabase";
+import { useThemeColors } from "@/src/providers/theme-provider";
 
 import { useEffect, useState } from "react";
 import {
@@ -26,6 +26,7 @@ interface SupportModalProps {
 }
 
 export default function SupportModal({ visible, onClose }: SupportModalProps) {
+  const colors = useThemeColors();
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
@@ -103,33 +104,43 @@ export default function SupportModal({ visible, onClose }: SupportModalProps) {
         {/* Overlay - tap outside to dismiss keyboard or close modal */}
         <Pressable style={styles.overlayInner} onPress={Keyboard.dismiss}>
           {/* Prevent close when pressing modal content */}
-          <Pressable style={styles.content}>
-            <AppText weight="bold" style={styles.title}>
+          <Pressable style={[styles.content, { backgroundColor: colors.card }]}>
+            <AppText
+              weight="bold"
+              style={[styles.title, { color: colors.text }]}
+            >
               Contactar Soporte
             </AppText>
 
-            <AppText style={styles.subtitle}>
+            <AppText style={[styles.subtitle, { color: colors.textMuted }]}>
               Escríbenos y te responderemos lo antes posible
             </AppText>
 
             {/* Name input */}
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                { color: colors.text, borderColor: colors.border },
+              ]}
               value={name}
               onChangeText={setName}
               placeholder="Tu nombre"
-              placeholderTextColor={Colors.light.textMuted}
+              placeholderTextColor={colors.textSecondary}
               autoCapitalize="words"
               editable={!sending}
             />
 
             {/* Message input - multiline */}
             <TextInput
-              style={[styles.input, styles.textArea]}
+              style={[
+                styles.input,
+                styles.textArea,
+                { color: colors.text, borderColor: colors.border },
+              ]}
               value={message}
               onChangeText={setMessage}
               placeholder="Describe tu problema o pregunta..."
-              placeholderTextColor={Colors.light.textMuted}
+              placeholderTextColor={colors.textSecondary}
               multiline
               numberOfLines={4}
               textAlignVertical="top"
@@ -137,13 +148,16 @@ export default function SupportModal({ visible, onClose }: SupportModalProps) {
             />
 
             {/* Buttons */}
-            <View style={styles.buttons}>
+            <View style={[styles.buttons, { backgroundColor: colors.card }]}>
               <TouchableOpacity
-                style={styles.cancelButton}
+                style={[styles.cancelButton, { backgroundColor: colors.card }]}
                 onPress={onClose}
                 disabled={sending}
               >
-                <AppText weight="medium" style={styles.cancelText}>
+                <AppText
+                  weight="medium"
+                  style={[styles.cancelText, { color: colors.text }]}
+                >
                   Cancelar
                 </AppText>
               </TouchableOpacity>
@@ -152,14 +166,18 @@ export default function SupportModal({ visible, onClose }: SupportModalProps) {
                 style={[
                   styles.sendButton,
                   sending && styles.sendButtonDisabled,
+                  { backgroundColor: colors.primary },
                 ]}
                 onPress={handleSend}
                 disabled={sending}
               >
                 {sending ? (
-                  <ActivityIndicator size="small" color="#fff" />
+                  <ActivityIndicator size="small" color={colors.textWhite} />
                 ) : (
-                  <AppText weight="bold" style={styles.sendText}>
+                  <AppText
+                    weight="bold"
+                    style={[styles.sendText, { color: colors.textWhite }]}
+                  >
                     Enviar
                   </AppText>
                 )}
@@ -196,23 +214,19 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    color: Colors.light.text,
     textAlign: "center",
   },
   subtitle: {
     fontSize: 14,
-    color: Colors.light.textMuted,
     textAlign: "center",
     marginTop: 8,
   },
   input: {
     borderWidth: 2,
-    borderColor: Colors.light.border,
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
     marginTop: 16,
-    color: Colors.light.text,
   },
   textArea: {
     height: 120,
@@ -229,10 +243,8 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     fontSize: 16,
-    color: Colors.light.textMuted,
   },
   sendButton: {
-    backgroundColor: Colors.light.primary,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 10,
@@ -244,6 +256,5 @@ const styles = StyleSheet.create({
   },
   sendText: {
     fontSize: 16,
-    color: "#fff",
   },
 });

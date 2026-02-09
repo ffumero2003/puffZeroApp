@@ -20,11 +20,14 @@ import { useAuthGuard } from "../src/guards/AuthGuard";
 import { supabase } from "../src/lib/supabase";
 import { AuthProvider, useAuth } from "../src/providers/auth-provider";
 import { OnboardingProvider } from "../src/providers/onboarding-provider";
+import { ThemeProvider, useTheme } from "../src/providers/theme-provider";
 
 WebBrowser.maybeCompleteAuthSession();
 
 function RootNavigation() {
   const { initializing } = useAuth();
+  // NEW: Get activeTheme to set StatusBar style dynamically
+  const { activeTheme } = useTheme();
 
   // 🔥 TODO EL FLUJO EN UN SOLO LUGAR
   useAuthGuard();
@@ -45,6 +48,10 @@ function RootNavigation() {
 
   return (
     <>
+      {/* NEW: StatusBar style flips based on theme */}
+      {/* "light" status bar = white icons (for dark backgrounds) */}
+      {/* "dark" status bar = dark icons (for light backgrounds) */}
+      <StatusBar style={activeTheme === "dark" ? "light" : "dark"} />
       <Stack
         screenOptions={{
           headerShown: false,
@@ -69,12 +76,13 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <OnboardingProvider>
-          <StatusBar style="dark" />
-          <RootNavigation />
-        </OnboardingProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <OnboardingProvider>
+            <RootNavigation />
+          </OnboardingProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

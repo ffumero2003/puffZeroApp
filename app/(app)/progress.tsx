@@ -5,13 +5,14 @@ import ProgressHeader from "@/src/components/app/progress/ProgressHeader";
 import PuffsChart from "@/src/components/app/progress/PuffsChart";
 import RecentPuffsStats from "@/src/components/app/progress/RecentPuffsStats";
 import StreakCard from "@/src/components/app/progress/StreakCard";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { useProgressViewModel } from "@/src/viewmodels/app/useProgressViewModel";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 
 export default function Progress() {
+  const colors = useThemeColors();
   const {
     loading,
     timeSinceLastPuff,
@@ -40,33 +41,33 @@ export default function Progress() {
     }, [refreshData])
   );
 
-  
-
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.light.primary} />
+      <View
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: colors.background },
+        ]}
+      >
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <ProgressHeader timeSinceLastPuff={timeSinceLastPuff} />
-      
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        
-
         {/* Countdown Timer to Goal */}
-        <CountdownTimer 
-          goalSpeedDays={goalSpeedDays} 
-          profileCreatedAt={profileCreatedDate} 
+        <CountdownTimer
+          goalSpeedDays={goalSpeedDays}
+          profileCreatedAt={profileCreatedDate}
         />
 
         {/* Recent Puffs Statistics */}
@@ -98,8 +99,6 @@ export default function Progress() {
           daysSinceStart={daysSinceStart}
         />
 
-        
-
         {/* Bottom padding for scroll */}
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -110,14 +109,13 @@ export default function Progress() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
+
     width: "100%",
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Colors.light.background,
   },
   scrollView: {
     flex: 1,

@@ -2,7 +2,7 @@
 // Modal for editing email address with validation
 
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -27,6 +27,7 @@ export default function EmailInputModal({
   onSave,
   initialValue,
 }: EmailInputModalProps) {
+  const colors = useThemeColors();
   const [tempValue, setTempValue] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -82,41 +83,52 @@ export default function EmailInputModal({
     >
       <Pressable style={styles.overlay} onPress={onClose}>
         {/* Prevent close when pressing modal content */}
-        <Pressable style={styles.content}>
-          <AppText weight="bold" style={styles.title}>
+        <Pressable style={[styles.content, { backgroundColor: colors.card }]}>
+          <AppText weight="bold" style={[styles.title, { color: colors.text }]}>
             Cambiar Correo
           </AppText>
 
           <TextInput
-            style={[styles.input, error && styles.inputError]}
+            style={[
+              styles.input,
+              error && styles.inputError,
+              { color: colors.text, borderColor: colors.border },
+            ]}
             value={tempValue}
             onChangeText={handleChange}
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
             placeholder="correo@ejemplo.com"
-            placeholderTextColor={Colors.light.textMuted}
+            placeholderTextColor={colors.textMuted}
             autoFocus
             editable={!saving && !success}
           />
 
           {/* Error message */}
-          {error && <AppText style={styles.errorText}>{error}</AppText>}
+          {error && (
+            <AppText style={[styles.errorText, { color: colors.danger }]}>
+              {error}
+            </AppText>
+          )}
 
           {/* Success message */}
           {success && (
-            <AppText style={styles.successText}>
+            <AppText style={[styles.successText, { color: colors.success }]}>
               ✅ Se envió un correo de confirmación a tu nueva dirección
             </AppText>
           )}
 
           <View style={styles.buttons}>
             <TouchableOpacity
-              style={styles.cancelButton}
+              style={[styles.cancelButton, { backgroundColor: colors.card }]}
               onPress={onClose}
               disabled={saving}
             >
-              <AppText weight="medium" style={styles.cancelText}>
+              <AppText
+                weight="medium"
+                style={[styles.cancelText, { color: colors.text }]}
+              >
                 Cancelar
               </AppText>
             </TouchableOpacity>
@@ -125,14 +137,18 @@ export default function EmailInputModal({
               style={[
                 styles.saveButton,
                 (saving || success) && styles.saveButtonDisabled,
+                { backgroundColor: colors.primary, borderColor: colors.border },
               ]}
               onPress={handleSave}
               disabled={saving || success}
             >
               {saving ? (
-                <ActivityIndicator size="small" color="#fff" />
+                <ActivityIndicator size="small" color={colors.textWhite} />
               ) : (
-                <AppText weight="bold" style={styles.saveText}>
+                <AppText
+                  weight="bold"
+                  style={[styles.saveText, { color: colors.textWhite }]}
+                >
                   Guardar
                 </AppText>
               )}
@@ -152,7 +168,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   content: {
-    backgroundColor: "#fff",
     borderRadius: 16,
     padding: 24,
     width: "85%",
@@ -160,30 +175,27 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    color: Colors.light.text,
+
     textAlign: "center",
   },
   input: {
     borderWidth: 2,
-    borderColor: Colors.light.border,
+
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
     marginTop: 16,
-    color: Colors.light.text,
   },
-  inputError: {
-    borderColor: Colors.light.danger,
-  },
+  inputError: {},
   errorText: {
     fontSize: 14,
-    color: Colors.light.danger,
+
     textAlign: "center",
     marginTop: 8,
   },
   successText: {
     fontSize: 14,
-    color: Colors.light.success,
+
     textAlign: "center",
     marginTop: 8,
   },
@@ -199,10 +211,8 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     fontSize: 16,
-    color: Colors.light.textMuted,
   },
   saveButton: {
-    backgroundColor: Colors.light.primary,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 10,
@@ -214,6 +224,5 @@ const styles = StyleSheet.create({
   },
   saveText: {
     fontSize: 16,
-    color: "#fff",
   },
 });

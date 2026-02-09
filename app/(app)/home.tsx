@@ -8,9 +8,9 @@ import { usePendingVerification } from "@/src/hooks/usePendingVerification";
 // COMMENTED OUT: Invalid direct imports - these are returned by the hook, not exported
 // import { currentWeek, canGoBack, canGoForward, goToPreviousWeek, goToNextWeek } from "@/src/viewmodels/app/useHomeViewModel";
 import { VerificationModal } from "@/src/components/app/VerificationModal";
-import { Colors } from "@/src/constants/theme";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import {
   resendEmailChangeVerification,
   sendVerificationEmail,
@@ -142,6 +142,8 @@ export default function Home() {
     }
   };
 
+  const colors = useThemeColors();
+
   // Show loading spinner until profile, puff count, and quote are all ready
   if (loading) {
     return (
@@ -151,14 +153,14 @@ export default function Home() {
           { justifyContent: "center", alignItems: "center" },
         ]}
       >
-        <ActivityIndicator size="large" color={Colors.light.primary} />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
     <>
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
         {/* Header */}
         {/* <View style={styles.header}> */}
         <HomeHeader firstName={firstName} dailyGoal={dailyGoal} />
@@ -195,10 +197,25 @@ export default function Home() {
               checking={checking}
             />
           )}
+          {/* <VerificationModal
+            visible={true}
+            type={verificationType}
+            email={pending.email}
+            daysRemaining={daysRemaining}
+            isMandatory={isMandatory}
+            onClose={dismissModal}
+            onResendEmail={handleResendEmail}
+            onCheckVerification={handleCheckVerification}
+            resending={resending}
+            checking={checking}
+          /> */}
 
           <View style={styles.quoteContainer}>
             <AppText
-              style={[styles.quote, { transform: [{ skewX: "-10deg" }] }]}
+              style={[
+                styles.quote,
+                { transform: [{ skewX: "-10deg" }], color: colors.text },
+              ]}
               weight="bold"
             >
               {motivationalMessage}
@@ -215,15 +232,18 @@ export default function Home() {
 
           {/* Add Puff Button */}
           <TouchableOpacity
-            style={styles.addButton}
+            style={[styles.addButton, { backgroundColor: colors.primary }]}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
               addPuff();
             }}
             activeOpacity={0.8}
           >
-            <Ionicons name="add" size={60} color={Colors.light.textWhite} />
-            <AppText weight="bold" style={styles.addButtonText}>
+            <Ionicons name="add" size={60} color={colors.textWhite} />
+            <AppText
+              weight="bold"
+              style={[styles.addButtonText, { color: colors.textWhite }]}
+            >
               Agregar Puffs
             </AppText>
           </TouchableOpacity>
@@ -252,7 +272,6 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
     width: "100%",
   },
   scrollView: {
@@ -297,11 +316,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: "center",
     fontStyle: "italic",
-    color: Colors.light.text,
+
     lineHeight: 26,
   },
   addButton: {
-    backgroundColor: Colors.light.primary,
     borderRadius: 28,
     paddingVertical: 32,
     paddingHorizontal: 40,
@@ -313,6 +331,5 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     fontSize: 18,
-    color: Colors.light.textWhite,
   },
 });

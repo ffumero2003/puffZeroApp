@@ -1,6 +1,6 @@
 // src/components/home/WeekDayCircle.tsx
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import * as Haptics from "expo-haptics";
 import { StyleSheet, TouchableOpacity } from "react-native";
 
@@ -19,18 +19,26 @@ export default function WeekDayCircle({
   isActive,
   onPress,
 }: Props) {
+  const colors = useThemeColors();
+
   return (
     <TouchableOpacity
       onPress={() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         onPress();
       }}
-      style={[styles.container, isActive && styles.active]}
+      style={[
+        styles.container,
+        { backgroundColor: isActive ? colors.primary : colors.secondary },
+      ]}
       activeOpacity={0.7}
     >
       <AppText
         weight="bold"
-        style={[styles.text, isActive && styles.textActive]}
+        style={[
+          styles.text,
+          { color: isActive ? colors.textWhite : colors.text },
+        ]}
       >
         {day}
       </AppText>
@@ -43,18 +51,10 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: Colors.light.secondary,
     alignItems: "center",
     justifyContent: "center",
   },
-  active: {
-    backgroundColor: Colors.light.primary,
-  },
   text: {
     fontSize: 16,
-    color: Colors.light.text,
-  },
-  textActive: {
-    color: Colors.light.textWhite,
   },
 });

@@ -8,12 +8,17 @@ import SettingsHeader from "@/src/components/app/settings/SettingsHeader";
 import SettingsRow from "@/src/components/app/settings/SettingsRow";
 import SettingsSection from "@/src/components/app/settings/SettingsSection";
 import SupportModal from "@/src/components/app/settings/SupportModal";
+import ThemePickerModal from "@/src/components/app/settings/ThemePickerModal";
 import { VerificationStatus } from "@/src/components/app/settings/VerificationStatus";
-import { Colors } from "@/src/constants/theme";
+// NEW: Import useThemeColors for dynamic colors
+import { useThemeColors } from "@/src/providers/theme-provider";
+// NEW: Import useTheme for theme preference getter/setter
 import { useAuth } from "@/src/providers/auth-provider";
+import { useTheme } from "@/src/providers/theme-provider";
 import { deleteAccount } from "@/src/services/auth-services";
 import { useSettingsViewModel } from "@/src/viewmodels/app/useSettingsViewModel";
 
+import { ROUTES } from "@/src/constants/routes";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -24,14 +29,27 @@ import {
   View,
 } from "react-native";
 
+// NEW: Labels for the theme options (in Spanish to match your app)
+const THEME_LABELS: Record<string, string> = {
+  system: "Sistema",
+  light: "Claro",
+  dark: "Oscuro",
+};
+
 export default function Settings() {
   const { signOut, user } = useAuth();
   const vm = useSettingsViewModel();
+  // NEW: Get theme preference and setter
+  const { themePreference, setThemePreference } = useTheme();
+  // NEW: Get dynamic colors
+  const colors = useThemeColors();
 
   // Modal visibility states
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showPuffsModal, setShowPuffsModal] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
+  // NEW: State for theme picker modal
+  const [showThemeModal, setShowThemeModal] = useState(false);
 
   // ============================================
   // Handlers
@@ -46,7 +64,6 @@ export default function Settings() {
       const userId = user?.id;
       if (!userId) return;
 
-      // Call edge function to delete all user data + auth account
       const { error } = await deleteAccount(userId);
 
       if (error) {
@@ -54,7 +71,6 @@ export default function Settings() {
         return;
       }
 
-      // Sign out locally and go to onboarding
       await signOut();
       router.replace("/(onboarding)/onboarding");
     } catch (error) {
@@ -67,8 +83,15 @@ export default function Settings() {
   // ============================================
   if (vm.loading) {
     return (
-      <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color={Colors.light.primary} />
+      // NEW: Dynamic background color
+      <View
+        style={[
+          styles.container,
+          styles.centered,
+          { backgroundColor: colors.background },
+        ]}
+      >
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -77,7 +100,8 @@ export default function Settings() {
   // Render
   // ============================================
   return (
-    <View style={styles.container}>
+    // NEW: Dynamic background color
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <SettingsHeader />
 
       <ScrollView
@@ -87,41 +111,31 @@ export default function Settings() {
       >
         {/* Profile Section */}
         <SettingsSection title="Perfil">
-          {/* Correo - editable */}
           <SettingsRow
             label="Correo"
             value={vm.email}
             onPress={() => setShowEmailModal(true)}
           />
-
-          {/* Meta Diaria - editable */}
           <SettingsRow
             label="Meta Diaria"
             value={`${vm.puffsPerDay} puffs`}
             onPress={() => setShowPuffsModal(true)}
           />
-
-          {/* Gasto Mensual - read only with currency symbol */}
           <SettingsRow
             label="Gasto Mensual"
             value={vm.getFormattedMoney()}
             showChevron={false}
           />
-
-          {/* Goal - read only */}
           <SettingsRow
             label="Meta"
             value={vm.getGoalLabel()}
             showChevron={false}
           />
-
-          {/* Why Stopped - read only */}
           <SettingsRow
             label="Motivación"
             value={vm.getWhyStoppedLabel()}
             showChevron={false}
           />
-
           <VerificationStatus />
         </SettingsSection>
 
@@ -133,10 +147,24 @@ export default function Settings() {
               <Switch
                 value={vm.notificationsEnabled}
                 onValueChange={vm.toggleNotifications}
-                trackColor={{ false: "#ccc", true: Colors.light.primary }}
+                // NEW: Dynamic switch track color
+                trackColor={{
+                  false: colors.switchTrackOff,
+                  true: colors.primary,
+                }}
                 thumbColor="#fff"
               />
             }
+            isLast={true}
+          />
+        </SettingsSection>
+
+        {/* NEW: Appearance Section - Theme picker */}
+        <SettingsSection title="Apariencia">
+          <SettingsRow
+            label="Tema"
+            value={THEME_LABELS[themePreference]}
+            onPress={() => setShowThemeModal(true)}
             isLast={true}
           />
         </SettingsSection>
@@ -145,17 +173,16 @@ export default function Settings() {
         <SettingsSection title="Acerca de">
           <SettingsRow
             label="Politica de Privacidad"
-            onPress={() => router.push("/privacy-policy")}
+            onPress={() => router.push(ROUTES.PRIVACY_POLICY)}
           />
           <SettingsRow
             label="Términos y Condiciones"
-            onPress={() => router.push("/terms-of-use")}
+            onPress={() => router.push(ROUTES.TERMS_OF_USE)}
           />
           <SettingsRow
             label="Contactar Soporte"
             onPress={() => setShowSupportModal(true)}
           />
-
           <SettingsRow
             label="Versión"
             value="1.0.0"
@@ -164,7 +191,6 @@ export default function Settings() {
           />
         </SettingsSection>
 
-        {/* Action Buttons */}
         <SettingsActions
           onLogout={handleLogout}
           onDeleteAccount={handleDeleteAccount}
@@ -175,7 +201,6 @@ export default function Settings() {
       {/* MODALS */}
       {/* ============================================ */}
 
-      {/* Email Input */}
       <EmailInputModal
         visible={showEmailModal}
         onClose={() => setShowEmailModal(false)}
@@ -183,7 +208,6 @@ export default function Settings() {
         initialValue={vm.email}
       />
 
-      {/* Puffs Input - with validation */}
       <InputModal
         visible={showPuffsModal}
         onClose={() => setShowPuffsModal(false)}
@@ -196,10 +220,17 @@ export default function Settings() {
         minValueHint={vm.getPuffsHint()}
       />
 
-      {/* Support Contact */}
       <SupportModal
         visible={showSupportModal}
         onClose={() => setShowSupportModal(false)}
+      />
+
+      {/* NEW: Theme Picker Modal */}
+      <ThemePickerModal
+        visible={showThemeModal}
+        onClose={() => setShowThemeModal(false)}
+        selectedValue={themePreference}
+        onSelect={setThemePreference}
       />
     </View>
   );
@@ -208,7 +239,6 @@ export default function Settings() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
   },
   centered: {
     justifyContent: "center",
@@ -219,5 +249,28 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingBottom: 40,
+  },
+  // NEW: Modal styles for the theme picker
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    width: "80%",
+    borderRadius: 16,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  modalOption: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderRadius: 8,
   },
 });

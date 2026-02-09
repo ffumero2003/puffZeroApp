@@ -1,8 +1,7 @@
 // src/components/app/settings/SettingsRow.tsx
-// Reusable row for settings (pressable or static)
-
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+// NEW: Dynamic colors
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 interface SettingsRowProps {
@@ -10,7 +9,7 @@ interface SettingsRowProps {
   value?: string;
   onPress?: () => void;
   showChevron?: boolean;
-  rightElement?: React.ReactNode; // For custom elements like Switch
+  rightElement?: React.ReactNode;
   isLast?: boolean;
 }
 
@@ -22,28 +21,39 @@ export default function SettingsRow({
   rightElement,
   isLast = false,
 }: SettingsRowProps) {
+  // NEW: Dynamic colors
+  const colors = useThemeColors();
   const Container = onPress ? TouchableOpacity : View;
 
   return (
     <Container
-      style={[styles.row, isLast && { borderBottomWidth: 0 }]}
+      // NEW: Dynamic border color
+      style={[
+        styles.row,
+        { borderBottomColor: colors.secondary },
+        isLast && { borderBottomWidth: 0 },
+      ]}
       onPress={onPress}
       activeOpacity={0.6}
     >
-      <AppText style={styles.label}>{label}</AppText>
+      <AppText style={[styles.label, { color: colors.text }]}>{label}</AppText>
 
-      {/* Right side: either custom element or value with chevron */}
       {rightElement ? (
         rightElement
       ) : (
         <View style={styles.valueContainer}>
           {value && (
-            <AppText weight="medium" style={styles.value}>
+            <AppText
+              weight="medium"
+              style={[styles.value, { color: colors.textMuted }]}
+            >
               {value}
             </AppText>
           )}
           {showChevron && onPress && (
-            <AppText style={styles.chevron}>›</AppText>
+            <AppText style={[styles.chevron, { color: colors.textMuted }]}>
+              ›
+            </AppText>
           )}
         </View>
       )}
@@ -59,11 +69,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.light.secondary,
   },
   label: {
     fontSize: 16,
-    color: Colors.light.text,
   },
   valueContainer: {
     flexDirection: "row",
@@ -71,11 +79,9 @@ const styles = StyleSheet.create({
   },
   value: {
     fontSize: 16,
-    color: Colors.light.textMuted,
     marginRight: 8,
   },
   chevron: {
     fontSize: 20,
-    color: Colors.light.textMuted,
   },
 });

@@ -2,6 +2,7 @@
 import { sendWelcomeBackNotification } from "@/src/services/notifications/welcome-back-notification";
 import { Session, User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
+import { AppState } from "react-native";
 import { supabase } from "../lib/supabase";
 import { checkAndSendDailyAchievementOnOpen } from "../services/notifications/daily-achievement-notification";
 import { scheduleDailyQuoteNotification } from "../services/notifications/daily-quote-notification";
@@ -199,25 +200,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // When user is authenticated and app becomes active:
+  // Reset inactivity timers on EVERY app foreground, not just when user?.id changes
   useEffect(() => {
-    if (user?.id) {
-      // Update activity (resets inactivity timers)
-      updateLastActivity();
+    if (!user?.id) return;
 
-      // Schedule weekly summary for Sundays 8pm
-      scheduleWeeklySummaryNotification();
+    // Run immediately on mount (first login / auth resolved)
+    updateLastActivity();
+    scheduleWeeklySummaryNotification();
+    checkAndSendFirstPuffFreeDayNotification();
+    scheduleEndOfDayPuffFreeCheck();
+    scheduleDailyQuoteNotification();
+    refreshDailyReminderIfNeeded();
+    checkAndSendDailyAchievementOnOpen(user.id);
 
-      // Check if yesterday was puff-free + schedule daily check
-      checkAndSendFirstPuffFreeDayNotification();
-      scheduleEndOfDayPuffFreeCheck();
+    // Listen for app coming back to foreground → user is active, reset inactivity timers
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        // User opened/resumed the app → they are active, reset inactivity timers
+        updateLastActivity();
+      }
+    });
 
-      scheduleDailyQuoteNotification();
-
-      refreshDailyReminderIfNeeded();
-
-      // scheduleDailyAchievementCheck();
-      checkAndSendDailyAchievementOnOpen(user.id);
-    }
+    // Cleanup listener when user logs out or component unmounts
+    return () => {
+      subscription.remove();
+    };
   }, [user?.id]);
 
   return (

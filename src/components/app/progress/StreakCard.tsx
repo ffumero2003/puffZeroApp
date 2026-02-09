@@ -1,6 +1,6 @@
 // src/components/app/progress/StreakCard.tsx
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -16,8 +16,17 @@ type StreakTime = {
   seconds: number;
 };
 
-export default function StreakCard({ lastPuffTime, profileCreatedAt }: StreakCardProps) {
-  const [streak, setStreak] = useState<StreakTime>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+export default function StreakCard({
+  lastPuffTime,
+  profileCreatedAt,
+}: StreakCardProps) {
+  const colors = useThemeColors();
+  const [streak, setStreak] = useState<StreakTime>({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
 
   useEffect(() => {
     const calculateStreak = () => {
@@ -25,7 +34,9 @@ export default function StreakCard({ lastPuffTime, profileCreatedAt }: StreakCar
       const diff = Math.max(0, Date.now() - startTime.getTime());
 
       const days = Math.floor(diff / (24 * 60 * 60 * 1000));
-      const hours = Math.floor((diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+      const hours = Math.floor(
+        (diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000)
+      );
       const minutes = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
       const seconds = Math.floor((diff % (60 * 1000)) / 1000);
 
@@ -49,13 +60,26 @@ export default function StreakCard({ lastPuffTime, profileCreatedAt }: StreakCar
   };
 
   return (
-    <View style={styles.container}>
-      <AppText weight="bold" style={styles.title}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.card, borderColor: colors.border },
+      ]}
+    >
+      <AppText weight="bold" style={[styles.title, { color: colors.text }]}>
         Streak 🔥
       </AppText>
-      
-      <View style={styles.streakContainer}>
-        <AppText weight="semibold" style={styles.streakText}>
+
+      <View
+        style={[
+          styles.streakContainer,
+          { backgroundColor: colors.secondary, borderColor: colors.border },
+        ]}
+      >
+        <AppText
+          weight="semibold"
+          style={[styles.streakText, { color: colors.text }]}
+        >
           {formatStreak()}
         </AppText>
       </View>
@@ -66,30 +90,25 @@ export default function StreakCard({ lastPuffTime, profileCreatedAt }: StreakCar
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.textWhite,
+
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: Colors.light.secondary,
+
     padding: 16,
     minHeight: 100,
   },
   title: {
     fontSize: 16,
-    color: Colors.light.text,
     marginBottom: 12,
   },
   streakContainer: {
-    backgroundColor: Colors.light.secondary,
     borderRadius: 10,
     paddingVertical: 14,
-    
-    
+
     borderWidth: 1,
-    borderColor: Colors.light.primary,
   },
   streakText: {
     fontSize: 14,
-    color: Colors.light.text,
     textAlign: "center",
   },
 });

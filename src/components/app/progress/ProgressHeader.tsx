@@ -1,7 +1,7 @@
 // src/components/app/progress/ProgressHeader.tsx
 import Logo from "@/assets/images/logo-puff-zero.png";
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { Image, StyleSheet, View } from "react-native";
 
 interface ProgressHeaderProps {
@@ -11,13 +11,14 @@ interface ProgressHeaderProps {
 export default function ProgressHeader({
   timeSinceLastPuff,
 }: ProgressHeaderProps) {
+  const colors = useThemeColors();
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
-        <AppText weight="bold" style={styles.title}>
+        <AppText weight="bold" style={[styles.title, { color: colors.text }]}>
           Tu Progreso
         </AppText>
-        <AppText style={styles.subtitle}>
+        <AppText style={[styles.subtitle, { color: colors.textSecondary }]}>
           Última actualización:{" "}
           <AppText weight="bold">{timeSinceLastPuff}</AppText>
         </AppText>
@@ -43,12 +44,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    color: Colors.light.text,
+
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: Colors.light.textSecondary,
+
     opacity: 0.7,
   },
   logoContainer: {

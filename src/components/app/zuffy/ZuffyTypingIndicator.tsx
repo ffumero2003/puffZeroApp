@@ -2,11 +2,12 @@
 // Animated three-dot typing indicator that looks like a Zuffy chat bubble
 // Shows when Zuffy is "thinking" after the user sends a message or uses a quick action
 
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import React, { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 
 export default function ZuffyTypingIndicator() {
+  const colors = useThemeColors();
   // Create 3 animated values, one for each dot
   const dot1 = useRef(new Animated.Value(0)).current;
   const dot2 = useRef(new Animated.Value(0)).current;
@@ -64,11 +65,29 @@ export default function ZuffyTypingIndicator() {
     // Outer container matches the assistant bubble alignment (left-aligned)
     <View style={styles.container}>
       {/* Bubble matches the same style as ZuffyChatBubble's assistant bubble */}
-      <View style={styles.bubble}>
+      <View style={[styles.bubble, { backgroundColor: colors.secondary }]}>
         <View style={styles.dotsRow}>
-          <Animated.View style={[styles.dot, getDotStyle(dot1)]} />
-          <Animated.View style={[styles.dot, getDotStyle(dot2)]} />
-          <Animated.View style={[styles.dot, getDotStyle(dot3)]} />
+          <Animated.View
+            style={[
+              styles.dot,
+              getDotStyle(dot1),
+              { backgroundColor: colors.textMuted },
+            ]}
+          />
+          <Animated.View
+            style={[
+              styles.dot,
+              getDotStyle(dot2),
+              { backgroundColor: colors.textMuted },
+            ]}
+          />
+          <Animated.View
+            style={[
+              styles.dot,
+              getDotStyle(dot3),
+              { backgroundColor: colors.textMuted },
+            ]}
+          />
         </View>
       </View>
     </View>
@@ -84,7 +103,6 @@ const styles = StyleSheet.create({
   },
   // Matches the assistant bubble style from ZuffyChatBubble
   bubble: {
-    backgroundColor: Colors.light.secondary,
     borderRadius: 20,
     borderBottomLeftRadius: 4,
     paddingHorizontal: 20,
@@ -101,6 +119,5 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.light.textMuted, // Muted color so it's subtle
   },
 });

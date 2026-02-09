@@ -1,6 +1,6 @@
 // src/components/app/progress/RecentPuffsStats.tsx
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { StyleSheet, View } from "react-native";
 
 interface RecentPuffsStatsProps {
@@ -14,26 +14,17 @@ export default function RecentPuffsStats({
   puffsLast7Days,
   puffsLast30Days,
 }: RecentPuffsStatsProps) {
+  const colors = useThemeColors();
   return (
     <View style={styles.container}>
-      <AppText weight="bold" style={styles.title}>
+      <AppText weight="bold" style={[styles.title, { color: colors.text }]}>
         Ultimamente 💨
       </AppText>
 
       <View style={styles.statsContainer}>
-        <StatCard 
-          label="Últimas 24 horas" 
-          value={puffsLast24Hours} 
-           
-        />
-        <StatCard 
-          label="Últimos 7 días" 
-          value={puffsLast7Days} 
-        />
-        <StatCard 
-          label="Últimos 30 días" 
-          value={puffsLast30Days} 
-        />
+        <StatCard label="Últimas 24 horas" value={puffsLast24Hours} />
+        <StatCard label="Últimos 7 días" value={puffsLast7Days} />
+        <StatCard label="Últimos 30 días" value={puffsLast30Days} />
       </View>
     </View>
   );
@@ -42,23 +33,31 @@ export default function RecentPuffsStats({
 interface StatCardProps {
   label: string;
   value: number;
-  
 }
 
 function StatCard({ label, value }: StatCardProps) {
+  const colors = useThemeColors();
   return (
-    <View style={styles.card}>
-      <AppText 
-        weight="semibold" 
-        style={styles.cardLabel}
+    <View
+      style={[
+        styles.card,
+        { backgroundColor: colors.card, borderColor: colors.border },
+      ]}
+    >
+      <AppText
+        weight="semibold"
+        style={[styles.cardLabel, { color: colors.text }]}
       >
         {label}
       </AppText>
-      <AppText weight="bold" style={styles.cardValue}>
-        <AppText weight="extrabold" style={styles.cardValueNumber}>
+      <AppText weight="bold" style={[styles.cardValue, { color: colors.text }]}>
+        <AppText
+          weight="extrabold"
+          style={[styles.cardValueNumber, { color: colors.text }]}
+        >
           {value}
-        </AppText>
-        {" "}puffs
+        </AppText>{" "}
+        puffs
       </AppText>
     </View>
   );
@@ -71,14 +70,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    color: Colors.light.text,
+
     marginBottom: 12,
   },
   statsContainer: {
     gap: 10,
   },
   card: {
-    backgroundColor: "#FFF",
     borderRadius: 16,
     paddingVertical: 20,
     flexDirection: "row",
@@ -90,22 +88,18 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
     borderWidth: 2,
-    borderColor: Colors.light.secondary,
   },
-  
+
   cardLabel: {
     fontSize: 18,
-    color: Colors.light.text,
     paddingHorizontal: 8,
   },
-  
+
   cardValue: {
     fontSize: 16,
-    color: Colors.light.text,
     paddingHorizontal: 8,
   },
   cardValueNumber: {
     fontSize: 20,
-    color: Colors.light.primary,
   },
 });

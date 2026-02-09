@@ -1,6 +1,7 @@
 // app/(app)/_layout.tsx
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+// NEW: Import useThemeColors instead of static Colors
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Tabs } from "expo-router";
@@ -18,6 +19,9 @@ function CustomTabBarButton({
   icon: string;
   onPress: () => void;
 }) {
+  // NEW: Dynamic colors from theme
+  const colors = useThemeColors();
+
   return (
     <Pressable
       onPress={() => {
@@ -27,23 +31,24 @@ function CustomTabBarButton({
       style={[
         styles.tabButton,
         {
-          backgroundColor: focused
-            ? Colors.light.primary
-            : Colors.light.secondary,
+          // NEW: Dynamic background based on focused state + theme
+          backgroundColor: focused ? colors.primary : colors.secondary,
         },
       ]}
     >
       <Ionicons
         name={icon as any}
         size={20}
-        color={focused ? Colors.light.textWhite : Colors.light.text}
+        // NEW: Dynamic icon color
+        color={focused ? colors.textWhite : colors.text}
       />
       <AppText
         weight="semibold"
         style={[
           styles.tabLabel,
           {
-            color: focused ? Colors.light.textWhite : Colors.light.text,
+            // NEW: Dynamic label color
+            color: focused ? colors.textWhite : colors.text,
           },
         ]}
       >
@@ -54,13 +59,21 @@ function CustomTabBarButton({
 }
 
 export default function AppLayout() {
+  // NEW: Dynamic colors for the tab bar container and safe area
+  const colors = useThemeColors();
+
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+    // NEW: Dynamic SafeAreaView background prevents white strip in dark mode
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      edges={["top"]}
+    >
       <Tabs
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: Colors.light.background,
+            // NEW: Dynamic tab bar background
+            backgroundColor: colors.background,
             borderTopWidth: 0,
             elevation: 0,
             height: 80,
@@ -70,7 +83,13 @@ export default function AppLayout() {
           },
         }}
         tabBar={(props) => (
-          <View style={styles.tabBarContainer}>
+          // NEW: Dynamic tab bar container background
+          <View
+            style={[
+              styles.tabBarContainer,
+              { backgroundColor: colors.background },
+            ]}
+          >
             <CustomTabBarButton
               focused={props.state.index === 0}
               label="Home"
@@ -107,10 +126,10 @@ export default function AppLayout() {
   );
 }
 
+// Static styles - only non-color properties remain here
 const styles = StyleSheet.create({
   tabBarContainer: {
     flexDirection: "row",
-    backgroundColor: Colors.light.background,
     paddingHorizontal: 10,
     paddingVertical: 12,
     paddingBottom: 20,

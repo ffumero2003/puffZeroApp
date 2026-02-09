@@ -8,7 +8,7 @@ import ZuffyHeader from "@/src/components/app/zuffy/ZuffyHeader";
 import ZuffyQuickActions from "@/src/components/app/zuffy/ZuffyQuickActions";
 import ZuffyTypingIndicator from "@/src/components/app/zuffy/ZuffyTypingIndicator";
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { useZuffyViewModel } from "@/src/viewmodels/app/useZuffyViewModel";
 import React, { useEffect, useRef } from "react";
 import {
@@ -24,6 +24,7 @@ import {
 
 export default function Zuffy() {
   // Get all the data and functions from the view model
+  const colors = useThemeColors();
   const {
     firstName,
     messages,
@@ -53,8 +54,14 @@ export default function Zuffy() {
   // Show loading state while initializing
   if (!isInitialized) {
     return (
-      <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color={Colors.light.primary} />
+      <View
+        style={[
+          styles.container,
+          styles.centered,
+          { backgroundColor: colors.background },
+        ]}
+      >
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -64,11 +71,13 @@ export default function Zuffy() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 70 : 0}
     >
-      <View style={styles.innerContainer}>
+      <View
+        style={[styles.innerContainer, { backgroundColor: colors.background }]}
+      >
         {/* Header with title and cloud icon */}
         <ZuffyHeader />
 
@@ -78,6 +87,7 @@ export default function Zuffy() {
           style={styles.chatArea}
           contentContainerStyle={[
             styles.chatContent,
+            { backgroundColor: colors.background },
             isEmptyChat && styles.chatContentEmpty,
           ]}
           // "handled" allows buttons inside to work, dismisses keyboard on scroll
@@ -90,8 +100,17 @@ export default function Zuffy() {
           {isEmptyChat ? (
             // Empty state with greeting and quick actions
             // Pressable here dismisses keyboard when tapping empty area
-            <Pressable style={styles.emptyState} onPress={Keyboard.dismiss}>
-              <AppText weight="bold" style={styles.greeting}>
+            <Pressable
+              style={[
+                styles.emptyState,
+                { backgroundColor: colors.background },
+              ]}
+              onPress={Keyboard.dismiss}
+            >
+              <AppText
+                weight="bold"
+                style={[styles.greeting, { color: colors.text }]}
+              >
                 Hola, {firstName} 👋
               </AppText>
 
@@ -129,7 +148,6 @@ export default function Zuffy() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
   },
   innerContainer: {
     flex: 1,
@@ -156,7 +174,6 @@ const styles = StyleSheet.create({
   },
   greeting: {
     fontSize: 28,
-    color: Colors.light.primary,
     textAlign: "center",
   },
 });

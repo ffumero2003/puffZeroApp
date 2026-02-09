@@ -1,6 +1,6 @@
 // src/components/home/DayDetailModal.tsx
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Modal, Pressable, StyleSheet, View } from "react-native";
@@ -22,6 +22,8 @@ export default function DayDetailModal({
   dailyGoal,
   onClose,
 }: Props) {
+  const colors = useThemeColors();
+
   // -- Compute the goal status message and color --
   const difference = puffs - dailyGoal;
   let goalMessage: string;
@@ -30,19 +32,19 @@ export default function DayDetailModal({
   if (puffs === 0) {
     // No puffs recorded (future day or no data)
     goalMessage = "Sin datos registrados";
-    goalColor = Colors.light.textSecondary;
+    goalColor = colors.textSecondary;
   } else if (difference < 0) {
     // Under goal — good
     goalMessage = `${Math.abs(difference)} puffs por debajo de tu meta!`;
-    goalColor = Colors.light.success;
+    goalColor = colors.success;
   } else if (difference === 0) {
     // Exactly at goal
     goalMessage = "Justo en tu meta";
-    goalColor = Colors.light.warning;
+    goalColor = colors.warning;
   } else {
     // Over goal — bad
     goalMessage = `Superaste tu meta por ${difference} puffs`;
-    goalColor = Colors.light.danger;
+    goalColor = colors.danger;
   }
 
   // -- Map abbreviations to full day names --
@@ -64,22 +66,25 @@ export default function DayDetailModal({
       onRequestClose={onClose}
     >
       <Pressable
-        style={styles.overlay}
+        style={[styles.overlay, { backgroundColor: colors.background }]}
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           onClose();
         }}
       >
-        <View style={styles.modal}>
+        <View style={[styles.modal, { backgroundColor: colors.card }]}>
           <Pressable
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               onClose();
             }}
-            style={styles.content}
+            style={[styles.content, { backgroundColor: colors.card }]}
           >
             <View style={styles.header}>
-              <AppText weight="bold" style={styles.title}>
+              <AppText
+                weight="bold"
+                style={[styles.title, { color: colors.text }]}
+              >
                 {dayAbbreviations[day] || day}
               </AppText>
               <Pressable
@@ -88,17 +93,24 @@ export default function DayDetailModal({
                   onClose();
                 }}
               >
-                <Ionicons name="close" size={24} color={Colors.light.text} />
+                <Ionicons name="close" size={24} color={colors.text} />
               </Pressable>
             </View>
 
-            <AppText style={styles.date}>{date}</AppText>
+            <AppText style={[styles.date, { color: colors.textSecondary }]}>
+              {date}
+            </AppText>
 
             <View style={styles.puffsContainer}>
-              <AppText weight="bold" style={styles.puffsNumber}>
+              <AppText
+                weight="bold"
+                style={[styles.puffsNumber, { color: colors.primary }]}
+              >
                 {puffs}
               </AppText>
-              <AppText style={styles.puffsLabel}>Puffs consumidos</AppText>
+              <AppText style={[styles.puffsLabel, { color: colors.text }]}>
+                Puffs consumidos
+              </AppText>
             </View>
 
             {/* -- NEW: Goal status message -- */}
@@ -124,7 +136,7 @@ const styles = StyleSheet.create({
   },
   modal: {
     width: "85%",
-    backgroundColor: Colors.light.background,
+
     borderRadius: 20,
     padding: 20,
   },
@@ -138,11 +150,9 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    color: Colors.light.text,
   },
   date: {
     fontSize: 16,
-    color: Colors.light.textSecondary,
   },
   puffsContainer: {
     alignItems: "center",
@@ -150,11 +160,9 @@ const styles = StyleSheet.create({
   },
   puffsNumber: {
     fontSize: 48,
-    color: Colors.light.primary,
   },
   puffsLabel: {
     fontSize: 16,
-    color: Colors.light.text,
     marginTop: 8,
   },
   // -- NEW STYLE --

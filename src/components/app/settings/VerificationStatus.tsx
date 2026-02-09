@@ -2,11 +2,11 @@
 // Componente que muestra el estado de verificación en Settings
 
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
 import {
   formatCountdown,
   useVerificationStatus,
 } from "@/src/hooks/useVerificationStatus";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import React from "react";
 import {
   ActivityIndicator,
@@ -24,24 +24,30 @@ export function VerificationStatus() {
     countdownMs,
     checkVerification,
   } = useVerificationStatus();
-
+  const colors = useThemeColors();
   if (loading) {
     return (
       <View style={styles.container}>
         <AppText style={styles.label}>Verificación</AppText>
-        <ActivityIndicator size="small" color={Colors.light.primary} />
+        <ActivityIndicator size="small" color={colors.primary} />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <AppText style={styles.label}>Verificación</AppText>
+    <View style={[styles.container, { backgroundColor: colors.card }]}>
+      <AppText style={[styles.label, { color: colors.text }]}>
+        Verificación
+      </AppText>
 
       {isVerified ? (
         // Estado: Verificado
-        <View style={styles.verifiedBadge}>
-          <AppText style={styles.verifiedText}>✅ Verificado</AppText>
+        <View
+          style={[styles.verifiedBadge, { backgroundColor: colors.secondary }]}
+        >
+          <AppText style={[styles.verifiedText, { color: colors.text }]}>
+            ✅ Verificado
+          </AppText>
         </View>
       ) : (
         // Estado: No verificado
@@ -50,13 +56,20 @@ export function VerificationStatus() {
           disabled={!canCheckToday || checking}
           style={[
             styles.verifyButton,
+            { backgroundColor: colors.primary },
             (!canCheckToday || checking) && styles.verifyButtonDisabled,
+            {
+              backgroundColor: colors.switchTrackOff,
+              borderColor: colors.border,
+            },
           ]}
         >
           {checking ? (
-            <ActivityIndicator size="small" color="#fff" />
+            <ActivityIndicator size="small" color={colors.textWhite} />
           ) : (
-            <AppText style={styles.verifyButtonText}>
+            <AppText
+              style={[styles.verifyButtonText, { color: colors.textWhite }]}
+            >
               {canCheckToday ? "Verificar" : formatCountdown(countdownMs)}
             </AppText>
           )}
@@ -73,36 +86,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 16,
     paddingHorizontal: 16,
-    backgroundColor: "#fff",
+
     borderRadius: 12,
   },
   label: {
     fontSize: 16,
-    color: Colors.light.text,
   },
   verifiedBadge: {
-    backgroundColor: "#E8F5E9",
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 8,
   },
   verifiedText: {
-    color: "#2E7D32",
     fontSize: 14,
     fontWeight: "600",
   },
   verifyButton: {
-    backgroundColor: Colors.light.primary,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
   },
   verifyButtonDisabled: {
-    backgroundColor: "#B0B0B0",
     width: "30%",
   },
   verifyButtonText: {
-    color: "#fff",
     fontSize: 14,
     fontWeight: "600",
     textAlign: "center",

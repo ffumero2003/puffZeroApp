@@ -2,7 +2,7 @@
 // Unified modal for both account verification and email change verification
 
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { VerificationType } from "@/src/services/verification/verification-service";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
@@ -23,9 +23,9 @@ interface VerificationModalProps {
   isMandatory: boolean;
   onClose: () => void;
   onResendEmail: () => void;
-  onCheckVerification: () => void; // NEW
+  onCheckVerification: () => void;
   resending?: boolean;
-  checking?: boolean; // NEW
+  checking?: boolean;
 }
 
 export function VerificationModal({
@@ -40,10 +40,10 @@ export function VerificationModal({
   onResendEmail,
   resending = false,
 }: VerificationModalProps) {
+  const colors = useThemeColors();
   const isUrgent = daysRemaining <= 2;
   const isEmailChange = type === "email_change";
 
-  // Text based on verification type
   const title = isEmailChange
     ? "Verificá tu nuevo email"
     : "Verificá tu cuenta";
@@ -59,7 +59,6 @@ export function VerificationModal({
 
   const handleResend = () => {
     onResendEmail();
-    // Don't close modal - let parent handle it after success
   };
 
   return (
@@ -75,6 +74,7 @@ export function VerificationModal({
             <View
               style={[
                 styles.modal,
+                { backgroundColor: colors.card },
                 isUrgent && styles.urgentModal,
                 isMandatory && styles.mandatoryModal,
               ]}
@@ -82,7 +82,7 @@ export function VerificationModal({
               {/* Close button - only show if NOT mandatory */}
               {!isMandatory && (
                 <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                  <Ionicons name="close" size={24} color="#666" />
+                  <Ionicons name="close" size={24} color={colors.text} />
                 </TouchableOpacity>
               )}
 
@@ -90,6 +90,7 @@ export function VerificationModal({
               <View
                 style={[
                   styles.iconCircle,
+                  { backgroundColor: colors.secondary },
                   isUrgent && styles.urgentIconCircle,
                   isMandatory && styles.mandatoryIconCircle,
                 ]}
@@ -102,7 +103,7 @@ export function VerificationModal({
                       ? "#DC3545"
                       : isUrgent
                       ? "#856404"
-                      : Colors.light.primary
+                      : colors.primary
                   }
                 />
               </View>
@@ -110,26 +111,39 @@ export function VerificationModal({
               {/* Title */}
               <AppText
                 weight="bold"
-                style={[styles.title, isMandatory && styles.mandatoryTitle]}
+                style={[
+                  styles.title,
+                  { color: colors.text },
+                  isMandatory && styles.mandatoryTitle,
+                ]}
               >
                 {isMandatory ? "¡Verificación requerida!" : title}
               </AppText>
 
               {/* Subtitle */}
-              <AppText style={styles.subtitle}>
+              <AppText
+                style={[styles.subtitle, { color: colors.textSecondary }]}
+              >
                 {isMandatory
                   ? "Debés verificar tu email para continuar usando la app:"
                   : subtitle}
               </AppText>
 
-              <AppText weight="semibold" style={styles.email}>
+              <AppText
+                weight="semibold"
+                style={[styles.email, { color: colors.primary }]}
+              >
                 {email}
               </AppText>
 
-              {/* Expiry info - show different message when mandatory */}
+              {/* Expiry info */}
               {isMandatory ? (
                 <View style={styles.mandatoryBadge}>
-                  <Ionicons name="alert-circle" size={14} color="#DC3545" />
+                  <Ionicons
+                    name="alert-circle"
+                    size={14}
+                    color={colors.danger}
+                  />
                   <AppText style={styles.mandatoryBadgeText}>
                     {isEmailChange
                       ? "El cambio de email expira hoy"
@@ -138,15 +152,23 @@ export function VerificationModal({
                 </View>
               ) : daysRemaining > 0 ? (
                 <View
-                  style={[styles.expiryBadge, isUrgent && styles.urgentBadge]}
+                  style={[
+                    styles.expiryBadge,
+                    { backgroundColor: colors.secondary },
+                    isUrgent && styles.urgentBadge,
+                  ]}
                 >
                   <Ionicons
                     name="time-outline"
                     size={14}
-                    color={isUrgent ? "#856404" : "#666"}
+                    color={isUrgent ? colors.warning : colors.textSecondary}
                   />
                   <AppText
-                    style={[styles.expiryText, isUrgent && styles.urgentText]}
+                    style={[
+                      styles.expiryText,
+                      { color: colors.textMuted },
+                      isUrgent && styles.urgentText,
+                    ]}
                   >
                     Expira en {daysRemaining}{" "}
                     {daysRemaining === 1 ? "día" : "días"}
@@ -156,33 +178,38 @@ export function VerificationModal({
 
               {/* Buttons */}
               <View style={styles.buttonContainer}>
-                {/* Resend button - always show, primary when mandatory */}
+                {/* Resend button */}
                 <TouchableOpacity
                   onPress={handleResend}
                   disabled={resending}
                   style={[
-                    isMandatory ? styles.primaryButton : styles.resendButton,
+                    isMandatory
+                      ? [
+                          styles.primaryButton,
+                          { backgroundColor: colors.primary },
+                        ]
+                      : [styles.resendButton, { borderColor: colors.primary }],
                     resending && styles.disabledButton,
                   ]}
                 >
                   {resending ? (
                     <ActivityIndicator
                       size="small"
-                      color={isMandatory ? "#fff" : Colors.light.primary}
+                      color={isMandatory ? "#fff" : colors.primary}
                     />
                   ) : (
                     <>
                       <Ionicons
                         name="refresh-outline"
                         size={18}
-                        color={isMandatory ? "#fff" : Colors.light.primary}
+                        color={isMandatory ? "#fff" : colors.primary}
                       />
                       <AppText
                         weight="semibold"
                         style={
                           isMandatory
                             ? styles.primaryButtonText
-                            : styles.resendText
+                            : [styles.resendText, { color: colors.primary }]
                         }
                       >
                         Reenviar email
@@ -195,7 +222,10 @@ export function VerificationModal({
                 {!isMandatory && (
                   <TouchableOpacity
                     onPress={onClose}
-                    style={styles.dismissButton}
+                    style={[
+                      styles.dismissButton,
+                      { backgroundColor: colors.primary },
+                    ]}
                   >
                     <AppText weight="medium" style={styles.dismissText}>
                       Entendido
@@ -210,9 +240,15 @@ export function VerificationModal({
                   style={styles.checkButton}
                 >
                   {checking ? (
-                    <ActivityIndicator size="small" color="#666" />
+                    <ActivityIndicator size="small" color={colors.textMuted} />
                   ) : (
-                    <AppText weight="medium" style={styles.checkButtonText}>
+                    <AppText
+                      weight="medium"
+                      style={[
+                        styles.checkButtonText,
+                        { color: colors.textMuted },
+                      ]}
+                    >
                       Ya verifiqué mi cuenta
                     </AppText>
                   )}
@@ -221,7 +257,7 @@ export function VerificationModal({
 
               {/* Help text when mandatory */}
               {isMandatory && (
-                <AppText style={styles.helpText}>
+                <AppText style={[styles.helpText, { color: colors.textMuted }]}>
                   ¿No recibiste el email? Revisá tu carpeta de spam.
                 </AppText>
               )}
@@ -242,7 +278,6 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   modal: {
-    backgroundColor: "#fff",
     borderRadius: 20,
     padding: 24,
     width: "100%",
@@ -269,7 +304,6 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: "#E8F4FD",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 16,
@@ -283,7 +317,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    color: Colors.light.text,
     marginBottom: 8,
     textAlign: "center",
   },
@@ -292,12 +325,10 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: "#666",
     textAlign: "center",
   },
   email: {
     fontSize: 14,
-    color: Colors.light.primary,
     marginTop: 4,
     marginBottom: 16,
     textAlign: "center",
@@ -305,7 +336,6 @@ const styles = StyleSheet.create({
   expiryBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F5F5F5",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
@@ -331,7 +361,6 @@ const styles = StyleSheet.create({
   },
   expiryText: {
     fontSize: 12,
-    color: "#666",
   },
   urgentText: {
     color: "#856404",
@@ -348,10 +377,8 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: Colors.light.primary,
   },
   resendText: {
-    color: Colors.light.primary,
     fontSize: 15,
   },
   primaryButton: {
@@ -361,7 +388,6 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
     borderRadius: 12,
-    backgroundColor: Colors.light.primary,
   },
   primaryButtonText: {
     color: "#fff",
@@ -370,7 +396,6 @@ const styles = StyleSheet.create({
   dismissButton: {
     paddingVertical: 14,
     borderRadius: 12,
-    backgroundColor: Colors.light.primary,
     alignItems: "center",
   },
   dismissText: {
@@ -382,17 +407,14 @@ const styles = StyleSheet.create({
   },
   helpText: {
     fontSize: 12,
-    color: "#888",
     marginTop: 16,
     textAlign: "center",
   },
-
   checkButton: {
     paddingVertical: 12,
     alignItems: "center",
   },
   checkButtonText: {
-    color: "#666",
     fontSize: 14,
     textDecorationLine: "underline",
   },

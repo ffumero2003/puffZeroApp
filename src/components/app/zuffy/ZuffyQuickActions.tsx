@@ -1,9 +1,6 @@
 // src/components/app/zuffy/ZuffyQuickActions.tsx
-// This component displays the quick action buttons/chips
-// These help users start conversations without having to think of what to say
-
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { QUICK_ACTION_PROMPTS } from "@/src/services/zuffy-ai-service";
 import * as Haptics from "expo-haptics";
 import React from "react";
@@ -11,11 +8,9 @@ import { Pressable, StyleSheet, View } from "react-native";
 
 type Props = {
   onActionPress: (prompt: string) => void;
-  disabled?: boolean; // Disable when message limit is reached or loading
+  disabled?: boolean;
 };
 
-// Define the quick actions with their display labels and emojis
-// These match the prompts defined in the AI service
 const QUICK_ACTIONS = [
   {
     id: "howToFeel",
@@ -38,6 +33,8 @@ const QUICK_ACTIONS = [
 ];
 
 export default function ZuffyQuickActions({ onActionPress, disabled }: Props) {
+  const colors = useThemeColors();
+
   return (
     <View style={styles.container}>
       {QUICK_ACTIONS.map((action, index) => (
@@ -45,9 +42,12 @@ export default function ZuffyQuickActions({ onActionPress, disabled }: Props) {
           key={action.id}
           style={({ pressed }) => [
             styles.chip,
+            {
+              backgroundColor: pressed ? colors.border : colors.secondary,
+              borderColor: colors.border,
+            },
             index < 2 ? styles.chipHalf : styles.chipFull,
-            pressed && styles.chipPressed,
-            disabled && styles.chipDisabled,
+            disabled && { opacity: 0.5 },
           ]}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -55,13 +55,14 @@ export default function ZuffyQuickActions({ onActionPress, disabled }: Props) {
           }}
           disabled={disabled}
         >
-          {/* numberOfLines={1} prevents text from wrapping to multiple lines */}
-          {/* ellipsizeMode="tail" adds "..." if text is too long (fallback) */}
           <AppText
             numberOfLines={1}
-            // ellipsizeMode="tail"
             weight="bold"
-            style={[styles.chipText, disabled && styles.chipTextDisabled]}
+            style={{
+              fontSize: 13,
+              color: disabled ? colors.textMuted : colors.text,
+              textAlign: "center",
+            }}
           >
             {action.label}
             {action.emoji}
@@ -75,47 +76,25 @@ export default function ZuffyQuickActions({ onActionPress, disabled }: Props) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    flexWrap: "wrap", // Allow chips to wrap to next line
+    flexWrap: "wrap",
     justifyContent: "center",
     gap: 6,
-
     paddingVertical: 10,
   },
   chip: {
-    backgroundColor: Colors.light.secondary,
     paddingHorizontal: 6,
     paddingVertical: 8,
     borderRadius: 20,
-    // Subtle border for definition
     borderWidth: 1,
-    borderColor: Colors.light.border,
   },
   chipHalf: {
     width: "49%",
-    // No flexWrap needed here - that's for containers, not items
   },
-
   chipFull: {
-    flexBasis: "100%", // forces it onto its own row
-    alignSelf: "center", // centers within the row
-    flexGrow: 0, // don't stretch
-    flexShrink: 1, // allow shrinking if needed
-    maxWidth: "70%", // safety so it doesn't overflow on small screens
-  },
-
-  chipPressed: {
-    // Darken slightly when pressed for feedback
-    backgroundColor: Colors.light.border,
-  },
-  chipDisabled: {
-    opacity: 0.5,
-  },
-  chipText: {
-    fontSize: 13,
-    color: Colors.light.text,
-    textAlign: "center",
-  },
-  chipTextDisabled: {
-    color: Colors.light.textMuted,
+    flexBasis: "100%",
+    alignSelf: "center",
+    flexGrow: 0,
+    flexShrink: 1,
+    maxWidth: "70%",
   },
 });
