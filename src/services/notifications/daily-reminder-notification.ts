@@ -9,26 +9,40 @@ const LAST_REMINDER_SCHEDULE_KEY = "daily_reminder_last_scheduled";
 // A random one is picked each time the notification fires
 // ============================================
 const DAILY_REMINDER_MESSAGES = [
-  // Morning motivation
-  { title: "💨 Buenos días", body: "Recuerda registrar tus puffs y mantener tu progreso." },
-  { title: "🌅 ¡Nuevo día, nueva oportunidad!", body: "¿Cómo te sientes hoy? Registra tu primer puff." },
-  { title: "☀️ ¡Arriba!", body: "Hoy es un buen día para avanzar en tu meta." },
-  
-  // Progress focused
-  { title: "📊 Tu progreso te espera", body: "Registra tus puffs para mantener tu racha." },
-  { title: "🎯 Mantén el enfoque", body: "Cada registro cuenta. ¿Cómo va tu día?" },
-  { title: "📱 Un momento para ti", body: "Abre la app y revisa cómo vas." },
-  
-  // Encouragement
-  { title: "💪 ¡Tú puedes!", body: "Cada día que registras es un paso más hacia tu meta." },
-  { title: "🌟 Sigue adelante", body: "Tu compromiso es inspirador. ¡Registra tu progreso!" },
-  { title: "🏆 Campeón/a", body: "No olvides registrar hoy. ¡Vas muy bien!" },
-  
-  // Gentle reminders
-  { title: "👋 ¡Hola!", body: "Solo un recordatorio amigable para registrar tus puffs." },
-  { title: "🔔 Recordatorio diario", body: "¿Ya registraste tus puffs de hoy?" },
-  { title: "⏰ Es hora", body: "Tómate un momento para actualizar tu progreso." },
+  {
+    title: "🌅 Nuevo día",
+    body: "Si hoy fumas, regístralo. Si no, vas excelente."
+  },
+  {
+    title: "☀️ Buenos días",
+    body: "Si hoy vapeas, regístralo. Si no, vas perfecto."
+  },
+  {
+    title: "🎯 Regla del día",
+    body: "Fumarás → regístralo. No fumarás → vas muy bien."
+  },
+  {
+    title: "🧠 Empieza consciente",
+    body: "Si hoy fumas, regístralo. Si no, gran comienzo."
+  },
+  {
+    title: "🏆 Inicio ganador",
+    body: "Si hoy fumas, regístralo. Si no, sigue así."
+  },
+  {
+    title: "📅 Día nuevo",
+    body: "Vapearás → regístralo. No vapearás → excelente."
+  },
+  {
+    title: "💪 Mentalidad del día",
+    body: "Si hoy fumas, regístralo. Si no, vas por buen camino."
+  },
+  {
+    title: "⏰ 8:00 AM",
+    body: "Hoy empieza el control: fumas → registras, no fumas → ganas."
+  },
 ];
+
 
 
 /**
