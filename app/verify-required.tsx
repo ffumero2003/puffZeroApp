@@ -2,7 +2,7 @@
 import AppText from "@/src/components/AppText";
 import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { supabase } from "@/src/lib/supabase";
 import { sendVerificationEmail } from "@/src/services/auth-services";
 import { layout } from "@/src/styles/layout";
@@ -12,6 +12,7 @@ import { Alert, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function VerifyRequiredScreen() {
+  const colors = useThemeColors();
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(false);
 
@@ -65,7 +66,7 @@ export default function VerifyRequiredScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light.background }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={layout.screenContainer}>
         <View>
           <OnboardingHeader showBack={false} showProgress={false} />
@@ -107,9 +108,9 @@ export default function VerifyRequiredScreen() {
               marginTop: 12, 
               backgroundColor: "transparent", 
               borderWidth: 2, 
-              borderColor: Colors.light.primary 
+              borderColor: colors.primary 
             }}
-            textStyle={{ color: Colors.light.primary }}
+            textStyle={{ color: colors.primary }}
           />
         </View>
       </View>

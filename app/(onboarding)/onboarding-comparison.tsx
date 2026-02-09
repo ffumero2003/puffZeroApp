@@ -4,7 +4,7 @@ import AppText from "@/src/components/AppText";
 import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import TitleBlock from "@/src/components/onboarding/TitleBlock";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 
 import ComparisonImage from "@/assets/images/onboarding/con-puff-zero.png";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
@@ -14,15 +14,18 @@ import { ROUTES } from "@/src/constants/routes";
 import { router } from "expo-router";
 
 export default function OnboardingComparison() {
+  const colors = useThemeColors();
 
   //onboarding comparison
   function goToGoal() {
-    router.push(ROUTES.ONBOARDING_GOAL)
+    router.push(ROUTES.ONBOARDING_GOAL);
   }
-  
+
   return (
     <ScreenWrapper>
-      <View style={layout.screenContainer}>
+      <View
+        style={[layout.screenContainer, { backgroundColor: colors.background }]}
+      >
         <View>
           <OnboardingHeader step={7} total={11} />
 
@@ -40,18 +43,13 @@ export default function OnboardingComparison() {
             />
 
             {/* Texto inferior */}
-            <AppText style={layout.description}>
+            <AppText style={[layout.description, { color: colors.text }]}>
               Puff
-              <AppText
-                weight="extrabold"
-                style={{ color: Colors.light.primary }}
-              >
+              <AppText weight="extrabold" style={{ color: colors.primary }}>
                 Zero
               </AppText>{" "}
               te acompaña, te motiva y te ayuda a mantenerte constante.
             </AppText>
-
-            
           </View>
         </View>
         <ContinueButton
@@ -63,5 +61,3 @@ export default function OnboardingComparison() {
     </ScreenWrapper>
   );
 }
-
-

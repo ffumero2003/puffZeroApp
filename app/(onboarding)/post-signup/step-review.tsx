@@ -1,39 +1,40 @@
-import AppText from "@/src/components/AppText";
-import ContinueButton from "@/src/components/onboarding/ContinueButton";
-import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
-import ReviewCard from "@/src/components/onboarding/ReviewCard";
-import { Colors } from "@/src/constants/theme";
-import { useAuth } from "@/src/providers/auth-provider";
-import { layout } from "@/src/styles/layout";
-import { useEffect, useRef } from "react";
-import { Alert, Image, ScrollView, View } from "react-native";
-
 import ReviewsModal from "@/assets/images/onboarding/reviews-modal.png";
 import AlexReview from "@/assets/images/reviews/alex-review.jpg";
 import AntonioReview from "@/assets/images/reviews/antonio-review.jpg";
 import MariaReview from "@/assets/images/reviews/maria-review.jpg";
+import AppText from "@/src/components/AppText";
+import ContinueButton from "@/src/components/onboarding/ContinueButton";
+import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
+import ReviewCard from "@/src/components/onboarding/ReviewCard";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
-
+import { useAuth } from "@/src/providers/auth-provider";
+import { useThemeColors } from "@/src/providers/theme-provider";
+import { layout } from "@/src/styles/layout";
+import { useEffect, useRef } from "react";
+import { Alert, Image, ScrollView, View } from "react-native";
 
 export default function Review() {
+  const colors = useThemeColors();
   const { authFlow } = useAuth();
   const hasShownAlert = useRef(false);
 
   useEffect(() => {
     if (authFlow === "register" && !hasShownAlert.current) {
       hasShownAlert.current = true;
-      Alert.alert(
-        "¡Cuenta creada!",
-        "Tu cuenta fue creada exitosamente.",
-        [{ text: "OK" }]
-      );
+      Alert.alert("¡Cuenta creada!", "Tu cuenta fue creada exitosamente.", [
+        { text: "OK" },
+      ]);
     }
   }, [authFlow]);
-  
+
   return (
     <ScreenWrapper>
-      <View style={layout.containerWithLoadingBar}>
-
+      <View
+        style={[
+          layout.containerWithLoadingBar,
+          { backgroundColor: colors.background },
+        ]}
+      >
         {/* 🔵 HEADER FIJO ARRIBA (sin back ni progress) */}
         <OnboardingHeader
           step={0}
@@ -44,7 +45,10 @@ export default function Review() {
 
         {/* 🔵 BLOQUE SUPERIOR — NO SCROLL */}
         <View style={layout.content}>
-          <AppText weight="bold" style={layout.titleCenterNoMargin}>
+          <AppText
+            weight="bold"
+            style={[layout.titleCenterNoMargin, { color: colors.text }]}
+          >
             Dejanos una calificación
           </AppText>
 
@@ -54,9 +58,12 @@ export default function Review() {
             resizeMode="contain"
           />
 
-          <AppText weight="bold" style={layout.description}>
+          <AppText
+            weight="bold"
+            style={[layout.description, { color: colors.text }]}
+          >
             Puff
-            <AppText weight="extrabold" style={{ color: Colors.light.primary }}>
+            <AppText weight="extrabold" style={{ color: colors.primary }}>
               Zero
             </AppText>{" "}
             fue diseñado para apoyarte{"\n"}en tu camino
@@ -65,7 +72,6 @@ export default function Review() {
 
         {/* 🟣 REVIEWS CON SCROLL */}
         <ScrollView
-          
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 60 }}
         >
@@ -95,12 +101,8 @@ export default function Review() {
         <ContinueButton
           text="Continuar"
           route="/(onboarding)/post-signup/step-notifications"
-          
         />
       </View>
     </ScreenWrapper>
   );
-
 }
-
-

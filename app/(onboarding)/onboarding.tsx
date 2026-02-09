@@ -8,17 +8,21 @@ import { Image, View } from "react-native";
 import HomePage from "@/assets/images/onboarding/onboarding-home-page.png";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { router } from "expo-router";
 
 export default function Onboarding() {
   //onboarding
+  const colors = useThemeColors();
   function goToProgress() {
     router.push(ROUTES.ONBOARDING_PROGRESS);
   }
 
   return (
     <ScreenWrapper>
-      <View style={layout.screenContainer}>
+      <View
+        style={[layout.screenContainer, { backgroundColor: colors.background }]}
+      >
         <OnboardingHeader
           step={0}
           total={11}
@@ -33,7 +37,10 @@ export default function Onboarding() {
             resizeMode="contain"
           />
 
-          <AppText weight="bold" style={layout.titleCenter}>
+          <AppText
+            weight="bold"
+            style={[layout.titleCenter, { color: colors.text }]}
+          >
             Lleva tu consumo al día, sin complicaciones
           </AppText>
 

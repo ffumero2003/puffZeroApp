@@ -1,5 +1,5 @@
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { Image, StyleSheet, View } from "react-native";
 
 interface Props {
@@ -9,22 +9,26 @@ interface Props {
 }
 
 export default function FactItem({ icon, value, label }: Props) {
+  const colors = useThemeColors();
+
   return (
     <View style={styles.container}>
-      <View style={styles.iconWrapper}>
+      <View style={[styles.iconWrapper, { backgroundColor: colors.secondary }]}>
         <Image source={icon} style={styles.icon} />
       </View>
 
       <View style={styles.textContainer}>
-        <AppText weight="extrabold" style={styles.value}>
+        <AppText
+          weight="extrabold"
+          style={[styles.value, { color: colors.primary }]}
+        >
           {value}
         </AppText>
-        <AppText style={styles.label}>
+        <AppText style={[styles.label, { color: colors.text }]}>
           {label}
         </AppText>
       </View>
     </View>
-
   );
 }
 
@@ -38,7 +42,6 @@ const styles = StyleSheet.create({
     width: 75,
     height: 75,
     borderRadius: 100,
-    backgroundColor: Colors.light.secondary,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 16,
@@ -52,19 +55,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   textContainer: {
-      maxWidth: "70%", // 🔥 ahora SÍ funciona
-      paddingVertical: 10,
-      paddingHorizontal: 10,
-      borderRadius: 14,
-    },
-    value: {
-      fontSize: 22,
-      color: Colors.light.primary,
-    },
-    label: {
-      fontSize: 16,
-      opacity: 0.7,
-      marginTop: 2,
-    },
-
+    maxWidth: "70%", // 🔥 ahora SÍ funciona
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 14,
+  },
+  value: {
+    fontSize: 22,
+  },
+  label: {
+    fontSize: 16,
+    opacity: 0.7,
+    marginTop: 2,
+  },
 });

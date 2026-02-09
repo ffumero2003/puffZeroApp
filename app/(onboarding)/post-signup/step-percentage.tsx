@@ -2,7 +2,7 @@ import AppText from "@/src/components/AppText";
 import CheckItem from "@/src/components/onboarding/CheckItem";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import { ROUTES } from "@/src/constants/routes";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { useStepPercentageViewModel } from "@/src/viewmodels/onboarding/useStepPercentageViewModel";
 import { router } from "expo-router";
@@ -12,6 +12,7 @@ import { Animated, StyleSheet, View } from "react-native";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 
 export default function StepPercentage() {
+  const colors = useThemeColors();
   const { progress, getStatusText, completed } = useStepPercentageViewModel();
   const animatedWidth = useRef(new Animated.Value(0)).current;
 
@@ -29,24 +30,37 @@ export default function StepPercentage() {
   });
 
   useEffect(() => {
-  if (completed) {
-    router.push(ROUTES.POST_SIGNUP_PLAN);
-  }
-}, [completed]);
+    if (completed) {
+      router.push(ROUTES.POST_SIGNUP_PLAN);
+    }
+  }, [completed]);
 
   return (
     <ScreenWrapper>
-      <View style={layout.screenContainer}>
+      <View
+        style={[layout.screenContainer, { backgroundColor: colors.background }]}
+      >
         <OnboardingHeader showBack={false} showProgress={false} />
 
         <View style={styles.center}>
-          <AppText weight="extrabold" style={styles.percentage}>
+          <AppText
+            weight="extrabold"
+            style={[styles.percentage, { color: colors.primary }]}
+          >
             {progress}%
           </AppText>
 
-          <View style={styles.progressTrack}>
+          <View
+            style={[
+              styles.progressTrack,
+              { backgroundColor: colors.secondary },
+            ]}
+          >
             <Animated.View
-              style={[styles.progressFill, { width: progressWidth }]}
+              style={[
+                styles.progressFill,
+                { width: progressWidth, backgroundColor: colors.primary },
+              ]}
             />
           </View>
 
@@ -74,7 +88,6 @@ const styles = StyleSheet.create({
   },
   percentage: {
     fontSize: 52,
-    color: Colors.light.primary,
     marginBottom: 6,
   },
   title: {
@@ -86,13 +99,11 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 20,
     borderRadius: 10,
-    backgroundColor: "#E5E0FF",
     overflow: "hidden",
     marginBottom: 14,
   },
   progressFill: {
     height: "100%",
-    backgroundColor: Colors.light.primary,
   },
   statusText: {
     fontSize: 16,
@@ -100,9 +111,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   checklist: {
-    width: "100%",      // todos iguales
+    width: "100%", // todos iguales
     flexDirection: "column",
     alignItems: "center",
   },
-
 });

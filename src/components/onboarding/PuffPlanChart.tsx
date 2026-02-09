@@ -1,5 +1,5 @@
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { StyleSheet, View } from "react-native";
 
 
@@ -17,6 +17,8 @@ export default function PuffsPlanChart({
   endLabel,
 }: Props) {
   // Guard rail
+  const colors = useThemeColors();
+
   if (!data || data.length === 0) return null;
 
   const maxValue = Math.max(...data);
@@ -28,7 +30,7 @@ export default function PuffsPlanChart({
       <View style={styles.scale}>
         {/* START VALUE */}
         <View style={styles.startGroup}>
-          <AppText style={styles.startNumber} weight="bold">
+          <AppText style={[styles.startNumber, { color: colors.primary }]} weight="bold">
             {startValue}
           </AppText>
           <AppText style={styles.startUnit}>
@@ -37,7 +39,7 @@ export default function PuffsPlanChart({
         </View>
 
         <View style={styles.startGroup}>
-          <AppText style={styles.startNumber} weight="bold">
+          <AppText style={[styles.startNumber, { color: colors.primary }]} weight="bold">
             0
           </AppText>
           <AppText style={styles.startUnit}>
@@ -49,7 +51,7 @@ export default function PuffsPlanChart({
 
 
       {/* Chart */}
-      <View style={styles.chart}>
+      <View style={[styles.chart, { backgroundColor: colors.secondary }]}>
         {data.map((value, index) => {
           const heightPct =
             maxValue === 0 ? 0 : (value / maxValue) * 100;
@@ -59,7 +61,7 @@ export default function PuffsPlanChart({
               <View
                 style={[
                   styles.bar,
-                  { height: `${heightPct}%` },
+                  { height: `${heightPct}%`, backgroundColor: colors.primary },
                 ]}
               />
             </View>
@@ -95,7 +97,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-end",
     justifyContent: "space-between",
-    backgroundColor: Colors.light.secondary,
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 12,
@@ -107,7 +108,6 @@ const styles = StyleSheet.create({
   bar: {
     width: 8,
     borderRadius: 4,
-    backgroundColor: Colors.light.primary,
   },
   labels: {
     marginTop: 8,
@@ -127,7 +127,6 @@ const styles = StyleSheet.create({
   startNumber: {
     fontSize: 18,
     fontWeight: "800",
-    color: Colors.light.primary,
   },
   startUnit: {
     fontSize: 12,

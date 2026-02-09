@@ -16,7 +16,7 @@ import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import TitleBlock from "@/src/components/onboarding/TitleBlock";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { getAddictionLevel } from "@/src/utils/addiction";
 import { usePuffsViewModel } from "@/src/viewmodels/onboarding/usePuffsViewModel";
@@ -24,6 +24,7 @@ import { usePuffsViewModel } from "@/src/viewmodels/onboarding/usePuffsViewModel
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 export default function OnboardingPuffs() {
+  const colors = useThemeColors();
   const [value, setValue] = useState(0);
   const { submitPuffs, isValidPuffs } = usePuffsViewModel();
 
@@ -59,7 +60,9 @@ export default function OnboardingPuffs() {
 
   return (
     <ScreenWrapper>
-      <View style={layout.screenContainer}>
+      <View
+        style={[layout.screenContainer, { backgroundColor: colors.background }]}
+      >
         <View>
           <OnboardingHeader step={5} total={11} />
 
@@ -76,19 +79,25 @@ export default function OnboardingPuffs() {
               minimumValue={0}
               maximumValue={400}
               step={1}
-              minimumTrackTintColor={Colors.light.primary}
-              maximumTrackTintColor="#CFCBFF"
-              thumbTintColor={Colors.light.primary}
+              minimumTrackTintColor={colors.primary}
+              maximumTrackTintColor={colors.secondary}
+              thumbTintColor={colors.primary}
             />
 
             <AnimatedTextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                { backgroundColor: colors.inputBackground, color: colors.text },
+              ]}
               editable={false}
               animatedProps={animatedProps}
             />
 
             <Animated.View style={labelStyle}>
-              <AppText weight="semibold" style={styles.classification}>
+              <AppText
+                weight="semibold"
+                style={[styles.classification, { color: colors.primary }]}
+              >
                 {addiction}
               </AppText>
             </Animated.View>
@@ -112,7 +121,6 @@ const styles = StyleSheet.create({
   },
   input: {
     marginTop: 20,
-    backgroundColor: "#E6E4FF",
     borderRadius: 12,
     width: 120,
     paddingVertical: 14,
@@ -121,12 +129,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     alignSelf: "center",
     fontFamily: "Manrope_600SemiBold",
-    color: Colors.light.text,
   },
   classification: {
     textAlign: "center",
     fontSize: 22,
-    color: Colors.light.primary,
     marginTop: 20,
   },
 });

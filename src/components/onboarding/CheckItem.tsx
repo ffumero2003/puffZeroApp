@@ -1,5 +1,5 @@
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 
@@ -31,12 +31,16 @@ export default function CheckItem({
     }
   }, [active]);
 
+  const colors = useThemeColors();
+
   return (
     <View style={styles.checkItem}>
       <Animated.View
         style={[
           styles.circle,
-          active ? styles.circleActive : styles.circleInactive,
+          active
+            ? { borderColor: colors.primary, backgroundColor: colors.primary }
+            : styles.circleInactive,
           {
             transform: [{ scale: scaleAnim }],
             opacity: active ? opacityAnim : 1,
@@ -46,24 +50,27 @@ export default function CheckItem({
         {active && <AppText style={styles.checkMark}>✓</AppText>}
       </Animated.View>
 
-      <AppText style={[styles.text, active && styles.textActive]} weight="bold">
+      <AppText
+        style={[
+          styles.text,
+          { color: active ? colors.text : colors.textSecondary },
+        ]}
+        weight="bold"
+      >
         {text}
       </AppText>
     </View>
   );
 }
 
-
 const styles = StyleSheet.create({
   checkItem: {
-    width: "70%",            // 🔥 CLAVE
+    width: "70%", // 🔥 CLAVE
     flexDirection: "row",
     alignItems: "center",
-   
-  
+
     marginBottom: 14,
   },
-
 
   circle: {
     width: 22,
@@ -76,17 +83,10 @@ const styles = StyleSheet.create({
   },
 
   circleInactive: {
-    borderColor: "#D1D5DB",
     backgroundColor: "transparent",
   },
 
-  circleActive: {
-    borderColor: Colors.light.primary,
-    backgroundColor: Colors.light.primary,
-  },
-
   checkMark: {
-    color: "#FFFFFF",
     fontSize: 14,
     fontWeight: "bold",
     lineHeight: 14,
@@ -94,10 +94,5 @@ const styles = StyleSheet.create({
 
   text: {
     fontSize: 18,
-    color: Colors.light.textSecondary,
-  },
-
-  textActive: {
-    color: Colors.light.text,
   },
 });

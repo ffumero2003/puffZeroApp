@@ -13,13 +13,14 @@ import GoogleButton from "@/src/components/onboarding/GoogleButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import SeparatorRow from "@/src/components/onboarding/SeparatorRow";
 import UnderlineInput from "@/src/components/onboarding/UnderlineInput";
+import { ROUTES } from "@/src/constants/routes";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { useLoginViewModel } from "@/src/viewmodels/auth/useLoginViewModel";
 import * as Haptics from "expo-haptics";
 
-import { ROUTES } from "@/src/constants/routes";
-
 export default function Login() {
+  const colors = useThemeColors();
   const {
     email,
     password,
@@ -41,7 +42,9 @@ export default function Login() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={layout.containerAuth}>
+      <View
+        style={[layout.containerAuth, { backgroundColor: colors.background }]}
+      >
         <OnboardingHeader showProgress={false} />
 
         <AuthHeader
@@ -84,7 +87,10 @@ export default function Login() {
           }}
           style={layout.forgotContainer}
         >
-          <AppText weight="bold" style={layout.forgotLink}>
+          <AppText
+            weight="bold"
+            style={[layout.forgotLink, { color: colors.text }]}
+          >
             Recuperar
           </AppText>
         </TouchableOpacity>
@@ -100,11 +106,11 @@ export default function Login() {
         <GoogleButton mode="login" />
 
         <View style={layout.bottomContainer}>
-          <AppText style={layout.text}>
+          <AppText style={[layout.text, { color: colors.text }]}>
             Al iniciar sesión, confirmás que aceptás la{" "}
             <AppText
-              weight="bold"
-              style={layout.linkLogin}
+              weight="extrabold"
+              style={{ color: colors.primary }}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 router.push("/privacy-policy");
@@ -114,8 +120,8 @@ export default function Login() {
             </AppText>{" "}
             y los{" "}
             <AppText
-              weight="bold"
-              style={layout.linkLogin}
+              weight="extrabold"
+              style={{ color: colors.primary }}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 router.push("/terms-of-use");

@@ -206,7 +206,6 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    backgroundColor: "#fff",
     borderRadius: 16,
     padding: 24,
     width: "85%",

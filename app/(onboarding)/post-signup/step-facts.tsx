@@ -9,16 +9,19 @@ import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
 import { FACTS, HOW_TO_FACTS } from "@/src/lib/onboarding/facts.library";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 
 export default function StepFacts() {
-
+  const colors = useThemeColors();
   const goPay = () => {
     router.push(ROUTES.POST_SIGNUP_PAYWALL);
   };
   return (
     <ScreenWrapper>
-      <View style={layout.screenContainer}>
+      <View
+        style={[layout.screenContainer, { backgroundColor: colors.background }]}
+      >
         <View style={layout.content}>
           <OnboardingHeader showBack={false} showProgress={false} />
 
@@ -34,24 +37,20 @@ export default function StepFacts() {
 
           {/* HOW TO */}
           <View style={styles.section}>
-            <AppText weight="extrabold" style={styles.sectionTitle}>
+            <AppText
+              weight="extrabold"
+              style={[styles.sectionTitle, { color: colors.text }]}
+            >
               Cómo alcanzar tus metas
             </AppText>
 
             {HOW_TO_FACTS.map((item) => (
-              <HowToFacts
-                key={item.key}
-                icon={item.icon}
-                text={item.text}
-              />
+              <HowToFacts key={item.key} icon={item.icon} text={item.text} />
             ))}
           </View>
         </View>
 
-        <ContinueButton
-          text="¡Listo para empezar!"
-          onPress={goPay}
-        />
+        <ContinueButton text="¡Listo para empezar!" onPress={goPay} />
       </View>
     </ScreenWrapper>
   );

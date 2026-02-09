@@ -1,24 +1,35 @@
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { Image, ImageSourcePropType, StyleSheet, View } from "react-native";
-
 
 interface ReviewCardProps {
   name: string;
   age: number;
   text: string;
-  image: ImageSourcePropType; 
+  image: ImageSourcePropType;
 }
 
-export default function ReviewCard({ name, age, text, image }: ReviewCardProps) {
+export default function ReviewCard({
+  name,
+  age,
+  text,
+  image,
+}: ReviewCardProps) {
+  const colors = useThemeColors();
+
   return (
-    <View style={styles.card}>
+    <View
+      style={[
+        styles.card,
+        { backgroundColor: colors.card, borderColor: colors.cardBorder },
+      ]}
+    >
       {/* Top row */}
       <View style={styles.topRow}>
         <Image source={image} style={styles.profileImage} />
 
         <View style={styles.headerText}>
-          <AppText weight="bold" style={styles.name}>
+          <AppText weight="bold" style={[styles.name, { color: colors.text }]}>
             {name}, {age}
           </AppText>
           <AppText style={styles.stars}>⭐⭐⭐⭐⭐</AppText>
@@ -26,18 +37,18 @@ export default function ReviewCard({ name, age, text, image }: ReviewCardProps) 
       </View>
 
       {/* Review text */}
-      <AppText style={styles.reviewText}>{text}</AppText>
+      <AppText style={[styles.reviewText, { color: colors.text }]}>
+        {text}
+      </AppText>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 26,
     padding: 20,
     borderWidth: 1,
-    borderColor: "#D9D9F3",
     marginBottom: 22,
   },
 
@@ -52,7 +63,7 @@ const styles = StyleSheet.create({
     height: 58,
     borderRadius: 29,
     borderWidth: 2,
-    borderColor: "#000",
+
     marginRight: 14,
   },
 
@@ -68,12 +79,10 @@ const styles = StyleSheet.create({
 
   stars: {
     fontSize: 18,
-    color: Colors.light.primary,
   },
 
   reviewText: {
     fontSize: 16,
     lineHeight: 22,
-    color: Colors.light.text,
   },
 });

@@ -8,9 +8,9 @@ import TitleBlock from "@/src/components/onboarding/TitleBlock";
 import { layout } from "@/src/styles/layout";
 
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { useMotivationViewModel } from "@/src/viewmodels/onboarding/useMotivationViewModel";
 import * as Haptics from "expo-haptics";
-
 const MOTIVATION_OPTIONS = [
   { id: "salud", title: "Salud ❤️" },
   { id: "finanzas", title: "Libertad Financiera 💰" },
@@ -22,6 +22,7 @@ const MOTIVATION_OPTIONS = [
 ];
 
 export default function OnboardingMotivation() {
+  const colors = useThemeColors();
   const { submitMotivation } = useMotivationViewModel();
 
   const handleSelect = (id: string) => {
@@ -33,7 +34,12 @@ export default function OnboardingMotivation() {
 
   return (
     <ScreenWrapper>
-      <View style={layout.containerWithLoadingBar}>
+      <View
+        style={[
+          layout.containerWithLoadingBar,
+          { backgroundColor: colors.background },
+        ]}
+      >
         <OnboardingHeader step={10} total={11} />
 
         <View style={layout.content}>

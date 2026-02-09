@@ -1,5 +1,5 @@
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { Image, StyleSheet, View } from "react-native";
 
 interface Props {
@@ -8,19 +8,18 @@ interface Props {
 }
 
 export default function HowToFacts({ icon, text }: Props) {
+  const colors = useThemeColors();
+
   return (
     <View style={styles.container}>
-      <View style={styles.iconWrapper}>
+      <View style={[styles.iconWrapper, { backgroundColor: colors.secondary }]}>
         <Image source={icon} style={styles.icon} />
       </View>
 
       <View style={styles.textContainer}>
-        <AppText weight="bold" style={styles.text}>
-          {text}
-        </AppText>
+        <AppText style={[styles.text, { color: colors.text }]}>{text}</AppText>
       </View>
     </View>
-
   );
 }
 
@@ -31,18 +30,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   textContainer: {
-  maxWidth: "70%", // 🔥 controla el ancho
-  
-  paddingVertical: 10,
-  paddingHorizontal: 14,
-  borderRadius: 14,
-},
+    maxWidth: "70%", // 🔥 controla el ancho
+
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 14,
+  },
 
   iconWrapper: {
     width: 75,
     height: 75,
     borderRadius: 100,
-    backgroundColor: Colors.light.secondary,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 5,
@@ -54,5 +52,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
+    opacity: 0.7,
   },
 });

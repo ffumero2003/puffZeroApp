@@ -1,5 +1,4 @@
 import { StyleSheet } from "react-native";
-import { Colors } from "../constants/theme";
 
 export const components = StyleSheet.create({ 
   //Componentes
@@ -55,7 +54,6 @@ export const components = StyleSheet.create({
 
     button: {
       marginTop: 30,
-      backgroundColor: Colors.light.primary,
 
       height: 65,              // 🔥 ALTURA FIJA GLOBAL
       paddingHorizontal: 32,   // OK
@@ -77,27 +75,18 @@ export const components = StyleSheet.create({
 
     multiButton: {
       width: "100%",
-      backgroundColor: "#FFFFFF",
       paddingVertical: 18,
       paddingHorizontal: 20,
       borderRadius: 20,
       marginBottom: 16,
       borderWidth: 2,
-      borderColor: "#C9D2FB",
     },
 
-    multiButtonSelected: {
-      backgroundColor: "#E5E0FF",
-      borderColor: Colors.light.primary,
-    },
-
+  
     multiText: {
       fontSize: 20,
-      color: Colors.light.text,
     },
-    multiTextSelected: {
-      color: Colors.light.primary,
-    },
+    
 
 
     //onboarding progress bar
@@ -116,13 +105,11 @@ export const components = StyleSheet.create({
     progressContainer: {
       flex: 1,
       height: 16,
-      backgroundColor: Colors.light.secondary,
       borderRadius: 20,
       overflow: "hidden",
     },
     progressFill: {
       height: "100%",
-      backgroundColor: Colors.light.primary,
       borderRadius: 20,
     },
 
@@ -130,48 +117,35 @@ export const components = StyleSheet.create({
 
     footer: {
       
-      color: Colors.light.text,
       fontSize: 20,
       textAlign: "center",
       paddingBottom: 30
     },
-    link: {
-      color: Colors.light.primary,
-    },
+   
 
 
     // onboarding option card
 
     card: {
-      backgroundColor: Colors.light.secondaryBackground,
       borderWidth: 2,
-      borderColor: "#C9D2FB",
       borderRadius: 20,
       paddingVertical: 16,
       paddingHorizontal: 20,
       marginBottom: 20,
     },
-    cardSelected: {
-      backgroundColor: "#E5E0FF",
-      borderColor: Colors.light.primary,
-    },
+    
     badge: {
       alignSelf: "flex-start",
-      backgroundColor: Colors.light.primary,
       paddingHorizontal: 10,
       paddingVertical: 5,
       borderRadius: 12,
       marginBottom: 6,
     },
-    badgeSelected: {
-      borderColor: Colors.light.primary,
-    },
+    
     badgeText: {
       fontSize: 16,
-      color: Colors.light.textWhite,
     },
-    description: {
-      color: Colors.light.text,
+    description:{
       fontSize: 18,
     },
 
@@ -181,17 +155,14 @@ export const components = StyleSheet.create({
 
     buttonWhite: {
       width: "100%",
-      backgroundColor: "#FFFFFF",
       paddingVertical: 18,
       paddingHorizontal: 20,
       borderRadius: 20,
       marginBottom: 16,
       borderWidth: 2,
-      borderColor: "#C9D2FB",
     },
     textWhite: {
       fontSize: 20,
-      color: Colors.light.text,
     },
 
 
@@ -200,7 +171,6 @@ export const components = StyleSheet.create({
     register: {
       textAlign: "center",
       fontSize: 18,
-      color: Colors.light.text,
     },
     
 

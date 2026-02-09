@@ -2,7 +2,7 @@
 import NotificationsModal from "@/assets/images/onboarding/notifications-modal.png";
 import AppText from "@/src/components/AppText";
 import { ROUTES } from "@/src/constants/routes";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { router } from "expo-router";
 import { Image, Pressable, StyleSheet, View } from "react-native";
@@ -11,8 +11,8 @@ import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { useNotificationsViewModel } from "@/src/viewmodels/onboarding/useNotificationsViewModel";
 
 export default function NotificationsStep() {
-  const { requestPermission, skipPermission } =
-    useNotificationsViewModel();
+  const colors = useThemeColors();
+  const { requestPermission, skipPermission } = useNotificationsViewModel();
 
   const goNext = () => {
     router.push(ROUTES.POST_SIGNUP_PERCENTAGE);
@@ -30,30 +30,47 @@ export default function NotificationsStep() {
 
   return (
     <ScreenWrapper>
-      <View style={layout.containerWithLoadingBar}>
-        
-
+      <View
+        style={[
+          layout.containerWithLoadingBar,
+          { backgroundColor: colors.background },
+        ]}
+      >
         <View style={layout.contentNotifications}>
-          <AppText weight="bold" style={layout.title}>
+          <AppText weight="bold" style={[layout.title, { color: colors.text }]}>
             Alcanza tus metas con{"\n"}recordatorios
           </AppText>
 
-          <AppText weight="medium" style={layout.subtitle}>
+          <AppText
+            weight="medium"
+            style={[layout.subtitle, { color: colors.text }]}
+          >
             Un pequeño recordatorio puede marcar la diferencia en tu día.
           </AppText>
         </View>
 
         <View style={styles.middleSection}>
-          <View style={styles.mockCard}>
-            <AppText weight="semibold" style={styles.appName}>
+          <View
+            style={[
+              styles.mockCard,
+              { backgroundColor: colors.card, borderColor: colors.cardBorder },
+            ]}
+          >
+            <AppText
+              weight="semibold"
+              style={[styles.appName, { color: colors.text }]}
+            >
               “Puff
-              <AppText weight="extrabold" style={layout.link}>
+              <AppText weight="extrabold" style={{ color: colors.primary }}>
                 Zero
               </AppText>
               ” quiere enviarte notificaciones
             </AppText>
 
-            <AppText weight="regular" style={styles.mockDescription}>
+            <AppText
+              weight="regular"
+              style={[styles.mockDescription, { color: colors.textMuted }]}
+            >
               Pueden incluir alertas, recordatorios, sonidos o insignias.{"\n"}
               Podés desactivarlas cuando querás desde Configuración.
             </AppText>
@@ -61,18 +78,24 @@ export default function NotificationsStep() {
             <View style={styles.buttonsRow}>
               <Pressable
                 onPress={handleSkip}
-                style={[styles.btnOption, { backgroundColor: "#E7E7E7" }]}
+                style={[
+                  styles.btnOption,
+                  { backgroundColor: colors.secondary },
+                ]}
               >
-                <AppText weight="semibold" style={{ color: "#000" }}>
+                <AppText weight="semibold" style={{ color: colors.text }}>
                   Don't Allow
                 </AppText>
               </Pressable>
 
               <Pressable
                 onPress={handleAllow}
-                style={styles.btnOptionAllow}
+                style={[
+                  styles.btnOptionAllow,
+                  { backgroundColor: colors.primary },
+                ]}
               >
-                <AppText weight="semibold" style={{ color: "#fff" }}>
+                <AppText weight="semibold" style={{ color: colors.textWhite }}>
                   Allow
                 </AppText>
               </Pressable>
@@ -93,7 +116,6 @@ export default function NotificationsStep() {
 }
 
 const styles = StyleSheet.create({
-  
   middleSection: {
     flex: 1,
     justifyContent: "center",
@@ -104,13 +126,12 @@ const styles = StyleSheet.create({
   mockCard: {
     width: "100%",
     maxWidth: 340,
-    backgroundColor: "#FFFFFF",
     borderRadius: 24,
     padding: 20,
 
     // iOS shadow
     shadowColor: "#000",
-    shadowOpacity: 0.20,
+    shadowOpacity: 0.2,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
 
@@ -121,14 +142,12 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 20,
     lineHeight: 22,
-    color: "#000",
     marginBottom: 12,
   },
 
   mockDescription: {
     fontSize: 16,
     lineHeight: 20,
-    color: "#444",
     marginBottom: 20,
   },
 
@@ -151,7 +170,5 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Colors.light.primary,
   },
-
 });

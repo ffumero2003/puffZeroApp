@@ -1,4 +1,5 @@
 import KeepGoingButton from "@/src/components/onboarding/KeepGoingButton";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { components } from "@/src/styles/components";
 import * as Haptics from "expo-haptics";
 import { Href, router } from "expo-router";
@@ -18,6 +19,7 @@ export default function ContinueButton({
   disabled = false,
   onPress,
 }: ContinueButtonProps) {
+  const colors = useThemeColors();
   function handlePress() {
     if (disabled) {
       Vibration.vibrate(30); // 🔥 feedback suave cuando NO se puede tocar

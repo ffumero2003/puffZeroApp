@@ -7,11 +7,11 @@ import OnboardingOptionCard from "@/src/components/onboarding/OnboardingOptionCa
 import TitleBlock from "@/src/components/onboarding/TitleBlock";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { useSpeedPlanViewModel } from "@/src/viewmodels/onboarding/useSpeedPlanViewModel";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-
 const OPTIONS = [
   {
     id: "14",
@@ -42,6 +42,7 @@ const OPTIONS = [
 ];
 
 export default function OnboardingSpeedPlan() {
+  const colors = useThemeColors();
   const [selected, setSelected] = useState<string | null>(null);
   const { submitSpeed } = useSpeedPlanViewModel();
 
@@ -54,7 +55,9 @@ export default function OnboardingSpeedPlan() {
 
   return (
     <ScreenWrapper>
-      <View style={layout.screenContainer}>
+      <View
+        style={[layout.screenContainer, { backgroundColor: colors.background }]}
+      >
         <OnboardingHeader step={9} total={11} />
 
         <View style={layout.content}>

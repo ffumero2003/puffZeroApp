@@ -1,4 +1,4 @@
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { ReactNode } from "react";
 import { StyleProp, ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -9,14 +9,15 @@ interface ScreenWrapperProps {
   style?: StyleProp<ViewStyle>;
 }
 
-export default function ScreenWrapper({ 
-  children, 
+export default function ScreenWrapper({
+  children,
   edges = ["top"],
-  style 
+  style,
 }: ScreenWrapperProps) {
+  const colors = useThemeColors();
   return (
     <SafeAreaView
-      style={[{ flex: 1, backgroundColor: Colors.light.background }, style]}
+      style={[{ flex: 1, backgroundColor: colors.background }, style]}
       edges={edges}
     >
       {children}

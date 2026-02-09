@@ -1,7 +1,13 @@
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { StyleSheet, TextInput, TextInputProps, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  TextInput,
+  TextInputProps,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface UnderlineInputProps extends TextInputProps {
   placeholder: string;
@@ -9,15 +15,11 @@ interface UnderlineInputProps extends TextInputProps {
   onChangeText?: (text: string) => void;
   style?: any;
   fieldType: "name" | "email" | "password" | "confirmPassword";
-
 }
 
 function capitalizeWords(text: string) {
-      return text
-        .toLowerCase()
-        .replace(/\b\w/g, char => char.toUpperCase());
-  }
-
+  return text.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+}
 
 export default function UnderlineInput({
   placeholder,
@@ -29,9 +31,10 @@ export default function UnderlineInput({
   ...props
 }: UnderlineInputProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const colors = useThemeColors();
 
   const isPassword =
-  fieldType === "password" || fieldType === "confirmPassword";
+    fieldType === "password" || fieldType === "confirmPassword";
 
   const textContentTypeMap = {
     name: "name",
@@ -47,15 +50,13 @@ export default function UnderlineInput({
     confirmPassword: "password-new",
   } as const;
 
-  
-
-
-
   return (
-    <View style={[styles.wrapper, style]}>
+    <View
+      style={[styles.wrapper, { borderBottomColor: colors.secondary }, style]}
+    >
       <TextInput
         placeholder={placeholder}
-        placeholderTextColor={Colors.light.textMuted}
+        placeholderTextColor={colors.textMuted}
         value={value}
         onChangeText={(text) => {
           if (fieldType === "name") {
@@ -65,7 +66,7 @@ export default function UnderlineInput({
           }
         }}
         secureTextEntry={isPassword && !showPassword}
-        style={styles.input}
+        style={[styles.input, { color: colors.text }]}
         textContentType={textContentTypeMap[fieldType]}
         autoComplete={autoCompleteMap[fieldType]}
         autoCapitalize={fieldType === "name" ? "words" : "none"}
@@ -81,7 +82,7 @@ export default function UnderlineInput({
           <Ionicons
             name={showPassword ? "eye-off-outline" : "eye-outline"}
             size={24}
-            color={Colors.light.textMuted}
+            color={colors.textMuted}
           />
         </TouchableOpacity>
       )}
@@ -93,7 +94,7 @@ const styles = StyleSheet.create({
   wrapper: {
     marginTop: 16,
     borderBottomWidth: 10,
-    borderBottomColor: "#E5E0FF",
+
     borderRadius: 12,
     flexDirection: "row",
     alignItems: "center",

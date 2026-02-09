@@ -2,11 +2,11 @@ import AppText from "@/src/components/AppText";
 import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import UnderlineInput from "@/src/components/onboarding/UnderlineInput";
-import { Colors } from "@/src/constants/theme";
 import {
   validateConfirmPassword,
   validatePassword,
 } from "@/src/lib/auth/auth.validation";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { useResetPasswordViewModel } from "@/src/viewmodels/auth/useResetPasswordViewModel";
 import { useState } from "react";
@@ -23,6 +23,7 @@ import { ROUTES } from "@/src/constants/routes";
 import { router } from "expo-router";
 
 export default function ResetPasswordScreen() {
+  const colors = useThemeColors();
   const [passwordError, setPasswordError] = useState("");
   const [confirmError, setConfirmError] = useState("");
   const { password, confirm, loading, setPassword, setConfirm, submit, ready } =
@@ -59,7 +60,7 @@ export default function ResetPasswordScreen() {
   if (!ready) {
     return (
       <SafeAreaView
-        style={{ flex: 1, backgroundColor: Colors.light.background }}
+        style={{ flex: 1, backgroundColor: colors.background }}
         edges={["top"]}
       />
     );
@@ -67,7 +68,7 @@ export default function ResetPasswordScreen() {
 
   return (
     <SafeAreaView
-      style={{ flex: 1, backgroundColor: Colors.light.background }}
+      style={{ flex: 1, backgroundColor: colors.background }}
       edges={["top"]}
     >
       <KeyboardAvoidingView
@@ -75,16 +76,24 @@ export default function ResetPasswordScreen() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={layout.screenContainer}>
+          <View
+            style={[
+              layout.screenContainer,
+              { backgroundColor: colors.background },
+            ]}
+          >
             <View>
               <OnboardingHeader showBack={false} showProgress={false} />
 
               <View style={layout.content}>
-                <AppText weight="bold" style={layout.title}>
+                <AppText
+                  weight="bold"
+                  style={[layout.title, { color: colors.text }]}
+                >
                   Crear nueva contraseña
                 </AppText>
 
-                <AppText style={layout.subtitle}>
+                <AppText style={[layout.subtitle, { color: colors.text }]}>
                   Ingresá y confirmá tu nueva contraseña para continuar.
                 </AppText>
               </View>
@@ -98,7 +107,10 @@ export default function ResetPasswordScreen() {
               />
 
               {passwordError && (
-                <AppText style={layout.errorText} weight="extrabold">
+                <AppText
+                  style={[layout.errorText, { color: colors.danger }]}
+                  weight="extrabold"
+                >
                   {passwordError}
                 </AppText>
               )}
@@ -111,7 +123,10 @@ export default function ResetPasswordScreen() {
                 secureTextEntry
               />
               {confirmError && (
-                <AppText style={layout.errorText} weight="extrabold">
+                <AppText
+                  style={[layout.errorText, { color: colors.danger }]}
+                  weight="extrabold"
+                >
                   {confirmError}
                 </AppText>
               )}

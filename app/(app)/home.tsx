@@ -150,7 +150,11 @@ export default function Home() {
       <View
         style={[
           styles.container,
-          { justifyContent: "center", alignItems: "center" },
+          {
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: colors.background,
+          },
         ]}
       >
         <ActivityIndicator size="large" color={colors.primary} />

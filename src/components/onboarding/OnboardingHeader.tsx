@@ -1,5 +1,5 @@
 import BackArrow from "@/assets/images/icons/back.png";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { components } from "@/src/styles/components";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
@@ -46,6 +46,8 @@ export default function OnboardingHeader({
     outputRange: ["0%", "100%"],
   });
 
+  const colors = useThemeColors();
+
   return (
     <View style={[components.wrapper, style]}>
       {showBack && (
@@ -58,15 +60,23 @@ export default function OnboardingHeader({
         >
           <Image
             source={BackArrow}
-            style={{ width: 30, height: 30, tintColor: Colors.light.text }}
+            style={{ width: 30, height: 30, tintColor: colors.text }}
           />
         </TouchableOpacity>
       )}
 
       {showProgress && (
-        <View style={components.progressContainer}>
+        <View
+          style={[
+            components.progressContainer,
+            { backgroundColor: colors.secondary },
+          ]}
+        >
           <Animated.View
-            style={[components.progressFill, { width: widthInterpolated }]}
+            style={[
+              components.progressFill,
+              { width: widthInterpolated, backgroundColor: colors.primary },
+            ]}
           />
         </View>
       )}

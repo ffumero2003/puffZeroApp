@@ -1,5 +1,5 @@
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { Pressable, StyleSheet, View } from "react-native";
 
 type Props = {
@@ -23,16 +23,26 @@ export default function SubscriptionOption({
   selected,
   onPress,
 }: Props) {
+  const colors = useThemeColors();
+
   return (
     <Pressable
       onPress={onPress}
-      style={[styles.container, selected && styles.selected]}
+      style={[
+        styles.container,
+        { backgroundColor: colors.secondary },
+        selected && { borderColor: colors.primary },
+      ]}
     >
       {highlight && (
-        <View style={[styles.highlight, selected && styles.selectedHighlight]}>
-          <AppText weight="bold">
-            {highlight}
-          </AppText>
+        <View
+          style={[
+            styles.highlight,
+            { backgroundColor: colors.secondary, borderColor: colors.border },
+            selected && { borderColor: colors.primary },
+          ]}
+        >
+          <AppText weight="bold">{highlight}</AppText>
         </View>
       )}
 
@@ -45,7 +55,7 @@ export default function SubscriptionOption({
 
           {subtitle && (
             <AppText
-              style={styles.subtitle}
+              style={[styles.subtitle, { color: colors.text }]}
               numberOfLines={1}
             >
               {subtitle}
@@ -55,8 +65,8 @@ export default function SubscriptionOption({
 
         {/* BADGE */}
         {badge && (
-          <View style={styles.badge}>
-            <AppText weight="bold" style={styles.badgeText}>
+          <View style={[styles.badge, { backgroundColor: colors.primary }]}>
+            <AppText weight="bold" style={{ color: colors.textWhite }}>
               {badge}
             </AppText>
           </View>
@@ -68,6 +78,7 @@ export default function SubscriptionOption({
             style={[
               styles.priceValue,
               strikePrice && styles.striked,
+              { color: colors.text },
             ]}
           >
             {price}
@@ -77,13 +88,12 @@ export default function SubscriptionOption({
             style={[
               styles.pricePeriod,
               strikePrice && styles.striked,
+              { color: colors.text },
             ]}
           >
             semana
           </AppText>
         </View>
-
-
       </View>
     </Pressable>
   );
@@ -91,34 +101,22 @@ export default function SubscriptionOption({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.light.secondary,
     borderRadius: 18,
     padding: 22,
     marginBottom: 12,
     borderWidth: 2,
     borderColor: "transparent",
-
-  },
-
-  selected: {
-    borderColor: Colors.light.primary,
   },
 
   highlight: {
     position: "absolute",
     top: -14,
     right: 12,
-    backgroundColor: Colors.light.secondary,
-    borderColor: Colors.light.border,
     borderWidth: 2,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
     zIndex: 10,
-  },
-
-  selectedHighlight: {
-    borderColor: Colors.light.primary,
   },
 
   mainRow: {
@@ -142,15 +140,11 @@ const styles = StyleSheet.create({
   },
 
   badge: {
-    backgroundColor: Colors.light.primary,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
     marginHorizontal: 8,
     flexShrink: 0,
-  },
-  badgeText : {
-    color: Colors.light.textWhite
   },
 
   priceColumn: {
@@ -172,6 +166,4 @@ const styles = StyleSheet.create({
     textDecorationLine: "line-through",
     opacity: 0.7,
   },
-
-
 });

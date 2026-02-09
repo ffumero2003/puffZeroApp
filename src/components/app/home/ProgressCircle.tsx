@@ -1,6 +1,5 @@
 // src/components/home/ProgressCircle.tsx
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
 import { useThemeColors } from "@/src/providers/theme-provider";
 import { StyleSheet, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
@@ -120,7 +119,7 @@ const styles = StyleSheet.create({
   },
   puffsCount: {
     fontSize: 26,
-    color: Colors.light.text,
+
     marginBottom: 8,
   },
   lastTimeContainer: {

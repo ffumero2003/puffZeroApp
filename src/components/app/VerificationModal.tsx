@@ -100,9 +100,9 @@ export function VerificationModal({
                   size={32}
                   color={
                     isMandatory
-                      ? "#DC3545"
+                      ? colors.danger
                       : isUrgent
-                      ? "#856404"
+                      ? colors.warning
                       : colors.primary
                   }
                 />

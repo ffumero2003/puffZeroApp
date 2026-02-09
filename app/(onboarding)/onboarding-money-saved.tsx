@@ -8,17 +8,20 @@ import { layout } from "@/src/styles/layout";
 import MoneySaved from "@/assets/images/onboarding/onboarding-money-saved.png";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { router } from "expo-router";
-
 export default function OnboardingMoneySaved() {
   //onboarding money saved
+  const colors = useThemeColors();
   function goToGraph() {
     router.push(ROUTES.ONBOARDING_GRAPH);
   }
 
   return (
     <ScreenWrapper>
-      <View style={layout.screenContainer}>
+      <View
+        style={[layout.screenContainer, { backgroundColor: colors.background }]}
+      >
         {/* 🔵 GROUP 1 — Header + Imagen + Título */}
         <View>
           <OnboardingHeader step={3} total={11} />
@@ -30,7 +33,10 @@ export default function OnboardingMoneySaved() {
               resizeMode="contain"
             />
 
-            <AppText weight="bold" style={layout.titleCenter}>
+            <AppText
+              weight="bold"
+              style={[layout.titleCenter, { color: colors.text }]}
+            >
               Cada puff evitado suma a tu ahorro
             </AppText>
           </View>

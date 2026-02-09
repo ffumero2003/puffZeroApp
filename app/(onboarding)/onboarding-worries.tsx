@@ -5,13 +5,13 @@ import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import MultiSelectButton from "@/src/components/onboarding/MultiSelectButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import TitleBlock from "@/src/components/onboarding/TitleBlock";
-import { ROUTES } from "@/src/constants/routes";
-import { layout } from "@/src/styles/layout";
-import { router } from "expo-router";
-
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
+import { ROUTES } from "@/src/constants/routes";
+import { useThemeColors } from "@/src/providers/theme-provider";
+import { layout } from "@/src/styles/layout";
 import { useWorriesViewModel } from "@/src/viewmodels/onboarding/useWorriesViewModel";
 import * as Haptics from "expo-haptics";
+import { router } from "expo-router";
 
 const CONCERNS = [
   { id: "ansiedad", title: "Ansiedad 🧊" },
@@ -25,6 +25,7 @@ const CONCERNS = [
 ];
 
 export default function OnboardingWorries() {
+  const colors = useThemeColors();
   const [selected, setSelected] = useState<string[]>([]);
   const { submitWorries } = useWorriesViewModel();
 
@@ -43,7 +44,9 @@ export default function OnboardingWorries() {
 
   return (
     <ScreenWrapper>
-      <View style={layout.screenContainer}>
+      <View
+        style={[layout.screenContainer, { backgroundColor: colors.background }]}
+      >
         <OnboardingHeader step={11} total={11} />
 
         <View style={layout.content}>

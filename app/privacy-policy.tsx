@@ -1,14 +1,16 @@
 // app/privacy-policy.tsx
 import AppText from "@/src/components/AppText";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PrivacyPolicy() {
+  const colors = useThemeColors();
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light.background }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
       <View style={layout.containerWithLoadingBar}>
         
         {/* Header */}

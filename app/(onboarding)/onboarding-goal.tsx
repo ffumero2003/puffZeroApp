@@ -6,11 +6,11 @@ import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import OnboardingOptionCard from "@/src/components/onboarding/OnboardingOptionCard";
 import TitleBlock from "@/src/components/onboarding/TitleBlock";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { useGoalViewModel } from "@/src/viewmodels/onboarding/useGoalViewModel";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-
 const GOAL_OPTIONS = [
   {
     id: "reduce",
@@ -25,6 +25,7 @@ const GOAL_OPTIONS = [
 ];
 
 export default function OnboardingGoal() {
+  const colors = useThemeColors();
   const [selected, setSelected] = useState<string | null>(null);
   const { submitGoal } = useGoalViewModel();
 
@@ -40,7 +41,9 @@ export default function OnboardingGoal() {
 
   return (
     <ScreenWrapper>
-      <View style={layout.screenContainer}>
+      <View
+        style={[layout.screenContainer, { backgroundColor: colors.background }]}
+      >
         <View>
           <OnboardingHeader step={8} total={11} />
 

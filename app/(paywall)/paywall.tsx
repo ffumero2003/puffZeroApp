@@ -13,7 +13,7 @@ import {
   CRC_EXCHANGE_RATES,
   CURRENCY_SYMBOLS,
 } from "@/src/constants/currency";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { layout } from "@/src/styles/layout";
@@ -62,6 +62,7 @@ export default function Paywall() {
 
   const { formatMoney } = useOnboardingPaywallViewModel();
   const [plan, setPlan] = useState<"weekly" | "yearly">("yearly");
+  const colors = useThemeColors();
 
   const displayName =
     name || (user?.user_metadata?.full_name as string | undefined) || undefined;
@@ -71,7 +72,7 @@ export default function Paywall() {
   const puffsText = puffs_per_day ? (
     <>
       Registrá tu progreso diario partiendo de{" "}
-      <AppText weight="bold" style={{ color: Colors.light.primary }}>
+      <AppText weight="bold" style={{ color: colors.primary }}>
         {puffs_per_day} puffs
       </AppText>
     </>
@@ -82,7 +83,7 @@ export default function Paywall() {
   const planText = goal_speed ? (
     <>
       No es fuerza de voluntad: es un plan claro de{" "}
-      <AppText weight="bold" style={{ color: Colors.light.primary }}>
+      <AppText weight="bold" style={{ color: colors.primary }}>
         {goal_speed} días
       </AppText>
     </>
@@ -97,7 +98,7 @@ export default function Paywall() {
     money_per_month && currency ? (
       <>
         Empezá a ahorrar hasta{" "}
-        <AppText weight="bold" style={{ color: Colors.light.primary }}>
+        <AppText weight="bold" style={{ color: colors.primary }}>
           {formatMoney(money_per_month * 12, currency)}
         </AppText>{" "}
         cada año
@@ -132,7 +133,7 @@ export default function Paywall() {
   const whyText = (
     <>
       Te ayudaremos a{" "}
-      <AppText weight="bold" style={{ color: Colors.light.primary }}>
+      <AppText weight="bold" style={{ color: colors.primary }}>
         {getWhyText(primaryWhy)}
       </AppText>
     </>
@@ -161,7 +162,7 @@ export default function Paywall() {
           {firstName ? (
             <>
               Hey{" "}
-              <AppText weight="bold" style={{ color: Colors.light.primary }}>
+              <AppText weight="bold" style={{ color: colors.primary }}>
                 {firstName}
               </AppText>
               , desbloqueá Puff
@@ -169,7 +170,7 @@ export default function Paywall() {
           ) : (
             <>Hey, desbloqueá PuffHOME</>
           )}
-          <AppText weight="bold" style={{ color: Colors.light.primary }}>
+          <AppText weight="bold" style={{ color: colors.primary }}>
             Zero
           </AppText>{" "}
           para llegar a tu mejor versión.

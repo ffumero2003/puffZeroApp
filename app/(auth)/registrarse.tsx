@@ -5,9 +5,8 @@ import {
   Platform,
   ScrollView,
   TouchableWithoutFeedback,
-  View
+  View,
 } from "react-native";
-
 
 import {
   validateConfirmPassword,
@@ -25,11 +24,12 @@ import SeparatorRow from "@/src/components/onboarding/SeparatorRow";
 import UnderlineInput from "@/src/components/onboarding/UnderlineInput";
 
 import { useAuth } from "@/src/providers/auth-provider";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { useRegisterViewModel } from "@/src/viewmodels/auth/useRegisterViewModel";
 
-
 export default function Register() {
+  const colors = useThemeColors();
   const { setAuthInProgress } = useAuth();
   /* ---------------------------
      STATE 
@@ -86,7 +86,6 @@ export default function Register() {
     setAuthInProgress(false);
   };
 
-
   /* ---------------------------
      VALID STATE
   ------------------------------*/
@@ -110,18 +109,17 @@ export default function Register() {
         style={{ flex: 1 }}
         keyboardVerticalOffset={Platform.OS === "ios" ? 50 : 0}
       >
-        <View style={layout.containerAuth}>
-          <OnboardingHeader showProgress={false}/>
+        <View
+          style={[layout.containerAuth, { backgroundColor: colors.background }]}
+        >
+          <OnboardingHeader showProgress={false} />
 
-          <AuthHeader
-            title="Crear Cuenta"
-            subtitle="Empezá tu proceso."
-          />
+          <AuthHeader title="Crear Cuenta" subtitle="Empezá tu proceso." />
 
           <ScrollView
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
-            >
+          >
             {/* Nombre */}
             <UnderlineInput
               placeholder="Nombre Completo"
@@ -130,7 +128,10 @@ export default function Register() {
               fieldType="name"
             />
             {nombreError && (
-              <AppText style={layout.errorText} weight="extrabold">
+              <AppText
+                style={[layout.errorText, { color: colors.danger }]}
+                weight="extrabold"
+              >
                 {nombreError}
               </AppText>
             )}
@@ -143,7 +144,10 @@ export default function Register() {
               fieldType="email"
             />
             {emailError && (
-              <AppText style={layout.errorText} weight="extrabold">
+              <AppText
+                style={[layout.errorText, { color: colors.danger }]}
+                weight="extrabold"
+              >
                 {emailError}
               </AppText>
             )}
@@ -157,7 +161,10 @@ export default function Register() {
               secureTextEntry
             />
             {passwordError && (
-              <AppText style={layout.errorText} weight="extrabold">
+              <AppText
+                style={[layout.errorText, { color: colors.danger }]}
+                weight="extrabold"
+              >
                 {passwordError}
               </AppText>
             )}
@@ -171,7 +178,10 @@ export default function Register() {
               secureTextEntry
             />
             {confirmError && (
-              <AppText style={layout.errorText} weight="extrabold">
+              <AppText
+                style={[layout.errorText, { color: colors.danger }]}
+                weight="extrabold"
+              >
                 {confirmError}
               </AppText>
             )}
@@ -181,7 +191,6 @@ export default function Register() {
               text="Registrarse"
               disabled={isInvalid}
               onPress={handleRegister}
-              
             />
 
             <SeparatorRow />
@@ -191,5 +200,4 @@ export default function Register() {
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
-
 }

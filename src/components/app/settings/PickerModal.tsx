@@ -2,7 +2,7 @@
 // Custom picker modal that works with Expo Go (no native dependencies)
 
 import AppText from "@/src/components/AppText";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import {
   Modal,
   Pressable,
@@ -34,6 +34,8 @@ export default function PickerModal({
   selectedValue,
   onValueChange,
 }: PickerModalProps) {
+  const colors = useThemeColors();
+
   // Handle option selection
   const handleSelect = (value: string | number) => {
     onValueChange(value);
@@ -49,14 +51,23 @@ export default function PickerModal({
     >
       <Pressable style={styles.overlay} onPress={onClose}>
         {/* Prevent closing when pressing content */}
-        <Pressable style={styles.content}>
-          {/* Header */}
-          <View style={styles.header}>
-            <AppText weight="bold" style={styles.title}>
+        {/* Dynamic background from theme */}
+        <Pressable style={[styles.content, { backgroundColor: colors.card }]}>
+          {/* Header - dynamic border color */}
+          <View
+            style={[styles.header, { borderBottomColor: colors.secondary }]}
+          >
+            <AppText
+              weight="bold"
+              style={[styles.title, { color: colors.text }]}
+            >
               {title}
             </AppText>
             <TouchableOpacity onPress={onClose}>
-              <AppText weight="semibold" style={styles.doneButton}>
+              <AppText
+                weight="semibold"
+                style={[styles.doneButton, { color: colors.primary }]}
+              >
                 Listo
               </AppText>
             </TouchableOpacity>
@@ -75,7 +86,9 @@ export default function PickerModal({
                   key={option.value}
                   style={[
                     styles.optionRow,
-                    isSelected && styles.optionRowSelected,
+                    { borderBottomColor: colors.secondary },
+                    // Highlight selected row with theme secondary color
+                    isSelected && { backgroundColor: colors.secondary },
                   ]}
                   onPress={() => handleSelect(option.value)}
                   activeOpacity={0.6}
@@ -84,14 +97,22 @@ export default function PickerModal({
                     weight={isSelected ? "bold" : "regular"}
                     style={[
                       styles.optionText,
-                      isSelected && styles.optionTextSelected,
+                      { color: colors.text },
+                      // Selected text uses primary color
+                      isSelected && { color: colors.primary },
                     ]}
                   >
                     {option.label}
                   </AppText>
 
-                  {/* Checkmark for selected */}
-                  {isSelected && <AppText style={styles.checkmark}>✓</AppText>}
+                  {/* Checkmark for selected - uses primary color */}
+                  {isSelected && (
+                    <AppText
+                      style={[styles.checkmark, { color: colors.primary }]}
+                    >
+                      ✓
+                    </AppText>
+                  )}
                 </TouchableOpacity>
               );
             })}
@@ -102,6 +123,7 @@ export default function PickerModal({
   );
 }
 
+// Static styles only - no colors here, all colors are applied inline above
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
@@ -109,7 +131,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   content: {
-    backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: "60%",
@@ -120,18 +141,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.light.secondary,
   },
   title: {
     fontSize: 18,
-    color: Colors.light.text,
   },
   doneButton: {
     fontSize: 16,
-    color: Colors.light.primary,
   },
   optionsList: {
-    paddingBottom: 34, // Safe area for iOS
+    paddingBottom: 34,
   },
   optionRow: {
     flexDirection: "row",
@@ -140,20 +158,11 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.light.secondary,
-  },
-  optionRowSelected: {
-    backgroundColor: Colors.light.secondary,
   },
   optionText: {
     fontSize: 16,
-    color: Colors.light.text,
-  },
-  optionTextSelected: {
-    color: Colors.light.primary,
   },
   checkmark: {
     fontSize: 18,
-    color: Colors.light.primary,
   },
 });

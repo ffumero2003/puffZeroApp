@@ -6,14 +6,14 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 
 import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
-  withTiming
+  withTiming,
 } from "react-native-reanimated";
 
 import AppText from "@/src/components/AppText";
@@ -21,7 +21,7 @@ import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import TitleBlock from "@/src/components/onboarding/TitleBlock";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 
 import { LATAM_CURRENCIES } from "@/src/constants/currency";
@@ -30,8 +30,8 @@ import { useMoneySpentViewModel } from "@/src/viewmodels/onboarding/useMoneySpen
 
 import { router } from "expo-router";
 
-
 export default function OnboardingMoneySpent() {
+  const colors = useThemeColors();
   const [amount, setAmount] = useState("");
   const [localCurrency, setLocalCurrency] = useState("CRC");
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -73,7 +73,12 @@ export default function OnboardingMoneySpent() {
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <View style={layout.screenContainer}>
+        <View
+          style={[
+            layout.screenContainer,
+            { backgroundColor: colors.background },
+          ]}
+        >
           <View style={{ flex: 1 }}>
             <OnboardingHeader step={6} total={11} />
 
@@ -89,10 +94,16 @@ export default function OnboardingMoneySpent() {
               />
 
               <TextInput
-                style={styles.inputCurrency}
+                style={[
+                  styles.inputCurrency,
+                  {
+                    backgroundColor: colors.inputBackground,
+                    color: colors.text,
+                  },
+                ]}
                 keyboardType="numeric"
                 placeholder="0"
-                placeholderTextColor="#A0A0BF"
+                placeholderTextColor={colors.textMuted}
                 value={amount}
                 onChangeText={(t) => setAmount(t.replace(/[^0-9]/g, ""))}
               />
@@ -104,7 +115,10 @@ export default function OnboardingMoneySpent() {
               ) : null}
 
               <TouchableOpacity
-                style={styles.currencyPicker}
+                style={[
+                  styles.currencyPicker,
+                  { backgroundColor: colors.inputBackground },
+                ]}
                 onPress={() => {
                   setPickerOpen(true);
                   overlayOpacity.value = withTiming(1, { duration: 200 });
@@ -115,10 +129,18 @@ export default function OnboardingMoneySpent() {
                   modalOpacity.value = withTiming(1, { duration: 260 });
                 }}
               >
-                <AppText weight="semibold" style={styles.currencyText}>
-                  {LATAM_CURRENCIES.find((c) => c.code === localCurrency)?.label}
+                <AppText
+                  weight="semibold"
+                  style={[styles.currencyText, { color: colors.text }]}
+                >
+                  {
+                    LATAM_CURRENCIES.find((c) => c.code === localCurrency)
+                      ?.label
+                  }
                 </AppText>
-                <AppText style={styles.arrow}>▼</AppText>
+                <AppText style={[styles.arrow, { color: colors.text }]}>
+                  ▼
+                </AppText>
               </TouchableOpacity>
             </ScrollView>
           </View>
@@ -155,12 +177,22 @@ export default function OnboardingMoneySpent() {
               });
             }}
           >
-            <Animated.View ref={modalRef} style={[styles.modalBox, modalBoxStyle]}>
+            <Animated.View
+              ref={modalRef}
+              style={[
+                styles.modalBox,
+                modalBoxStyle,
+                { backgroundColor: colors.secondary },
+              ]}
+            >
               <ScrollView style={{ maxHeight: 300 }}>
                 {LATAM_CURRENCIES.map((item) => (
                   <TouchableOpacity
                     key={item.code}
-                    style={styles.modalOption}
+                    style={[
+                      styles.modalOption,
+                      { borderBottomColor: colors.border },
+                    ]}
                     onPress={() => {
                       setLocalCurrency(item.code);
                       setPickerOpen(false);
@@ -178,24 +210,18 @@ export default function OnboardingMoneySpent() {
   );
 }
 
-
-
-
 const styles = StyleSheet.create({
   inputCurrency: {
-      backgroundColor: "#E6E4FF",
-      borderRadius: 12,
-      paddingVertical: 14,
-      paddingHorizontal: 20,
-      fontSize: 22,
-      color: Colors.light.text,
-      fontFamily: "Manrope_600SemiBold",
-      marginTop: 20
-    },
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    fontSize: 22,
+    fontFamily: "Manrope_600SemiBold",
+    marginTop: 20,
+  },
   currencyPicker: {
     marginTop: 20,
     alignSelf: "center",
-    backgroundColor: "#E6E4FF",
     borderRadius: 20,
     paddingVertical: 12,
     paddingHorizontal: 22,
@@ -206,12 +232,10 @@ const styles = StyleSheet.create({
 
   currencyText: {
     fontSize: 16,
-    color: Colors.light.text,
   },
 
   arrow: {
     fontSize: 16,
-    color: Colors.light.text,
     marginLeft: 4,
   },
 
@@ -227,7 +251,6 @@ const styles = StyleSheet.create({
   modalBox: {
     width: "100%",
     maxWidth: 380,
-    backgroundColor: Colors.light.secondary,
     paddingVertical: 10,
     borderRadius: 16,
     maxHeight: "60%",
@@ -237,6 +260,5 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.light.border,
   },
 });

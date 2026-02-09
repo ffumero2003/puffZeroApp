@@ -1,12 +1,10 @@
 import { StyleSheet } from "react-native";
-import { Colors } from "../constants/theme";
 
 export const layout = StyleSheet.create({
 
   /* 🔵 VISTAS */
   screenContainer: {
     flex: 1,
-    backgroundColor: Colors.light.background,
     paddingHorizontal: 24,
     
     justifyContent: "space-between"
@@ -14,7 +12,6 @@ export const layout = StyleSheet.create({
 
   containerWithLoadingBar: {
     flex: 1,
-    backgroundColor: Colors.light.background,
     paddingHorizontal: 24,
     paddingTop: 20,
     
@@ -22,7 +19,6 @@ export const layout = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
     alignItems: "center",
     justifyContent: "flex-end",
     paddingHorizontal: 24,
@@ -31,13 +27,11 @@ export const layout = StyleSheet.create({
 
   containerAuth : {
     flex: 1,
-    backgroundColor: Colors.light.background,
     paddingHorizontal: 24,
     
   },
   /* 🔵 HEADER SUPERIOR (OnboardingHeader) */
   headerContainer: {
-    backgroundColor: Colors.light.background,
     alignItems: "center",
     justifyContent: "flex-start",
     paddingHorizontal: 24,
@@ -76,14 +70,12 @@ export const layout = StyleSheet.create({
   /* 🔵 TITULOS GLOBALES */
   title: {
     fontSize: 28,
-    color: Colors.light.text,
     lineHeight: 32,
     
     
   },
 
   errorText: {
-    color: Colors.light.danger,
     fontSize: 16,
     marginTop: 4,
     marginLeft: 4,
@@ -92,33 +84,28 @@ export const layout = StyleSheet.create({
   titleCenter: {
     marginTop: 30,
     fontSize: 28,
-    color: Colors.light.text,
     textAlign: "center",
   },
   titleCenterNoMargin: {
 
     fontSize: 28,
-    color: Colors.light.text,
     textAlign: "center",
   },
 
   subtitle: {
     fontSize: 16,
-    color: Colors.light.textSecondary,
     marginTop: 8,
     marginBottom: 20
   },
 
   subtitleAuth: {
     fontSize: 16,
-    color: Colors.light.textSecondary,
     marginTop: 8,
     
   },
 
   description: {
     fontSize: 20,
-    color: Colors.light.textSecondary,
     textAlign: "center",
     marginTop: 8,
     marginBottom: 20,
@@ -126,7 +113,6 @@ export const layout = StyleSheet.create({
 
   /* 🔵 TARJETAS / CARDS ESTÁNDAR */
   card: {
-    backgroundColor: "#fff",
     borderRadius: 16,
     padding: 20,
     width: "92%",
@@ -156,32 +142,26 @@ export const layout = StyleSheet.create({
 
   footer: {
       
-      color: Colors.light.text,
       fontSize: 18,
       textAlign: "center",
       paddingBottom: 30
     },
-    link: {
-      color: Colors.light.primary,
-    },
+    
 
 
     // gasto por mes
 
     input: {
-      backgroundColor: "#E6E4FF",
       borderRadius: 12,
       paddingVertical: 14,
       paddingHorizontal: 20,
       fontSize: 22,
-      color: Colors.light.text,
       fontFamily: "Manrope_600SemiBold",
     },
     previewText: {
       marginTop: 8,
       fontSize: 16,
       marginHorizontal: 10,
-      color: Colors.light.textMuted,
     },
 
     //Login
@@ -192,7 +172,6 @@ export const layout = StyleSheet.create({
     },
 
     forgotLink: {
-      color: Colors.light.primary,
       fontSize: 18,
     },
 
@@ -206,13 +185,10 @@ export const layout = StyleSheet.create({
     text: {
       textAlign: "center",
       fontSize: 16,
-      color: Colors.light.textMuted,
       lineHeight: 20,
     },
 
-    linkLogin: {
-      color: Colors.light.primary,
-    },
+    
 
 
     //privacy policy/terms of use
@@ -220,21 +196,18 @@ export const layout = StyleSheet.create({
   
     sectionTitle: {
       fontSize: 18,
-      color: Colors.light.text,
       fontWeight: "bold",
       marginTop: 20,
       marginBottom: 8,
     },
     subsectionTitle: {
       fontSize: 16,
-      color: Colors.light.text,
       fontWeight: "600",
       marginTop: 10,
       marginBottom: 4,
     },
     paragraph: {
       fontSize: 15,
-      color: Colors.light.textMuted,
       lineHeight: 22,
     },
     contentPolicyTerms: {
@@ -245,19 +218,16 @@ export const layout = StyleSheet.create({
     //Reviews
 
     reviewCard: {
-      backgroundColor: "white",
       padding: 18,
       borderRadius: 20,
       marginBottom: 20,
       borderWidth: 1,
-      borderColor: "#D7D7F3",
     },
 
     profileCircle: {
       width: 45,
       height: 45,
       borderRadius: 25,
-      backgroundColor: "#E0E0E0",
       marginBottom: 10,
     },
 
@@ -273,7 +243,6 @@ export const layout = StyleSheet.create({
 
     reviewText: {
       fontSize: 15,
-      color: Colors.light.text,
       lineHeight: 20,
     },
 

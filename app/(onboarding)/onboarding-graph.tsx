@@ -9,17 +9,20 @@ import Graph from "@/assets/images/onboarding/onboarding-graph.png";
 
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { router } from "expo-router";
-
 export default function OnboardingGraph() {
   //onboarding money saved
+  const colors = useThemeColors();
   function goToPuffCount() {
     router.push(ROUTES.ONBOARDING_PUFFS);
   }
 
   return (
     <ScreenWrapper>
-      <View style={layout.screenContainer}>
+      <View
+        style={[layout.screenContainer, { backgroundColor: colors.background }]}
+      >
         {/* 🔵 GROUP 1 — contenido superior */}
         <View>
           <OnboardingHeader step={4} total={11} />
@@ -31,7 +34,10 @@ export default function OnboardingGraph() {
               resizeMode="contain"
             />
 
-            <AppText weight="bold" style={layout.titleCenter}>
+            <AppText
+              weight="bold"
+              style={[layout.titleCenter, { color: colors.text }]}
+            >
               Visualiza tu progreso día a día
             </AppText>
           </View>

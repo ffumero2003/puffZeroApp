@@ -9,12 +9,13 @@ import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import PuffsPlanChart from "@/src/components/onboarding/PuffPlanChart";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 
 import { usePersonalizedPlanViewModel } from "@/src/viewmodels/onboarding/usePersonalizedPlanViewModel";
 
 export default function StepPersonalizedPlan() {
+  const colors = useThemeColors();
   const { targetDate, puffsChart, status, finishFlow } =
     usePersonalizedPlanViewModel();
 
@@ -26,7 +27,6 @@ export default function StepPersonalizedPlan() {
 
   //   if (status === "invalid") return null;
 
-
   const handleContinue = () => {
     const ok = finishFlow();
     if (ok) {
@@ -36,7 +36,9 @@ export default function StepPersonalizedPlan() {
 
   return (
     <ScreenWrapper>
-      <View style={layout.screenContainer}>
+      <View
+        style={[layout.screenContainer, { backgroundColor: colors.background }]}
+      >
         <View style={layout.content}>
           <OnboardingHeader
             step={0}
@@ -51,22 +53,34 @@ export default function StepPersonalizedPlan() {
             resizeMode="contain"
           />
 
-          <AppText weight="extrabold" style={layout.titleCenterNoMargin}>
+          <AppText
+            weight="extrabold"
+            style={[layout.titleCenterNoMargin, { color: colors.text }]}
+          >
             ¡Felicidades! Tu plan personalizado está listo.
           </AppText>
 
           <View style={{ marginTop: 24 }}>
-            <AppText weight="medium" style={layout.description}>
+            <AppText
+              weight="medium"
+              style={[layout.description, { color: colors.text }]}
+            >
               Deberías dejarlo para:
             </AppText>
 
-            <AppText weight="extrabold" style={styles.dateText}>
+            <AppText
+              weight="extrabold"
+              style={[styles.dateText, { color: colors.primary }]}
+            >
               {targetDate ? `📅 ${targetDate}` : "Calculando…"}
             </AppText>
           </View>
 
           <View style={{ marginTop: 32 }}>
-            <AppText weight="extrabold" style={styles.planText}>
+            <AppText
+              weight="extrabold"
+              style={[styles.planText, { color: colors.text }]}
+            >
               Tu plan personalizado
             </AppText>
 
@@ -92,10 +106,7 @@ export default function StepPersonalizedPlan() {
 
           <AppText style={{ fontSize: 16, textAlign: "center", marginTop: 5 }}>
             Puff
-            <AppText
-              weight="extrabold"
-              style={{ color: Colors.light.primary }}
-            >
+            <AppText weight="extrabold" style={{ color: colors.primary }}>
               Zero
             </AppText>{" "}
             te acompaña, te motiva y te ayuda a mantenerte constante.
@@ -115,14 +126,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   dateText: {
-    color: Colors.light.primary,
     fontSize: 24,
     marginTop: 4,
     textAlign: "center",
   },
   planText: {
     fontSize: 16,
-    color: Colors.light.text,
     opacity: 0.6,
   },
 });

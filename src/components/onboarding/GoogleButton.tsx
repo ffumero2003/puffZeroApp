@@ -10,6 +10,7 @@ import { createProfile } from "@/src/lib/profile";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
+import { useTheme } from "@/src/providers/theme-provider";
 import { areNotificationsEnabled } from "@/src/services/notifications/notification-service";
 import { sendWelcomeBackNotification } from "@/src/services/notifications/welcome-back-notification";
 import { components } from "@/src/styles/components";
@@ -21,6 +22,7 @@ type GoogleButtonProps = {
 
 export default function GoogleButton({ mode }: GoogleButtonProps) {
   const { authInProgress, setAuthInProgress, setAuthFlow } = useAuth();
+  const { activeTheme } = useTheme();
   const {
     setName,
     puffs_per_day,
@@ -140,9 +142,12 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
     }
   };
 
+  const btnBg = activeTheme === "dark" ? "#fff" : "#000";
+  const btnText = activeTheme === "dark" ? "#000" : "#fff";
+
   return (
     <TouchableOpacity
-      style={components.googleBtn}
+      style={[components.googleBtn, { backgroundColor: btnBg }]}
       activeOpacity={0.7}
       disabled={authInProgress}
       onPress={() => {
@@ -151,11 +156,14 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
       }}
     >
       {authInProgress ? (
-        <ActivityIndicator color="#fff" />
+        <ActivityIndicator color={btnText} />
       ) : (
         <>
-          <Ionicons name="logo-google" size={20} color="#fff" />
-          <AppText weight="semibold" style={components.googleText}>
+          <Ionicons name="logo-google" size={20} color={btnText} />
+          <AppText
+            weight="semibold"
+            style={[components.googleText, { color: btnText }]}
+          >
             Continuar con Google
           </AppText>
         </>

@@ -1,13 +1,15 @@
 import Logo from "@/assets/images/logo-puff-zero-circle.png";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { ActivityIndicator, Image, Text, View } from "react-native";
 
 export default function Splash() {
+  const colors = useThemeColors();
+
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: Colors.light.background,
+        backgroundColor: colors.background,
         justifyContent: "center",
         alignItems: "center",
       }}
@@ -19,7 +21,7 @@ export default function Splash() {
           style={{
             marginTop: 20,
             fontSize: 30,
-            color: Colors.light.text,
+            color: colors.text,
             fontWeight: "700",
             textAlign: "center",
             lineHeight: 35,
@@ -32,7 +34,7 @@ export default function Splash() {
 
       <ActivityIndicator
         size="large"
-        color={Colors.light.primary}
+        color={colors.primary}
         style={{ marginTop: 40 }}
       />
 
@@ -40,7 +42,7 @@ export default function Splash() {
         style={{
           position: "absolute",
           bottom: 30,
-          color: Colors.light.textSecondary,
+          color: colors.textSecondary,
           fontSize: 16,
           fontWeight: "600",
         }}

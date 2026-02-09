@@ -1,7 +1,7 @@
 // app/verify-email.tsx
 import AppText from "@/src/components/AppText";
 import { ROUTES } from "@/src/constants/routes";
-import { Colors } from "@/src/constants/theme";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { supabase } from "@/src/lib/supabase";
 import { cancelVerificationReminders } from "@/src/services/notifications/verification-notification";
 import { clearPendingVerification } from "@/src/services/verification/verification-service";
@@ -13,6 +13,7 @@ import { ActivityIndicator, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function VerifyEmailScreen() {
+  const colors = useThemeColors();
   const [status, setStatus] = useState<"loading" | "success" | "error">(
     "loading"
   );
@@ -65,7 +66,7 @@ export default function VerifyEmailScreen() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.light.background }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <View
         style={[
           layout.screenContainer,
@@ -74,7 +75,7 @@ export default function VerifyEmailScreen() {
       >
         {status === "loading" && (
           <>
-            <ActivityIndicator size="large" color={Colors.light.primary} />
+            <ActivityIndicator size="large" color={colors.primary} />
             <AppText style={{ marginTop: 16 }}>
               Verificando tu cuenta...
             </AppText>
