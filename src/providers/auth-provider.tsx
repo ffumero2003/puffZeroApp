@@ -5,7 +5,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { checkAndSendDailyAchievementOnOpen } from "../services/notifications/daily-achievement-notification";
 import { scheduleDailyQuoteNotification } from "../services/notifications/daily-quote-notification";
-import { scheduleDailyLocalReminder } from "../services/notifications/daily-reminder-notification";
+import { refreshDailyReminderIfNeeded } from "../services/notifications/daily-reminder-notification";
 import {
   checkAndSendFirstPuffFreeDayNotification,
   scheduleEndOfDayPuffFreeCheck,
@@ -213,7 +213,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       scheduleDailyQuoteNotification();
 
-      scheduleDailyLocalReminder();
+      refreshDailyReminderIfNeeded();
 
       // scheduleDailyAchievementCheck();
       checkAndSendDailyAchievementOnOpen(user.id);

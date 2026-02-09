@@ -1,5 +1,8 @@
 // src/services/notifications/daily-reminder-notification.ts
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { areNotificationsEnabled, getNotifications } from "./notification-service";
+
+const LAST_REMINDER_SCHEDULE_KEY = "daily_reminder_last_scheduled";
 
 // ============================================
 // Message variations for daily reminder
@@ -27,12 +30,31 @@ const DAILY_REMINDER_MESSAGES = [
   { title: "⏰ Es hora", body: "Tómate un momento para actualizar tu progreso." },
 ];
 
+
 /**
  * Get a random daily reminder message
  * Called each time we schedule the notification
  */
 function getRandomReminderMessage(): { title: string; body: string } {
   return DAILY_REMINDER_MESSAGES[Math.floor(Math.random() * DAILY_REMINDER_MESSAGES.length)];
+}
+
+// It only reschedules if 24+ hours have passed since the last schedule
+export async function refreshDailyReminderIfNeeded(): Promise<void> {
+  try {
+    const lastScheduled = await AsyncStorage.getItem(LAST_REMINDER_SCHEDULE_KEY);
+
+    if (lastScheduled) {
+      const hoursSince = (Date.now() - parseInt(lastScheduled, 10)) / (1000 * 60 * 60);
+      // Only reschedule if 24+ hours have passed
+      if (hoursSince < 23.5) return;
+    }
+
+    await scheduleDailyLocalReminder();
+    await AsyncStorage.setItem(LAST_REMINDER_SCHEDULE_KEY, Date.now().toString());
+  } catch (error) {
+    console.error("❌ Error in refreshDailyReminderIfNeeded:", error);
+  }
 }
 
 /**
