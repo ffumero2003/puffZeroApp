@@ -5,14 +5,18 @@ import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import { layout } from "@/src/styles/layout";
 import { Image, View } from "react-native";
 
-import ZuffyImage from "@/assets/images/onboarding/onboarding-zuffy-page.png";
+import ZuffyImageDark from "@/assets/images/onboarding/dark/onboarding-zuffy-dark.png";
+import ZuffyImageLight from "@/assets/images/onboarding/light/onboarding-zuffy-light.png";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
-import { useThemeColors } from "@/src/providers/theme-provider";
+import { useTheme } from "@/src/providers/theme-provider";
 import { router } from "expo-router";
 export default function OnboardingZuffy() {
   //onboarding zuffy
-  const colors = useThemeColors();
+  const { colors, activeTheme } = useTheme();
+
+  const ZuffyImage = activeTheme === "light" ? ZuffyImageLight : ZuffyImageDark;
+
   function goToMoneySaved() {
     router.push(ROUTES.ONBOARDING_MONEY_SAVED);
   }

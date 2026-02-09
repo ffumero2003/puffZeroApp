@@ -1,4 +1,5 @@
-import ReviewsModal from "@/assets/images/onboarding/reviews-modal.png";
+import ReviewsModalDark from "@/assets/images/onboarding/dark/reviews-modal-dark.png";
+import ReviewsModalLight from "@/assets/images/onboarding/light/reviews-modal-light.png";
 import AlexReview from "@/assets/images/reviews/alex-review.jpg";
 import AntonioReview from "@/assets/images/reviews/antonio-review.jpg";
 import MariaReview from "@/assets/images/reviews/maria-review.jpg";
@@ -8,13 +9,13 @@ import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import ReviewCard from "@/src/components/onboarding/ReviewCard";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { useAuth } from "@/src/providers/auth-provider";
-import { useThemeColors } from "@/src/providers/theme-provider";
+import { useTheme } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { useEffect, useRef } from "react";
 import { Alert, Image, ScrollView, View } from "react-native";
 
 export default function Review() {
-  const colors = useThemeColors();
+  const { colors, activeTheme } = useTheme();
   const { authFlow } = useAuth();
   const hasShownAlert = useRef(false);
 
@@ -26,6 +27,9 @@ export default function Review() {
       ]);
     }
   }, [authFlow]);
+
+  const reviewsModal =
+    activeTheme === "light" ? ReviewsModalLight : ReviewsModalDark;
 
   return (
     <ScreenWrapper>
@@ -53,7 +57,7 @@ export default function Review() {
           </AppText>
 
           <Image
-            source={ReviewsModal}
+            source={reviewsModal}
             style={layout.headerImage}
             resizeMode="contain"
           />
@@ -71,10 +75,7 @@ export default function Review() {
         </View>
 
         {/* 🟣 REVIEWS CON SCROLL */}
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 60 }}
-        >
+        <ScrollView showsVerticalScrollIndicator={false} c>
           <ReviewCard
             name="Antonio"
             age={26}

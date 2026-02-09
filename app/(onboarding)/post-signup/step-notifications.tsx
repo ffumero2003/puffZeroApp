@@ -1,8 +1,9 @@
 // notifications-step.tsx
-import NotificationsModal from "@/assets/images/onboarding/notifications-modal.png";
+import NotificationsModalDark from "@/assets/images/onboarding/dark/notifications-modal-dark.png";
+import NotificationsModalLight from "@/assets/images/onboarding/light/notifications-modal-light.png";
 import AppText from "@/src/components/AppText";
 import { ROUTES } from "@/src/constants/routes";
-import { useThemeColors } from "@/src/providers/theme-provider";
+import { useTheme } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { router } from "expo-router";
 import { Image, Pressable, StyleSheet, View } from "react-native";
@@ -11,8 +12,11 @@ import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { useNotificationsViewModel } from "@/src/viewmodels/onboarding/useNotificationsViewModel";
 
 export default function NotificationsStep() {
-  const colors = useThemeColors();
+  const { colors, activeTheme } = useTheme();
   const { requestPermission, skipPermission } = useNotificationsViewModel();
+
+  const notificationsModal =
+    activeTheme === "light" ? NotificationsModalLight : NotificationsModalDark;
 
   const goNext = () => {
     router.push(ROUTES.POST_SIGNUP_PERCENTAGE);
@@ -105,7 +109,7 @@ export default function NotificationsStep() {
 
         <View style={layout.bottomButtonContainer}>
           <Image
-            source={NotificationsModal}
+            source={notificationsModal}
             style={layout.headerImage}
             resizeMode="contain"
           />

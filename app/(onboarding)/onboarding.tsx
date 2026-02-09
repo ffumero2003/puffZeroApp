@@ -5,18 +5,21 @@ import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import { layout } from "@/src/styles/layout";
 import { Image, View } from "react-native";
 
-import HomePage from "@/assets/images/onboarding/onboarding-home-page.png";
+import HomePageDark from "@/assets/images/onboarding/dark/onboarding-home-page-dark.png";
+import HomePageLight from "@/assets/images/onboarding/light/onboarding-home-light.png";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
-import { useThemeColors } from "@/src/providers/theme-provider";
+import { useTheme } from "@/src/providers/theme-provider";
 import { router } from "expo-router";
 
 export default function Onboarding() {
   //onboarding
-  const colors = useThemeColors();
+  const { colors, activeTheme } = useTheme();
   function goToProgress() {
     router.push(ROUTES.ONBOARDING_PROGRESS);
   }
+
+  const HomePage = activeTheme === "light" ? HomePageLight : HomePageDark;
 
   return (
     <ScreenWrapper>

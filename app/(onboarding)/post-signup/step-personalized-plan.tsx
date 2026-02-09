@@ -2,22 +2,25 @@
 import { router } from "expo-router";
 import { Image, StyleSheet, View } from "react-native";
 
-import CheckIcon from "@/assets/images/onboarding/check-onboarding.png";
+import CheckIconDark from "@/assets/images/onboarding/dark/checked-dark.png";
+import CheckIconLight from "@/assets/images/onboarding/light/checked-light.png";
 import AppText from "@/src/components/AppText";
 import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import PuffsPlanChart from "@/src/components/onboarding/PuffPlanChart";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
-import { useThemeColors } from "@/src/providers/theme-provider";
+import { useTheme } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 
 import { usePersonalizedPlanViewModel } from "@/src/viewmodels/onboarding/usePersonalizedPlanViewModel";
 
 export default function StepPersonalizedPlan() {
-  const colors = useThemeColors();
+  const { colors, activeTheme } = useTheme();
   const { targetDate, puffsChart, status, finishFlow } =
     usePersonalizedPlanViewModel();
+
+  const checkIcon = activeTheme === "light" ? CheckIconLight : CheckIconDark;
 
   //  useEffect(() => {
   //     if (status === "invalid") {
@@ -48,7 +51,7 @@ export default function StepPersonalizedPlan() {
           />
 
           <Image
-            source={CheckIcon}
+            source={checkIcon}
             style={styles.checkImage}
             resizeMode="contain"
           />

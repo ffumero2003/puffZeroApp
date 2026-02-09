@@ -99,28 +99,77 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
       if (mode === "register" && userId) {
         console.log("📝 Creando perfil para usuario de Google...");
 
-        const { data: profile, error: profileError } = await createProfile({
-          user_id: userId,
-          full_name: full_name || "Usuario Google",
-          puffs_per_day,
-          money_per_month,
-          currency,
-          goal,
-          goal_speed,
-          why_stopped,
-          worries,
-        });
+        // Check if a profile already exists for this user
+        // (Google OAuth reuses the same user_id for the same email)
+        const { data: existingProfile } = await supabase
+          .from("profiles")
+          .select("id, created_at")
+          .eq("user_id", userId)
+          .maybeSingle();
 
-        if (profileError) {
-          console.error("❌ Error creando perfil:", profileError);
-          Alert.alert("Error", "No pudimos crear tu perfil. Intentá de nuevo.");
-          setAuthInProgress(false);
-          return;
-        }
+        if (existingProfile) {
+          // Profile already exists — update it with the new onboarding data
+          console.log(
+            "♻️ Profile already exists, updating instead of inserting..."
+          );
 
-        if (profile?.created_at) {
-          console.log("✅ Perfil creado con created_at:", profile.created_at);
-          setProfileCreatedAt(profile.created_at);
+          const { data: updatedProfile, error: updateError } = await supabase
+            .from("profiles")
+            .update({
+              full_name: full_name || "Usuario Google",
+              puffs_per_day,
+              money_per_month,
+              currency,
+              goal,
+              goal_speed,
+              why_stopped,
+              worries,
+            })
+            .eq("user_id", userId)
+            .select()
+            .single();
+
+          if (updateError) {
+            console.error("❌ Error actualizando perfil:", updateError);
+            Alert.alert(
+              "Error",
+              "No pudimos actualizar tu perfil. Intentá de nuevo."
+            );
+            setAuthInProgress(false);
+            return;
+          }
+
+          if (updatedProfile?.created_at) {
+            setProfileCreatedAt(updatedProfile.created_at);
+          }
+        } else {
+          // No profile exists — create a new one
+          const { data: profile, error: profileError } = await createProfile({
+            user_id: userId,
+            full_name: full_name || "Usuario Google",
+            puffs_per_day,
+            money_per_month,
+            currency,
+            goal,
+            goal_speed,
+            why_stopped,
+            worries,
+          });
+
+          if (profileError) {
+            console.error("❌ Error creando perfil:", profileError);
+            Alert.alert(
+              "Error",
+              "No pudimos crear tu perfil. Intentá de nuevo."
+            );
+            setAuthInProgress(false);
+            return;
+          }
+
+          if (profile?.created_at) {
+            console.log("✅ Perfil creado con created_at:", profile.created_at);
+            setProfileCreatedAt(profile.created_at);
+          }
         }
       } else if (mode === "login" && userId) {
         // 🔔 Send welcome back notification for returning user

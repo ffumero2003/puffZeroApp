@@ -4,22 +4,26 @@ import AppText from "@/src/components/AppText";
 import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import TitleBlock from "@/src/components/onboarding/TitleBlock";
-import { useThemeColors } from "@/src/providers/theme-provider";
 
-import ComparisonImage from "@/assets/images/onboarding/con-puff-zero.png";
+import ConPuffZeroDark from "@/assets/images/onboarding/dark/con-puff-zero-dark.png";
+import ConPuffZeroLight from "@/assets/images/onboarding/light/con-puff-zero-light.png";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
+import { useTheme } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 
 import { ROUTES } from "@/src/constants/routes";
 import { router } from "expo-router";
 
 export default function OnboardingComparison() {
-  const colors = useThemeColors();
+  const { colors, activeTheme } = useTheme();
 
   //onboarding comparison
   function goToGoal() {
     router.push(ROUTES.ONBOARDING_GOAL);
   }
+
+  const conPuffZero =
+    activeTheme === "light" ? ConPuffZeroLight : ConPuffZeroDark;
 
   return (
     <ScreenWrapper>
@@ -37,7 +41,7 @@ export default function OnboardingComparison() {
 
             {/* Imagen completa */}
             <Image
-              source={ComparisonImage}
+              source={conPuffZero}
               style={layout.image}
               resizeMode="contain"
             />

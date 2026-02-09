@@ -5,18 +5,22 @@ import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import { layout } from "@/src/styles/layout";
 import { Image, View } from "react-native";
 
-import ProgressScreen from "@/assets/images/onboarding/onboarding-progress-page.png";
+import ProgressScreenDark from "@/assets/images/onboarding/dark/onboarding-progress-dark.png";
+import ProgressScreenLight from "@/assets/images/onboarding/light/onboarding-progress-light.png";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
-import { useThemeColors } from "@/src/providers/theme-provider";
+import { useTheme } from "@/src/providers/theme-provider";
 import { router } from "expo-router";
 
 export default function OnboardingProgress() {
   //onboarding progress
-  const colors = useThemeColors();
+  const { colors, activeTheme } = useTheme();
   function goToZuffy() {
     router.push(ROUTES.ONBOARDING_ZUFFY);
   }
+
+  const ProgressScreen =
+    activeTheme === "light" ? ProgressScreenLight : ProgressScreenDark;
 
   return (
     <ScreenWrapper>
