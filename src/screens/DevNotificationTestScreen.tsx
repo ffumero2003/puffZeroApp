@@ -308,7 +308,7 @@ export function DevNotificationTestScreen() {
     try {
       // showResult("Checking for puff-free day...");
       await resetFirstPuffFreeDayTracking(); // Reset first to allow re-testing
-      await checkAndSendFirstPuffFreeDayNotification();
+      await checkAndSendFirstPuffFreeDayNotification("test-user-id");
       // showResult("✅ Puff-free day check complete!");
     } catch (error) {
       showResult(`❌ Error: ${error}`);

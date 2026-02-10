@@ -257,7 +257,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Run immediately on mount (first login / auth resolved)
     updateLastActivity();
     scheduleWeeklySummaryNotification();
-    checkAndSendFirstPuffFreeDayNotification();
+    checkAndSendFirstPuffFreeDayNotification(user.id);
     scheduleEndOfDayPuffFreeCheck();
     scheduleDailyQuoteNotification();
     refreshDailyReminderIfNeeded();

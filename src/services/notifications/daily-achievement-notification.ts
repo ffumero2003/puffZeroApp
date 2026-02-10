@@ -3,7 +3,6 @@ import { supabase } from "@/src/lib/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getNotifications } from "./notification-service";
 
-const TODAY_PUFFS_KEY = "todayPuffs";
 
 /**
  * Get random achievement message based on performance

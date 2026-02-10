@@ -3,8 +3,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getNotifications } from "./notification-service";
 
 const FIRST_PUFF_FREE_DAY_SENT_KEY = "first_puff_free_day_notification_sent";
-const TODAY_PUFFS_KEY = "todayPuffs";
-const TODAY_DATE_KEY = "todayDate";
+// Use a function to generate user-scoped keys, matching useHomeViewModel.ts
+const getTodayPuffsKey = (userId: string) => `todayPuffs_${userId}`;
+const getTodayDateKey = (userId: string) => `todayDate_${userId}`;
 
 /**
  * Get congratulatory message for first puff-free day
@@ -59,7 +60,7 @@ async function markFirstPuffFreeDaySent(): Promise<void> {
  * Check if yesterday was a puff-free day and send notification
  * Call this when the app opens or at the start of a new day
  */
-export async function checkAndSendFirstPuffFreeDayNotification(): Promise<void> {
+export async function checkAndSendFirstPuffFreeDayNotification(userId: string): Promise<void> {
   const Notif = await getNotifications();
   if (!Notif) return;
 
@@ -75,8 +76,8 @@ export async function checkAndSendFirstPuffFreeDayNotification(): Promise<void> 
 
     // Get stored date and puffs
     const [storedDate, storedPuffs] = await Promise.all([
-      AsyncStorage.getItem(TODAY_DATE_KEY),
-      AsyncStorage.getItem(TODAY_PUFFS_KEY),
+      AsyncStorage.getItem(getTodayDateKey(userId)),
+      AsyncStorage.getItem(getTodayPuffsKey(userId)),
     ]);
 
     if (!storedDate) {
@@ -150,7 +151,7 @@ export async function cancelEndOfDayPuffFreeCheck(): Promise<void> {
 /**
  * Check current day and send notification if puff-free (call at end of day)
  */
-export async function checkCurrentDayAndNotify(): Promise<void> {
+export async function checkCurrentDayAndNotify(userId: string): Promise<void> {
   const Notif = await getNotifications();
   if (!Notif) return;
 
@@ -160,7 +161,7 @@ export async function checkCurrentDayAndNotify(): Promise<void> {
     const alreadySent = await wasFirstPuffFreeDaySent();
     if (alreadySent) return;
 
-    const todayPuffs = await AsyncStorage.getItem(TODAY_PUFFS_KEY);
+    const todayPuffs = await AsyncStorage.getItem(getTodayPuffsKey(userId));
     const puffCount = parseInt(todayPuffs || "0", 10);
 
     if (puffCount === 0) {
