@@ -1,7 +1,7 @@
 // src/components/home/ProgressCircle.tsx
 import AppText from "@/src/components/AppText";
 import { useThemeColors } from "@/src/providers/theme-provider";
-import { StyleSheet, View } from "react-native";
+import { Dimensions, StyleSheet, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 
 type Props = {
@@ -18,7 +18,8 @@ export default function ProgressCircle({
   lastPuffTime,
 }: Props) {
   const colors = useThemeColors();
-  const size = 290;
+  const screenWidth = Dimensions.get("window").width;
+  const size = Math.min(screenWidth * 0.7, 320);
   const strokeWidth = 20;
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;

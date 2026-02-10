@@ -2,7 +2,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
-import { ActivityIndicator, Alert, TouchableOpacity } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  TouchableOpacity,
+  Vibration,
+} from "react-native";
 
 import AppText from "@/src/components/AppText";
 import { ROUTES } from "@/src/constants/routes";
@@ -18,9 +23,13 @@ import * as Haptics from "expo-haptics";
 
 type GoogleButtonProps = {
   mode: "login" | "register";
+  disabled?: boolean;
 };
 
-export default function GoogleButton({ mode }: GoogleButtonProps) {
+export default function GoogleButton({
+  mode,
+  disabled = false,
+}: GoogleButtonProps) {
   const { authInProgress, setAuthInProgress, setAuthFlow } = useAuth();
   const { activeTheme } = useTheme();
   const {
@@ -286,10 +295,19 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
 
   return (
     <TouchableOpacity
-      style={[components.googleBtn, { backgroundColor: btnBg }]}
+      style={[
+        components.googleBtn,
+        { backgroundColor: btnBg },
+        disabled && { opacity: 0.5 }, // dim when disabled
+      ]}
       activeOpacity={0.7}
       disabled={authInProgress}
       onPress={() => {
+        // If externally disabled (terms not accepted), vibrate and bail
+        if (disabled) {
+          Vibration.vibrate(30);
+          return;
+        }
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         signInWithGoogle();
       }}

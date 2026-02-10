@@ -2,12 +2,13 @@
 import { supabase } from "@/src/lib/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Local cache so we don't hit the edge function on every app open.
-// The edge function already stores one quote per day in daily_quotes table
-// (same quote for all users), but we cache it locally to avoid
-// unnecessary network calls and random fallback flickers.
+// Local cache keys — single source of truth for both home screen and notification.
+// Quote refreshes every 23.5 hours so the user sees a new one each day.
 const QUOTE_CACHE_KEY = "daily_quote_cached";
-const QUOTE_DATE_KEY = "daily_quote_date";
+const QUOTE_TIMESTAMP_KEY = "daily_quote_timestamp"; // <-- renamed from QUOTE_DATE_KEY
+
+// 23.5 hours in milliseconds (84,600,000 ms)
+const QUOTE_TTL_MS = 23.5 * 60 * 60 * 1000;
 
 type QuoteContext = {
   percentage?: number;
@@ -24,20 +25,23 @@ export async function fetchAIQuote(context?: QuoteContext): Promise<string> {
   ];
 
     try {
-    const today = new Date().toISOString().split("T")[0];
+    const now = Date.now();
 
-    // Check if we already fetched today's quote
-    const [cachedQuote, cachedDate] = await Promise.all([
+    // Check local cache: is the cached quote still fresh (< 23.5 hours old)?
+    const [cachedQuote, cachedTimestamp] = await Promise.all([
       AsyncStorage.getItem(QUOTE_CACHE_KEY),
-      AsyncStorage.getItem(QUOTE_DATE_KEY),
+      AsyncStorage.getItem(QUOTE_TIMESTAMP_KEY),
     ]);
 
-    // Same day = return cached quote, no network call
-    if (cachedQuote && cachedDate === today) {
-      return cachedQuote;
+    if (cachedQuote && cachedTimestamp) {
+      const elapsed = now - parseInt(cachedTimestamp, 10);
+      // Still fresh — return cached quote without network call
+      if (elapsed < QUOTE_TTL_MS) {
+        return cachedQuote;
+      }
     }
 
-    // New day — call edge function (it returns the global daily quote)
+    // Expired or no cache — call edge function for a new quote
     const { data, error } = await supabase.functions.invoke("generate-quote", {
       body: { percentage: context?.percentage ?? 0 },
     });
@@ -46,10 +50,10 @@ export async function fetchAIQuote(context?: QuoteContext): Promise<string> {
 
     const quote = data?.quote || fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
 
-    // Cache locally so we don't call again today
+    // Cache locally with current timestamp
     await Promise.all([
       AsyncStorage.setItem(QUOTE_CACHE_KEY, quote),
-      AsyncStorage.setItem(QUOTE_DATE_KEY, today),
+      AsyncStorage.setItem(QUOTE_TIMESTAMP_KEY, now.toString()),
     ]);
 
     return quote;
@@ -58,4 +62,17 @@ export async function fetchAIQuote(context?: QuoteContext): Promise<string> {
     return fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
   }
 
+}
+
+/**
+ * Returns the currently cached quote without making any network call.
+ * Used by the notification scheduler so it shows the SAME quote
+ * that the user sees on the home screen.
+ */
+export async function getCachedQuote(): Promise<string | null> {
+  try {
+    return await AsyncStorage.getItem(QUOTE_CACHE_KEY);
+  } catch {
+    return null;
+  }
 }

@@ -325,14 +325,14 @@ const styles = StyleSheet.create({
   },
   addButton: {
     borderRadius: 28,
-    paddingVertical: 32,
-    paddingHorizontal: 40,
+    paddingVertical: 32, // was 32 — slightly smaller for small screens
+    paddingHorizontal: 34, // was 40 — slightly smaller for small screens
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "center",
-
     gap: 8,
   },
+
   addButtonText: {
     fontSize: 18,
   },

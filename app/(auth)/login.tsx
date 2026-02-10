@@ -1,6 +1,9 @@
 import { router } from "expo-router";
 import {
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
@@ -42,103 +45,116 @@ export default function Login() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View
-        style={[layout.containerAuth, { backgroundColor: colors.background }]}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 50 : 0}
       >
-        <OnboardingHeader showProgress={false} />
-
-        <AuthHeader
-          title="Iniciar Sesión"
-          subtitle="Vuelve a tomar control de tu vida"
-        />
-
-        {/* Email */}
-        <UnderlineInput
-          placeholder="Correo"
-          value={email}
-          onChangeText={onEmailChange}
-          fieldType="email"
-        />
-        {emailError ? (
-          <AppText
-            style={[layout.errorText, { color: colors.danger }]}
-            weight="extrabold"
-          >
-            {emailError}
-          </AppText>
-        ) : null}
-
-        {/* Password */}
-        <UnderlineInput
-          placeholder="Contraseña"
-          value={password}
-          onChangeText={onPasswordChange}
-          fieldType="password"
-          secureTextEntry
-        />
-        {passwordError ? (
-          <AppText
-            style={[layout.errorText, { color: colors.danger }]}
-            weight="extrabold"
-          >
-            {passwordError}
-          </AppText>
-        ) : null}
-
-        {/* Forgot password */}
-        <TouchableOpacity
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.push("/(auth)/forgot-password");
-          }}
-          style={layout.forgotContainer}
+        <View
+          style={[layout.containerAuth, { backgroundColor: colors.background }]}
         >
-          <AppText
-            weight="bold"
-            style={[layout.forgotLink, { color: colors.text }]}
+          <OnboardingHeader showProgress={false} />
+
+          <AuthHeader
+            title="Iniciar Sesión"
+            subtitle="Vuelve a tomar control de tu vida"
+          />
+
+          {/* ScrollView takes up available space, pushes terms to bottom */}
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
           >
-            Recuperar
-          </AppText>
-        </TouchableOpacity>
+            {/* Email */}
+            <UnderlineInput
+              placeholder="Correo"
+              value={email}
+              onChangeText={onEmailChange}
+              fieldType="email"
+            />
+            {emailError ? (
+              <AppText
+                style={[layout.errorText, { color: colors.danger }]}
+                weight="extrabold"
+              >
+                {emailError}
+              </AppText>
+            ) : null}
 
-        <ContinueButtonAuth
-          text={loading ? "Ingresando..." : "Iniciar Sesión"}
-          onPress={handleLogin}
-          disabled={isInvalid}
-        />
+            {/* Password */}
+            <UnderlineInput
+              placeholder="Contraseña"
+              value={password}
+              onChangeText={onPasswordChange}
+              fieldType="password"
+              secureTextEntry
+            />
+            {passwordError ? (
+              <AppText
+                style={[layout.errorText, { color: colors.danger }]}
+                weight="extrabold"
+              >
+                {passwordError}
+              </AppText>
+            ) : null}
 
-        <SeparatorRow />
-
-        <GoogleButton mode="login" />
-
-        <View style={layout.bottomContainer}>
-          <AppText style={[layout.text, { color: colors.text }]}>
-            Al iniciar sesión, confirmás que aceptás la{" "}
-            <AppText
-              weight="extrabold"
-              style={{ color: colors.primary }}
+            {/* Forgot password */}
+            <TouchableOpacity
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                router.push("/privacy-policy");
+                router.push("/(auth)/forgot-password");
               }}
+              style={layout.forgotContainer}
             >
-              Política de Privacidad
-            </AppText>{" "}
-            y los{" "}
-            <AppText
-              weight="extrabold"
-              style={{ color: colors.primary }}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                router.push("/terms-of-use");
-              }}
-            >
-              Términos de Uso
+              <AppText
+                weight="bold"
+                style={[layout.forgotLink, { color: colors.text }]}
+              >
+                Recuperar
+              </AppText>
+            </TouchableOpacity>
+
+            <ContinueButtonAuth
+              text={loading ? "Ingresando..." : "Iniciar Sesión"}
+              onPress={handleLogin}
+              disabled={isInvalid}
+            />
+
+            <SeparatorRow />
+
+            <GoogleButton mode="login" />
+          </ScrollView>
+
+          {/* MOVED OUTSIDE ScrollView — stays pinned at the bottom */}
+          <View style={layout.bottomContainer}>
+            <AppText style={[layout.text, { color: colors.text }]}>
+              Al iniciar sesión, confirmás que aceptás la{" "}
+              <AppText
+                weight="extrabold"
+                style={{ color: colors.primary }}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push("/privacy-policy");
+                }}
+              >
+                Política de Privacidad
+              </AppText>{" "}
+              y los{" "}
+              <AppText
+                weight="extrabold"
+                style={{ color: colors.primary }}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push("/terms-of-use");
+                }}
+              >
+                Términos de Uso
+              </AppText>
+              .
             </AppText>
-            .
-          </AppText>
+          </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 }

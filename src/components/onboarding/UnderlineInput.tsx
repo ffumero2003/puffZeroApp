@@ -39,15 +39,22 @@ export default function UnderlineInput({
   const textContentTypeMap = {
     name: "name",
     email: "emailAddress",
-    password: "newPassword",
-    confirmPassword: "newPassword",
+    password: "none",
+    confirmPassword: "none",
   } as const;
 
   const autoCompleteMap = {
     name: "name",
     email: "email",
-    password: "password-new",
-    confirmPassword: "password-new",
+    password: "off",
+    confirmPassword: "off",
+  } as const;
+
+  const keyboardTypeMap = {
+    name: "default",
+    email: "email-address",
+    password: "default",
+    confirmPassword: "default",
   } as const;
 
   return (
@@ -70,6 +77,7 @@ export default function UnderlineInput({
         textContentType={textContentTypeMap[fieldType]}
         autoComplete={autoCompleteMap[fieldType]}
         autoCapitalize={fieldType === "name" ? "words" : "none"}
+        keyboardType={keyboardTypeMap[fieldType]}
         {...props}
       />
 

@@ -12,32 +12,36 @@ const corsHeaders = {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+// 23.5 hours in milliseconds — matches client-side TTL
+const QUOTE_TTL_MS = 23.5 * 60 * 60 * 1000;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    // Get today's date (UTC)
-    const today = new Date().toISOString().split("T")[0];
-
-    // 1️⃣ Check if we already have today's quote
-    const { data: existingQuote } = await supabase
+    // 1️⃣ Check if we have a recent quote (< 23.5 hours old)
+    const { data: latestQuote } = await supabase
       .from("daily_quotes")
-      .select("quote")
-      .eq("date", today)
+      .select("quote, created_at")
+      .order("created_at", { ascending: false })
+      .limit(1)
       .single();
 
-    if (existingQuote?.quote) {
-      console.log("✅ Returning cached quote for", today);
-      return new Response(
-        JSON.stringify({ quote: existingQuote.quote, cached: true }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    if (latestQuote?.quote && latestQuote?.created_at) {
+      const age = Date.now() - new Date(latestQuote.created_at).getTime();
+      if (age < QUOTE_TTL_MS) {
+        console.log("✅ Returning cached quote (age:", Math.round(age / 3600000), "hrs)");
+        return new Response(
+          JSON.stringify({ quote: latestQuote.quote, cached: true }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     // 2️⃣ Generate new quote from OpenAI
-    console.log("🔄 Generating new quote for", today);
+    console.log("🔄 Generating new quote");
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -69,8 +73,8 @@ Solo responde con la frase, sin comillas.`,
     const quote = data.choices?.[0]?.message?.content?.trim() 
       || "Cada paso cuenta en tu camino.";
 
-    // 3️⃣ Save quote to database
-    await supabase.from("daily_quotes").insert({ quote, date: today });
+    // 3️⃣ Save quote to database (with created_at auto-set by Supabase)
+    await supabase.from("daily_quotes").insert({ quote, date: new Date().toISOString().split("T")[0] });
 
     return new Response(
       JSON.stringify({ quote, cached: false }),

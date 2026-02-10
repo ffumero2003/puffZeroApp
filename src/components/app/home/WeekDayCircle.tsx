@@ -2,7 +2,7 @@
 import AppText from "@/src/components/AppText";
 import { useThemeColors } from "@/src/providers/theme-provider";
 import * as Haptics from "expo-haptics";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { Dimensions, StyleSheet, TouchableOpacity } from "react-native";
 
 type Props = {
   day: string;
@@ -11,6 +11,9 @@ type Props = {
   isActive: boolean;
   onPress: () => void;
 };
+
+const screenWidth = Dimensions.get("window").width;
+const circleSize = Math.min((screenWidth - 60) / 7, 50); // 7 circles with padding, max 50
 
 export default function WeekDayCircle({
   day,
@@ -48,11 +51,11 @@ export default function WeekDayCircle({
 
 const styles = StyleSheet.create({
   container: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    alignItems: "center",
+    width: circleSize,
+    height: circleSize,
+    borderRadius: circleSize / 2,
     justifyContent: "center",
+    alignItems: "center",
   },
   text: {
     fontSize: 16,

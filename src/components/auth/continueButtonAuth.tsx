@@ -3,7 +3,9 @@ import { useThemeColors } from "@/src/providers/theme-provider";
 import { components } from "@/src/styles/components";
 import * as Haptics from "expo-haptics";
 import { Href, router } from "expo-router";
-import { Vibration, View, ViewStyle } from "react-native";
+import { useEffect, useRef } from "react"; // <-- NEW
+import { Animated, Vibration, ViewStyle } from "react-native"; // <-- NEW: Animated
+
 interface ContinueButtonProps {
   text?: string;
   route?: string | Href;
@@ -20,13 +22,24 @@ export default function ContinueButtonAuth({
   onPress,
 }: ContinueButtonProps) {
   const colors = useThemeColors();
+
+  // ─── Animated opacity: smoothly transitions when disabled changes ───
+  const opacity = useRef(new Animated.Value(disabled ? 0.6 : 1)).current;
+
+  useEffect(() => {
+    Animated.timing(opacity, {
+      toValue: disabled ? 0.6 : 1,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+  }, [disabled]);
+
   function handlePress() {
     if (disabled) {
-      Vibration.vibrate(30); // 🔥 feedback suave cuando NO se puede tocar
+      Vibration.vibrate(30);
       return;
     }
 
-    // 🔥 Haptic feedback cuando SÍ se puede tocar
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     if (onPress) {
@@ -40,14 +53,11 @@ export default function ContinueButtonAuth({
   }
 
   return (
-    <View
-      style={[
-        components.bottomButtonContainerAuth,
-        style,
-        disabled && { opacity: 0.6 },
-      ]}
+    // Changed View → Animated.View
+    <Animated.View
+      style={[components.bottomButtonContainerAuth, style, { opacity }]}
     >
       <KeepGoingButton text={text} disabled={disabled} onPress={handlePress} />
-    </View>
+    </Animated.View>
   );
 }

@@ -1,15 +1,16 @@
 import KeepGoingButton from "@/src/components/onboarding/KeepGoingButton";
-import { useThemeColors } from "@/src/providers/theme-provider";
 import { components } from "@/src/styles/components";
 import * as Haptics from "expo-haptics";
 import { Href, router } from "expo-router";
-import { Vibration, View, ViewStyle } from "react-native";
+import { useEffect, useRef } from "react"; // <-- NEW: for animation
+import { Animated, Vibration, ViewStyle } from "react-native"; // <-- NEW: Animated
+
 interface ContinueButtonProps {
   text?: string;
-  route?: string | Href; // ahora es opcional
+  route?: string | Href;
   style?: ViewStyle;
   disabled?: boolean;
-  onPress?: () => void; // NUEVO 🔥 permite lógica personalizada
+  onPress?: () => void;
 }
 
 export default function ContinueButton({
@@ -19,14 +20,23 @@ export default function ContinueButton({
   disabled = false,
   onPress,
 }: ContinueButtonProps) {
-  const colors = useThemeColors();
+  // ─── Animated opacity: smoothly transitions when disabled changes ───
+  const opacity = useRef(new Animated.Value(disabled ? 0.6 : 1)).current;
+
+  useEffect(() => {
+    Animated.timing(opacity, {
+      toValue: disabled ? 0.6 : 1,
+      duration: 250, // smooth 250ms fade
+      useNativeDriver: true,
+    }).start();
+  }, [disabled]);
+
   function handlePress() {
     if (disabled) {
-      Vibration.vibrate(30); // 🔥 feedback suave cuando NO se puede tocar
+      Vibration.vibrate(30);
       return;
     }
 
-    // 🔥 Haptic feedback cuando SÍ se puede tocar
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     if (onPress) {
@@ -40,14 +50,15 @@ export default function ContinueButton({
   }
 
   return (
-    <View
+    // Changed View → Animated.View so we can animate opacity
+    <Animated.View
       style={[
         components.bottomButtonContainer,
         style,
-        disabled && { opacity: 0.6 },
+        { opacity }, // <-- animated value instead of static ternary
       ]}
     >
       <KeepGoingButton text={text} disabled={disabled} onPress={handlePress} />
-    </View>
+    </Animated.View>
   );
 }

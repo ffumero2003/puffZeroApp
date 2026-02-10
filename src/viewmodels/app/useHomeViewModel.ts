@@ -46,6 +46,7 @@ export function useHomeViewModel() {
   const [motivationalMessage, setMotivationalMessage] = useState("");
   const [currentWeek, setCurrentWeek] = useState<WeekData | null>(null);
   const [puffsLoading, setPuffsLoading] = useState(true);
+  const [quoteLoading, setQuoteLoading] = useState(true);
 
 
 
@@ -198,11 +199,13 @@ const generateCurrentWeek = useCallback(async () => {
 
   // Load AI-generated motivational message
   const loadMotivationalMessage = useCallback(async () => {
-    const quote = await fetchAIQuote({
-      percentage,
-    });
-    setMotivationalMessage(quote);
-  }, [percentage]);
+  setQuoteLoading(true);
+  const quote = await fetchAIQuote({
+    percentage,
+  });
+  setMotivationalMessage(quote);
+  setQuoteLoading(false);
+}, [percentage]);
 
   // Load persisted data on mount
   useEffect(() => {
@@ -220,44 +223,6 @@ const generateCurrentWeek = useCallback(async () => {
       loadMotivationalMessage();
     }
   }, [profileLoading]);
-
-  
-
-  //   // Send welcome notification once when user first lands on Home
-  // useEffect(() => {
-  //   async function handleWelcomeNotification() {
-  //     try {
-  //       // Check if we already sent the welcome notification
-  //       const alreadySent = await AsyncStorage.getItem("welcomeNotificationSent");
-  //       if (alreadySent) return;
-
-  //       const notificationsEnabled = await areNotificationsEnabled();
-  //       if (!notificationsEnabled) return;
-
-  //       await sendWelcomeNotification();
-  //       await AsyncStorage.setItem("welcomeNotificationSent", "true");
-  //     } catch (error) {
-  //       console.error("Error sending welcome notification:", error);
-  //     }
-  //   }
-
-  //   handleWelcomeNotification();
-  // }, []); // Runs once on mount
-
-    // Send welcome notification every time user enters Home (TESTING)
-  // useEffect(() => {
-  //   async function handleWelcomeNotification() {
-  //     try {
-  //       // Skip areNotificationsEnabled check — it's never set during onboarding
-  //       await sendWelcomeNotification();
-  //     } catch (error) {
-  //       console.error("Error sending welcome notification:", error);
-  //     }
-  //   }
-
-  //   handleWelcomeNotification();
-  // }, []);
-
 
 
 
@@ -316,7 +281,7 @@ const generateCurrentWeek = useCallback(async () => {
   currentWeek,
   addPuff,
   // Home is ready only when BOTH profile and puffs data have loaded
-  loading: profileLoading || puffsLoading,
+  loading: profileLoading || puffsLoading || quoteLoading,
 };
 
 }

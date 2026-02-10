@@ -1,12 +1,27 @@
 // src/services/notifications/daily-quote-notification.ts
-import { supabase } from "@/src/lib/supabase"; // To fetch quote from generate-quote edge function
+import { fetchAIQuote, getCachedQuote } from "@/src/services/ai-quotes-service";
 import { areNotificationsEnabled, getNotifications } from "./notification-service";
 
 // ============================================
-// CURRENT: Sends notification immediately (for testing)
+// Sends notification immediately (for testing)
 // ============================================
 export async function sendDailyQuoteNotification(quote: string): Promise<void> {
-  // ... existing code stays the same
+  const Notif = await getNotifications();
+  if (!Notif) return;
+
+  // Send immediately (2-second delay) — used for testing only
+  await Notif.scheduleNotificationAsync({
+    content: {
+      title: "💨 Tu frase del día",
+      body: quote,
+      sound: true,
+      data: { type: "daily_quote" },
+    },
+    trigger: {
+      type: Notif.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: 2,
+    },
+  });
 }
 
 export async function scheduleDailyQuoteNotification(): Promise<void> {
@@ -23,14 +38,17 @@ export async function scheduleDailyQuoteNotification(): Promise<void> {
   await cancelDailyQuoteNotification();
 
   try {
-    // Fetch the global daily quote from the edge function
-    const { data, error } = await supabase.functions.invoke("generate-quote");
+    // Use the shared quote source — first try the local cache (same quote
+    // shown on the home screen), and if empty, fetch a fresh one.
+    // This guarantees the notification and home screen show the SAME message.
+    let quote = await getCachedQuote();
+    if (!quote) {
+      // No cached quote yet (first open) — fetch one, which also caches it
+      quote = await fetchAIQuote();
+    }
 
-    const quote = data?.quote || "Cada día es una nueva oportunidad para ser mejor.";
-
-    // Schedule for tomorrow 8 AM (one-shot, not repeating).
-    // Each app open reschedules with a new quote from the edge function,
-    // so the user always gets a fresh quote in their notification.
+    // Schedule for tomorrow 8:30 AM (one-shot, not repeating).
+    // Each app open reschedules, so the user always gets the current quote.
     const tomorrow8AM = new Date();
     tomorrow8AM.setDate(tomorrow8AM.getDate() + 1);
     tomorrow8AM.setHours(8, 30, 0, 0);
@@ -54,7 +72,7 @@ export async function scheduleDailyQuoteNotification(): Promise<void> {
 
 
 // ============================================
-// NEW: Cancel scheduled daily quote notifications
+// Cancel scheduled daily quote notifications
 // Call this before rescheduling to avoid duplicates
 // ============================================
 export async function cancelDailyQuoteNotification(): Promise<void> {
@@ -71,7 +89,6 @@ export async function cancelDailyQuoteNotification(): Promise<void> {
         await Notif.cancelScheduledNotificationAsync(notification.identifier);
       }
     }
-    // console.log("✅ Daily quote notification cancelled");
   } catch (error) {
     console.log("⚠️ Error canceling daily quote notification:", error);
   }

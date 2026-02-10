@@ -13,7 +13,7 @@ export const layout = StyleSheet.create({
   containerWithLoadingBar: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 20,
+   
     
   },
 

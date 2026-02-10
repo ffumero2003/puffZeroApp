@@ -8,13 +8,6 @@ import {
   View,
 } from "react-native";
 
-import {
-  validateConfirmPassword,
-  validateEmail,
-  validateFullName,
-  validatePassword,
-} from "@/src/lib/auth/auth.validation";
-
 import AppText from "@/src/components/AppText";
 import AuthHeader from "@/src/components/auth/AuthHeader";
 import ContinueButtonAuth from "@/src/components/auth/ContinueButtonAuth";
@@ -22,11 +15,21 @@ import GoogleButton from "@/src/components/onboarding/GoogleButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import SeparatorRow from "@/src/components/onboarding/SeparatorRow";
 import UnderlineInput from "@/src/components/onboarding/UnderlineInput";
+import {
+  validateConfirmPassword,
+  validateEmail,
+  validateFullName,
+  validatePassword,
+} from "@/src/lib/auth/auth.validation";
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import { Pressable } from "react-native"; // add Pressable and Vibration to your existing RN import
 
 import { useAuth } from "@/src/providers/auth-provider";
 import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { useRegisterViewModel } from "@/src/viewmodels/auth/useRegisterViewModel";
+import { router } from "expo-router";
 
 export default function Register() {
   const colors = useThemeColors();
@@ -34,6 +37,7 @@ export default function Register() {
   /* ---------------------------
      STATE 
   ------------------------------*/
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -94,6 +98,7 @@ export default function Register() {
     !password ||
     !confirm ||
     !nombre ||
+    !acceptedTerms ||
     Boolean(emailError) ||
     Boolean(passwordError) ||
     Boolean(confirmError) ||
@@ -186,6 +191,62 @@ export default function Register() {
               </AppText>
             )}
 
+            {/* Aceptar términos */}
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setAcceptedTerms((prev) => !prev);
+              }}
+              style={{
+                flexDirection: "row",
+                alignItems: "flex-start",
+                marginTop: 24,
+                marginBottom: 8,
+                gap: 10,
+              }}
+            >
+              {/* Checkbox icon */}
+              <Ionicons
+                name={acceptedTerms ? "checkbox" : "square-outline"}
+                size={22}
+                color={acceptedTerms ? colors.primary : colors.textSecondary}
+                style={{ marginTop: 1 }}
+              />
+
+              {/* Text with clickable links */}
+              <AppText
+                style={{
+                  flex: 1,
+                  fontSize: 14,
+                  lineHeight: 18,
+                  color: colors.textSecondary,
+                }}
+              >
+                Acepto la{" "}
+                <AppText
+                  weight="extrabold"
+                  style={{ color: colors.primary, fontSize: 14 }}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    router.push("/privacy-policy");
+                  }}
+                >
+                  Política de Privacidad
+                </AppText>{" "}
+                y los{" "}
+                <AppText
+                  weight="extrabold"
+                  style={{ color: colors.primary, fontSize: 14 }}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    router.push("/terms-of-use");
+                  }}
+                >
+                  Términos de Uso
+                </AppText>
+              </AppText>
+            </Pressable>
+
             {/* Botón */}
             <ContinueButtonAuth
               text="Registrarse"
@@ -194,7 +255,7 @@ export default function Register() {
             />
 
             <SeparatorRow />
-            <GoogleButton mode="register" />
+            <GoogleButton mode="register" disabled={!acceptedTerms} />
           </ScrollView>
         </View>
       </KeyboardAvoidingView>
