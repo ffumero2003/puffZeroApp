@@ -2,7 +2,7 @@
 import Logo from "@/assets/images/logo-puff-zero.png";
 import AppText from "@/src/components/AppText";
 import { useThemeColors } from "@/src/providers/theme-provider";
-import { Image, StyleSheet, View } from "react-native";
+import { Dimensions, Image, StyleSheet, View } from "react-native";
 
 interface ProgressHeaderProps {
   timeSinceLastPuff: string;
@@ -12,6 +12,9 @@ export default function ProgressHeader({
   timeSinceLastPuff,
 }: ProgressHeaderProps) {
   const colors = useThemeColors();
+  const screenWidth = Dimensions.get("window").width;
+  const logoSize = screenWidth * 0.25; // 20% of screen width
+
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
@@ -24,8 +27,12 @@ export default function ProgressHeader({
         </AppText>
       </View>
 
-      <View style={styles.logoContainer}>
-        <Image source={Logo} style={styles.logo} resizeMode="contain" />
+      <View style={{ marginLeft: 12 }}>
+        <Image
+          source={Logo}
+          style={{ width: logoSize, height: logoSize }}
+          resizeMode="contain"
+        />
       </View>
     </View>
   );
@@ -43,12 +50,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
 
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 16,
 
     opacity: 0.7,
   },

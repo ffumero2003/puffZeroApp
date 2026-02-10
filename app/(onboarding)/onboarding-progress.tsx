@@ -3,7 +3,7 @@ import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import LoginText from "@/src/components/onboarding/LoginText";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import { layout } from "@/src/styles/layout";
-import { Image, View } from "react-native";
+import { Dimensions, Image, View } from "react-native";
 
 import ProgressScreenDark from "@/assets/images/onboarding/dark/onboarding-progress-dark.png";
 import ProgressScreenLight from "@/assets/images/onboarding/light/onboarding-progress-light.png";
@@ -22,6 +22,8 @@ export default function OnboardingProgress() {
   const ProgressScreen =
     activeTheme === "light" ? ProgressScreenLight : ProgressScreenDark;
 
+  const screenWidth = Dimensions.get("window").width;
+
   return (
     <ScreenWrapper>
       <View
@@ -32,7 +34,10 @@ export default function OnboardingProgress() {
         <View style={{ width: "100%", alignItems: "center" }}>
           <Image
             source={ProgressScreen}
-            style={layout.bigImage}
+            style={{
+              width: screenWidth * 0.9,
+              height: screenWidth * 1 * 1.2, // taller aspect ratio for phone mockups
+            }}
             resizeMode="contain"
           />
 

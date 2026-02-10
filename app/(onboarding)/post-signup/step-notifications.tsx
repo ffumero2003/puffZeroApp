@@ -6,7 +6,7 @@ import { ROUTES } from "@/src/constants/routes";
 import { useTheme } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { router } from "expo-router";
-import { Image, Pressable, StyleSheet, View } from "react-native";
+import { Dimensions, Image, Pressable, StyleSheet, View } from "react-native";
 
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { useNotificationsViewModel } from "@/src/viewmodels/onboarding/useNotificationsViewModel";
@@ -14,6 +14,7 @@ import { useNotificationsViewModel } from "@/src/viewmodels/onboarding/useNotifi
 export default function NotificationsStep() {
   const { colors, activeTheme } = useTheme();
   const { requestPermission, skipPermission } = useNotificationsViewModel();
+  const screenWidth = Dimensions.get("window").width;
 
   const notificationsModal =
     activeTheme === "light" ? NotificationsModalLight : NotificationsModalDark;
@@ -110,7 +111,11 @@ export default function NotificationsStep() {
         <View style={layout.bottomButtonContainer}>
           <Image
             source={notificationsModal}
-            style={layout.headerImage}
+            style={{
+              width: screenWidth * 0.85,
+              height: screenWidth * 0.85 * 0.55,
+              alignSelf: "center",
+            }}
             resizeMode="contain"
           />
         </View>

@@ -1,4 +1,4 @@
-import { Image, View } from "react-native";
+import { Dimensions, Image, View } from "react-native";
 
 import AppText from "@/src/components/AppText";
 import ContinueButton from "@/src/components/onboarding/ContinueButton";
@@ -25,6 +25,8 @@ export default function OnboardingComparison() {
   const conPuffZero =
     activeTheme === "light" ? ConPuffZeroLight : ConPuffZeroDark;
 
+  const screenWidth = Dimensions.get("window").width;
+
   return (
     <ScreenWrapper>
       <View
@@ -39,10 +41,13 @@ export default function OnboardingComparison() {
               subtitle="Tu transición al dejar el vape"
             />
 
-            {/* Imagen completa */}
             <Image
               source={conPuffZero}
-              style={layout.image}
+              style={{
+                width: screenWidth * 0.9,
+                height: screenWidth * 0.95 * 0.85, // wider aspect ratio for this comparison image
+                marginVertical: 20,
+              }}
               resizeMode="contain"
             />
 

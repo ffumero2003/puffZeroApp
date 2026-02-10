@@ -60,7 +60,6 @@ export default function Settings() {
   // ============================================
   const handleLogout = async () => {
     await signOut();
-    router.replace("/(onboarding)/onboarding");
   };
 
   const handleDeleteAccount = async () => {
@@ -96,9 +95,8 @@ export default function Settings() {
       // which we just cleared. We want it to stay cleared.
       await supabase.auth.signOut();
 
-      // Step 5: Navigate to onboarding - AuthGuard will also do this
-      // since user becomes null, but we do it explicitly for immediate feedback
-      router.replace("/(onboarding)/onboarding");
+      // Step 5: No explicit navigation needed — AuthGuard detects user becomes
+      // null and automatically redirects to /(onboarding)/onboarding
     } catch (error) {
       console.error("❌ Error deleting account:", error);
     }

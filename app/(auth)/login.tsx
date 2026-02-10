@@ -60,7 +60,10 @@ export default function Login() {
           fieldType="email"
         />
         {emailError ? (
-          <AppText style={layout.errorText} weight="extrabold">
+          <AppText
+            style={[layout.errorText, { color: colors.danger }]}
+            weight="extrabold"
+          >
             {emailError}
           </AppText>
         ) : null}
@@ -74,7 +77,10 @@ export default function Login() {
           secureTextEntry
         />
         {passwordError ? (
-          <AppText style={layout.errorText} weight="extrabold">
+          <AppText
+            style={[layout.errorText, { color: colors.danger }]}
+            weight="extrabold"
+          >
             {passwordError}
           </AppText>
         ) : null}

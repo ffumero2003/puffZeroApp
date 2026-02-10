@@ -1,4 +1,4 @@
-import Logo from "@/assets/images/logo-puff-zero-circle.png";
+import Logo from "@/assets/images/logo-puff-zero.png";
 import { useThemeColors } from "@/src/providers/theme-provider";
 import { ActivityIndicator, Image, Text, View } from "react-native";
 

@@ -1,7 +1,7 @@
 // src/hooks/useUserData.ts
 import { getProfileByUserId } from "@/src/lib/profile";
 import { useAuth } from "@/src/providers/auth-provider";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Hook que retorna los datos completos del usuario
@@ -12,20 +12,27 @@ export function useUserData() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadUserData();
-  }, [user]);
+  // Track whether the initial load has completed.
+  // After the first load, refreshProfile() will update data
+  // silently (no loading spinner) to avoid UI flashes.
+  const hasLoadedOnce = useRef(false);
 
-  async function loadUserData() {
+  const loadUserData = useCallback(async () => {
     if (!user?.id) {
       setProfile(null);
       setLoading(false);
       return;
     }
 
+    // Only show loading spinner on the very first fetch.
+    // Subsequent refreshes update silently in the background.
+    if (!hasLoadedOnce.current) {
+      setLoading(true);
+    }
+
     try {
       const { data, error } = await getProfileByUserId(user.id);
-      
+
       if (error) {
         console.error("Error cargando profile:", error);
         setProfile(null);
@@ -37,14 +44,21 @@ export function useUserData() {
       setProfile(null);
     } finally {
       setLoading(false);
+      hasLoadedOnce.current = true;
     }
-  }
+  }, [user?.id]);
+
+  useEffect(() => {
+    loadUserData();
+  }, [loadUserData]);
 
   return {
     user,
     profile,
     loading,
-    
+    // Expose refresh so screens can re-fetch after navigating back
+    refreshProfile: loadUserData,
+
     // Helpers útiles
     fullName: profile?.full_name || user?.user_metadata?.full_name || "Usuario",
     email: user?.email || "",

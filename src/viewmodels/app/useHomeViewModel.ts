@@ -6,7 +6,9 @@ import { fetchAIQuote } from "@/src/services/ai-quotes-service";
 import { scheduleDailyAchievementCheck } from "@/src/services/notifications/daily-achievement-notification";
 import { updateLastActivity } from "@/src/services/notifications/inactivity-notification";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
 
 // Keys are now scoped per user so switching accounts doesn't show stale data
 const getStorageKeys = (userId: string) => ({
@@ -30,7 +32,14 @@ type WeekData = {
 
 export function useHomeViewModel() {
   const { user } = useAuth();
-  const { profile, loading: profileLoading } = useUserData();
+  const { profile, loading: profileLoading, refreshProfile } = useUserData();
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshProfile();
+    }, [refreshProfile])
+  );
+
   
   const [todayPuffs, setTodayPuffs] = useState(0);
   const [lastPuffTime, setLastPuffTime] = useState<Date | null>(null);

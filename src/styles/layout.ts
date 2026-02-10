@@ -69,7 +69,7 @@ export const layout = StyleSheet.create({
 
   /* 🔵 TITULOS GLOBALES */
   title: {
-    fontSize: 28,
+    fontSize: 30,
     lineHeight: 32,
     
     
@@ -82,18 +82,14 @@ export const layout = StyleSheet.create({
   },
 
   titleCenter: {
-    marginTop: 30,
-    fontSize: 28,
+    
+    fontSize: 30,
     textAlign: "center",
   },
-  titleCenterNoMargin: {
-
-    fontSize: 28,
-    textAlign: "center",
-  },
+ 
 
   subtitle: {
-    fontSize: 16,
+    fontSize: 18,
     marginTop: 8,
     marginBottom: 20
   },
@@ -135,6 +131,7 @@ export const layout = StyleSheet.create({
     width: "100%",
     height: 450,
   },
+
 
  
 

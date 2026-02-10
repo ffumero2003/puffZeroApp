@@ -1,21 +1,23 @@
-import { Image, View } from "react-native";
-
+import MoneySavedDark from "@/assets/images/onboarding/dark/money-saved-dark.png";
+import MoneySavedLight from "@/assets/images/onboarding/light/money-saved-light.png";
 import AppText from "@/src/components/AppText";
 import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
-import { layout } from "@/src/styles/layout";
-
-import MoneySaved from "@/assets/images/onboarding/onboarding-money-saved.png";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
-import { useThemeColors } from "@/src/providers/theme-provider";
+import { useTheme } from "@/src/providers/theme-provider";
+import { layout } from "@/src/styles/layout";
 import { router } from "expo-router";
+import { Dimensions, Image, View } from "react-native";
 export default function OnboardingMoneySaved() {
   //onboarding money saved
-  const colors = useThemeColors();
+  const { colors, activeTheme } = useTheme();
   function goToGraph() {
     router.push(ROUTES.ONBOARDING_GRAPH);
   }
+
+  const MoneySaved = activeTheme === "light" ? MoneySavedLight : MoneySavedDark;
+  const screenWidth = Dimensions.get("window").width;
 
   return (
     <ScreenWrapper>
@@ -26,24 +28,28 @@ export default function OnboardingMoneySaved() {
         <View>
           <OnboardingHeader step={3} total={11} />
 
-          <View style={{ alignItems: "center", marginTop: 20 }}>
+          <View style={{ alignItems: "center", marginTop: 80 }}>
             <Image
               source={MoneySaved}
-              style={layout.bigImage}
+              style={{
+                width: screenWidth * 0.9, // 85% of screen width
+                height: screenWidth * 0.9 * 0.85, // maintain aspect ratio (~4:3)
+                marginTop: 30,
+              }}
               resizeMode="contain"
             />
-
-            <AppText
-              weight="bold"
-              style={[layout.titleCenter, { color: colors.text }]}
-            >
-              Cada puff evitado suma a tu ahorro
-            </AppText>
           </View>
         </View>
 
-        {/* 🟢 GROUP 2 — Botón + Login */}
+        {/* 🟢 GROUP 2 — botón + login */}
         <View style={{ width: "100%" }}>
+          <AppText
+            weight="bold"
+            style={[layout.titleCenter, { color: colors.text }]}
+          >
+            Cada puff evitado suma a tu ahorro
+          </AppText>
+
           <ContinueButton
             text="Continuar"
             onPress={goToGraph}

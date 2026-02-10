@@ -1,7 +1,7 @@
 import AppText from "@/src/components/AppText";
 import { useThemeColors } from "@/src/providers/theme-provider";
 import { ReactNode } from "react";
-import { Image, StyleSheet, View } from "react-native";
+import { Dimensions, Image, StyleSheet, View } from "react-native";
 interface Props {
   icon: any;
   text: ReactNode;
@@ -9,9 +9,15 @@ interface Props {
 
 export default function FeatureItem({ icon, text }: Props) {
   const colors = useThemeColors();
+  const screenWidth = Dimensions.get("window").width;
+  const iconSize = screenWidth * 0.14; // ~50pt on standard phones
   return (
     <View style={styles.container}>
-      <Image source={icon} style={styles.icon} resizeMode="contain" />
+      <Image
+        source={icon}
+        style={{ width: iconSize, height: iconSize, marginRight: 14 }}
+        resizeMode="contain"
+      />
 
       <AppText weight="semibold" style={[styles.text, { color: colors.text }]}>
         {text}

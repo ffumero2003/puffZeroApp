@@ -1,23 +1,42 @@
 import AppText from "@/src/components/AppText";
 import { useThemeColors } from "@/src/providers/theme-provider";
-import { Image, StyleSheet, View } from "react-native";
+import { Dimensions, Image, StyleSheet, View } from "react-native";
 
 interface Props {
   icon: any;
   text: string;
 }
 
+const screenWidth = Dimensions.get("window").width;
+const iconSize = screenWidth * 0.19;
+const wrapperSize = screenWidth * 0.2;
+
 export default function HowToFacts({ icon, text }: Props) {
   const colors = useThemeColors();
 
   return (
     <View style={styles.container}>
-      <View style={[styles.iconWrapper, { backgroundColor: colors.secondary }]}>
-        <Image source={icon} style={styles.icon} />
+      <View
+        style={[
+          styles.iconWrapper,
+          {
+            backgroundColor: colors.secondary,
+            width: wrapperSize,
+            height: wrapperSize,
+            borderRadius: wrapperSize / 2,
+          },
+        ]}
+      >
+        <Image
+          source={icon}
+          style={{ width: iconSize, height: iconSize, resizeMode: "contain" }}
+        />
       </View>
 
       <View style={styles.textContainer}>
-        <AppText style={[styles.text, { color: colors.text }]}>{text}</AppText>
+        <AppText weight="bold" style={[styles.text, { color: colors.text }]}>
+          {text}
+        </AppText>
       </View>
     </View>
   );
@@ -51,7 +70,7 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   text: {
-    fontSize: 16,
+    fontSize: 18,
     opacity: 0.7,
   },
 });

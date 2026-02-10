@@ -79,7 +79,11 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <ThemeProvider onReady={() => SplashScreen.hideAsync()}>
+      <ThemeProvider
+        onReady={() => {
+          SplashScreen.hideAsync().catch(() => {});
+        }}
+      >
         <AuthProvider>
           <OnboardingProvider>
             <RootNavigation />

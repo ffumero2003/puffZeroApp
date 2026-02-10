@@ -56,10 +56,13 @@ export function VerificationStatus() {
           disabled={!canCheckToday || checking}
           style={[
             styles.verifyButton,
-            { backgroundColor: colors.primary },
-            (!canCheckToday || checking) && styles.verifyButtonDisabled,
             {
-              backgroundColor: colors.switchTrackOff,
+              // Primary color when button is active (can be pressed),
+              // switchTrackOff (gray) when countdown is running
+              backgroundColor:
+                canCheckToday && !checking
+                  ? colors.primary
+                  : colors.switchTrackOff,
               borderColor: colors.border,
             },
           ]}

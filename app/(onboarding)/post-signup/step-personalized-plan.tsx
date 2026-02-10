@@ -1,6 +1,6 @@
 // step-personalized-plan.tsx
 import { router } from "expo-router";
-import { Image, StyleSheet, View } from "react-native";
+import { Dimensions, Image, StyleSheet, View } from "react-native";
 
 import CheckIconDark from "@/assets/images/onboarding/dark/checked-dark.png";
 import CheckIconLight from "@/assets/images/onboarding/light/checked-light.png";
@@ -19,6 +19,7 @@ export default function StepPersonalizedPlan() {
   const { colors, activeTheme } = useTheme();
   const { targetDate, puffsChart, status, finishFlow } =
     usePersonalizedPlanViewModel();
+  const screenWidth = Dimensions.get("window").width;
 
   const checkIcon = activeTheme === "light" ? CheckIconLight : CheckIconDark;
 
@@ -52,13 +53,18 @@ export default function StepPersonalizedPlan() {
 
           <Image
             source={checkIcon}
-            style={styles.checkImage}
+            style={{
+              width: screenWidth * 0.28,
+              height: screenWidth * 0.28,
+              alignSelf: "center",
+              marginBottom: 20,
+            }}
             resizeMode="contain"
           />
 
           <AppText
             weight="extrabold"
-            style={[layout.titleCenterNoMargin, { color: colors.text }]}
+            style={[layout.titleCenter, { color: colors.text }]}
           >
             ¡Felicidades! Tu plan personalizado está listo.
           </AppText>

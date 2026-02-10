@@ -18,7 +18,7 @@ export default function ProgressCircle({
   lastPuffTime,
 }: Props) {
   const colors = useThemeColors();
-  const size = 280;
+  const size = 290;
   const strokeWidth = 20;
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   percentageLabel: {
-    fontSize: 12,
+    fontSize: 14,
     textAlign: "center",
 
     marginBottom: 12,
@@ -126,11 +126,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
 
-    paddingHorizontal: 5,
-    paddingVertical: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
     borderRadius: 10,
   },
   lastTime: {
-    fontSize: 12,
+    fontSize: 14,
   },
 });

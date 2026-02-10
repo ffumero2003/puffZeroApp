@@ -209,9 +209,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!result.error && result.data?.user) {
       const notificationsEnabled = await areNotificationsEnabled();
       if (notificationsEnabled) {
-        const firstName =
+        // Default to user_metadata name
+        let firstName =
           result.data.user.user_metadata?.full_name?.split(" ")[0];
-        sendWelcomeBackNotification(firstName);
+
+        // Always prefer the name stored in the profile (set during registration)
+        // over user_metadata, which may contain the email instead of the real name.
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("user_id", result.data.user.id)
+          .maybeSingle();
+
+        // Debug log — check what the profile query actually returns
+        console.log("🔔 Notification name debug:", {
+          metadataName: result.data.user.user_metadata?.full_name,
+          profileName: profileData?.full_name,
+          profileError: profileError?.message,
+          userId: result.data.user.id,
+        });
+
+        if (profileData?.full_name) {
+          firstName = profileData.full_name.trim().split(" ")[0];
+        }
+
+        await sendWelcomeBackNotification(firstName);
       }
     }
 

@@ -7,7 +7,6 @@ import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import FeatureItem from "@/src/components/paywall/FeatureItem";
 import SubscriptionOption from "@/src/components/paywall/SubscriptionOption";
-import { BYPASS_PAYWALL } from "@/src/config/dev";
 import {
   BASE_PRICES_CRC,
   CRC_EXCHANGE_RATES,
@@ -20,7 +19,7 @@ import { layout } from "@/src/styles/layout";
 import { useOnboardingPaywallViewModel } from "@/src/viewmodels/onboarding/useOnboardingPaywallViewModel";
 import { router } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 
@@ -208,26 +207,12 @@ export default function OnboardingPaywall() {
               onPress={() => setPlan("yearly")}
             />
           </View>
-
-          <ContinueButton
-            text="Continuar"
-            onPress={grantAccess}
-            style={layout.bottomButtonContainer}
-          />
-
-          {/* 🔧 DEV: Skip paywall button - visible when BYPASS_PAYWALL = false but still in dev */}
-          {__DEV__ && !BYPASS_PAYWALL && (
-            <TouchableOpacity
-              style={styles.devSkipButton}
-              onPress={grantAccess}
-              activeOpacity={0.7}
-            >
-              <AppText weight="bold" style={styles.devSkipText}>
-                🔧 SKIP PAYWALL (DEV)
-              </AppText>
-            </TouchableOpacity>
-          )}
         </View>
+        <ContinueButton
+          text="Continuar"
+          onPress={grantAccess}
+          style={layout.bottomButtonContainer}
+        />
       </View>
     </ScreenWrapper>
   );

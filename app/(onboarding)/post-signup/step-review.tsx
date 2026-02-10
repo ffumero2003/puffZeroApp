@@ -12,12 +12,13 @@ import { useAuth } from "@/src/providers/auth-provider";
 import { useTheme } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { useEffect, useRef } from "react";
-import { Alert, Image, ScrollView, View } from "react-native";
+import { Alert, Dimensions, Image, ScrollView, View } from "react-native";
 
 export default function Review() {
   const { colors, activeTheme } = useTheme();
   const { authFlow } = useAuth();
   const hasShownAlert = useRef(false);
+  const screenWidth = Dimensions.get("window").width;
 
   useEffect(() => {
     if (authFlow === "register" && !hasShownAlert.current) {
@@ -51,14 +52,18 @@ export default function Review() {
         <View style={layout.content}>
           <AppText
             weight="bold"
-            style={[layout.titleCenterNoMargin, { color: colors.text }]}
+            style={[layout.titleCenter, { color: colors.text }]}
           >
             Dejanos una calificación
           </AppText>
 
           <Image
             source={reviewsModal}
-            style={layout.headerImage}
+            style={{
+              width: screenWidth * 0.85,
+              height: screenWidth * 0.85 * 0.55,
+              alignSelf: "center",
+            }}
             resizeMode="contain"
           />
 

@@ -3,7 +3,7 @@ import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import LoginText from "@/src/components/onboarding/LoginText";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import { layout } from "@/src/styles/layout";
-import { Image, View } from "react-native";
+import { Dimensions, Image, View } from "react-native";
 
 import ZuffyImageDark from "@/assets/images/onboarding/dark/onboarding-zuffy-dark.png";
 import ZuffyImageLight from "@/assets/images/onboarding/light/onboarding-zuffy-light.png";
@@ -21,6 +21,8 @@ export default function OnboardingZuffy() {
     router.push(ROUTES.ONBOARDING_MONEY_SAVED);
   }
 
+  const screenWidth = Dimensions.get("window").width;
+
   return (
     <ScreenWrapper>
       <View
@@ -31,7 +33,10 @@ export default function OnboardingZuffy() {
         <View style={{ width: "100%", alignItems: "center" }}>
           <Image
             source={ZuffyImage}
-            style={layout.bigImage}
+            style={{
+              width: screenWidth * 0.9,
+              height: screenWidth * 1 * 1.2,
+            }}
             resizeMode="contain"
           />
 

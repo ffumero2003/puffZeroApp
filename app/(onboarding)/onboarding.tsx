@@ -3,7 +3,7 @@ import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import LoginText from "@/src/components/onboarding/LoginText";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import { layout } from "@/src/styles/layout";
-import { Image, View } from "react-native";
+import { Dimensions, Image, View } from "react-native";
 
 import HomePageDark from "@/assets/images/onboarding/dark/onboarding-home-page-dark.png";
 import HomePageLight from "@/assets/images/onboarding/light/onboarding-home-light.png";
@@ -20,6 +20,7 @@ export default function Onboarding() {
   }
 
   const HomePage = activeTheme === "light" ? HomePageLight : HomePageDark;
+  const screenWidth = Dimensions.get("window").width;
 
   return (
     <ScreenWrapper>
@@ -36,7 +37,10 @@ export default function Onboarding() {
         <View style={{ width: "100%", alignItems: "center" }}>
           <Image
             source={HomePage}
-            style={layout.bigImage}
+            style={{
+              width: screenWidth * 0.9,
+              height: screenWidth * 1 * 1.2, // taller aspect ratio for phone mockups
+            }}
             resizeMode="contain"
           />
 

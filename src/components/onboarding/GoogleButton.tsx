@@ -172,10 +172,100 @@ export default function GoogleButton({ mode }: GoogleButtonProps) {
           }
         }
       } else if (mode === "login" && userId) {
+        // ─── Check if this Google user_id already has a profile ───
+        const { data: existingProfile } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("user_id", userId)
+          .maybeSingle();
+
+        if (!existingProfile) {
+          // No profile for this Google user_id.
+          // The user may have registered with email/password before,
+          // which created a DIFFERENT user_id for the same email.
+          // Try to find the orphaned profile by looking up the old
+          // user_id via the email in auth.users (through profiles).
+          const userEmail = sessionData?.user?.email;
+
+          if (userEmail) {
+            // Look for ANY other auth user with this email that has a profile.
+            // We use an RPC or direct query — but since we can't query auth.users
+            // from the client, we search profiles by checking all profiles and
+            // matching by email is not possible directly.
+            //
+            // SIMPLEST APPROACH: Find profiles NOT matching this userId,
+            // and update the first one that matches the old account.
+            // Since Supabase may have linked/merged identities, we look
+            // for a profile with a different user_id that belongs to
+            // the same email by querying auth identities.
+
+            // Get all identity user IDs linked to this account
+            const identities = sessionData?.user?.identities || [];
+            const allUserIds = identities
+              .map((identity: any) => identity.user_id)
+              .filter((id: string) => id !== userId);
+
+            // Also try finding a profile where user_id matches any old identity
+            let migrated = false;
+
+            for (const oldId of allUserIds) {
+              const { data: oldProfile } = await supabase
+                .from("profiles")
+                .select("id")
+                .eq("user_id", oldId)
+                .maybeSingle();
+
+              if (oldProfile) {
+                // Found the orphaned profile — reassign it to the Google user_id
+                console.log(
+                  "🔄 Migrating profile from old user_id:",
+                  oldId,
+                  "→",
+                  userId
+                );
+                await supabase
+                  .from("profiles")
+                  .update({ user_id: userId })
+                  .eq("user_id", oldId);
+                migrated = true;
+                break;
+              }
+            }
+
+            if (!migrated) {
+              // No old profile found via identities either.
+              // As a last resort, create a minimal profile so the user
+              // doesn't see empty data. They can update it in Settings.
+              console.log(
+                "⚠️ No existing profile found for Google login, creating a new one"
+              );
+              await createProfile({
+                user_id: userId,
+                full_name: full_name || "Usuario Google",
+              });
+            }
+          }
+        }
+
         // 🔔 Send welcome back notification for returning user
         if (notificationsEnabled) {
           console.log("🔔 Sending welcome back notification for Google login");
-          await sendWelcomeBackNotification(firstName);
+
+          // Always prefer the name stored in the profile (set during registration)
+          // over Google's user_metadata, which may differ from what the user chose.
+          let notifName = firstName;
+
+          const { data: profileData } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("user_id", userId)
+            .maybeSingle();
+
+          if (profileData?.full_name) {
+            notifName = profileData.full_name.trim().split(" ")[0];
+          }
+
+          await sendWelcomeBackNotification(notifName);
         }
       }
 
