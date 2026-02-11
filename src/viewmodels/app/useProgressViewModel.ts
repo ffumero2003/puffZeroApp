@@ -89,15 +89,23 @@ export function useProgressViewModel() {
 
   
   // Get profile created date
-  const profileCreatedDate = useMemo(() => {
+      const profileCreatedDate = useMemo(() => {
+    // plan_started_at = when user restarted a plan (survives reinstall)
+    // profile_created_at = local context (fastest, set during current session)
+    // created_at = original profile creation (fallback)
     if (profile_created_at) {
       return new Date(profile_created_at);
+    }
+    if (profile?.plan_started_at) {
+      return new Date(profile.plan_started_at);
     }
     if (profile?.created_at) {
       return new Date(profile.created_at);
     }
     return new Date();
-  }, [profile_created_at, profile?.created_at]);
+  }, [profile_created_at, profile?.plan_started_at, profile?.created_at]);
+
+
 
   // Goal speed in days (from onboarding or profile)
   const goalSpeedDays = useMemo(() => {

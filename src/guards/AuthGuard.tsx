@@ -39,11 +39,8 @@ export function useAuthGuard() {
     const inOnboarding = segments[0] === "(onboarding)";
     const inPaywall = segments[0] === "(paywall)";
     const inPostSignup = segments[1] === "post-signup";
-    const inDev = segments[0] === "(dev)";
 
-    const inRoot = !inApp && !inAuth && !inOnboarding && !inPaywall && !inDev;
-
-    if (inDev) return;
+    const inRoot = !inApp && !inAuth && !inOnboarding && !inPaywall;
 
     // 🔓 RUTAS PÚBLICAS
     const publicRoutes = [

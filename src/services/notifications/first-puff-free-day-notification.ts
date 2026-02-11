@@ -89,7 +89,12 @@ export async function checkAndSendFirstPuffFreeDayNotification(userId: string): 
     
     // If it's a new day and yesterday had 0 puffs
     if (storedDate !== today) {
-      const yesterdayPuffs = parseInt(storedPuffs || "0", 10);
+      // If no puff data was stored, we can't confirm it was a puff-free day — skip
+      if (storedPuffs === null || storedPuffs === undefined) {
+        console.log("📊 No puff data for previous day, skipping puff-free check");
+        return;
+      }
+      const yesterdayPuffs = parseInt(storedPuffs, 10);
       
       if (yesterdayPuffs === 0) {
         // Yesterday was puff-free!
@@ -162,7 +167,11 @@ export async function checkCurrentDayAndNotify(userId: string): Promise<void> {
     if (alreadySent) return;
 
     const todayPuffs = await AsyncStorage.getItem(getTodayPuffsKey(userId));
-    const puffCount = parseInt(todayPuffs || "0", 10);
+    // If no puff data exists for today, we can't confirm it's puff-free — skip
+    if (todayPuffs === null || todayPuffs === undefined) {
+      return;
+    }
+    const puffCount = parseInt(todayPuffs, 10);
 
     if (puffCount === 0) {
       const message = getFirstPuffFreeDayMessage();

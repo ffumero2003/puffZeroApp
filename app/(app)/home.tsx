@@ -8,6 +8,8 @@ import { usePendingVerification } from "@/src/hooks/usePendingVerification";
 // COMMENTED OUT: Invalid direct imports - these are returned by the hook, not exported
 // import { currentWeek, canGoBack, canGoForward, goToPreviousWeek, goToNextWeek } from "@/src/viewmodels/app/useHomeViewModel";
 import { VerificationModal } from "@/src/components/app/VerificationModal";
+import PlanCompletedModal from "@/src/components/app/home/PlanCompletedModal";
+import RelapseModal from "@/src/components/app/home/RelapseModal";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useThemeColors } from "@/src/providers/theme-provider";
@@ -36,13 +38,16 @@ export default function Home() {
     timeSinceLastPuff,
     motivationalMessage,
     currentWeek,
-    // COMMENTED OUT: Week navigation - kept for potential future use
-    // canGoBack,
-    // canGoForward,
     addPuff,
-    // goToPreviousWeek,
-    // goToNextWeek,
     loading,
+
+    showPlanCompleted,
+    planIsSuccess,
+    dismissPlanCompleted,
+    selectNewPlan,
+    showRelapseModal,
+    dismissRelapseModal,
+    selectNewPlanFromRelapse,
   } = useHomeViewModel();
 
   const {
@@ -268,6 +273,19 @@ export default function Home() {
             onClose={() => setSelectedDay(null)}
           />
         )}
+        {/* Plan Completed Modal — shows when countdown timer reaches 0 */}
+        <PlanCompletedModal
+          visible={showPlanCompleted}
+          isSuccess={planIsSuccess}
+          onDismiss={dismissPlanCompleted}
+          onSelectNewPlan={selectNewPlan}
+        />
+        {/* Relapse Modal — shows when a successful user adds a puff */}
+        <RelapseModal
+          visible={showRelapseModal}
+          onDismiss={dismissRelapseModal}
+          onSelectNewPlan={selectNewPlanFromRelapse}
+        />
       </View>
     </>
   );

@@ -1,14 +1,15 @@
 // src/viewmodels/app/useHomeViewModel.ts
 import { useUserData } from "@/src/hooks/useUserData";
+import { updateProfile } from "@/src/lib/profile";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
+import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { fetchAIQuote } from "@/src/services/ai-quotes-service";
 import { scheduleDailyAchievementCheck } from "@/src/services/notifications/daily-achievement-notification";
 import { updateLastActivity } from "@/src/services/notifications/inactivity-notification";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-
 
 // Keys are now scoped per user so switching accounts doesn't show stale data
 const getStorageKeys = (userId: string) => ({
@@ -48,6 +49,13 @@ export function useHomeViewModel() {
   const [puffsLoading, setPuffsLoading] = useState(true);
   const [quoteLoading, setQuoteLoading] = useState(true);
 
+    // ─── Plan completion state ───
+  const [showPlanCompleted, setShowPlanCompleted] = useState(true);
+  const [planIsSuccess, setPlanIsSuccess] = useState(true);
+  const { profile_created_at, goal_speed, setGoalSpeed, setProfileCreatedAt } = useOnboarding();
+
+  // ─── Relapse modal state ───
+  const [showRelapseModal, setShowRelapseModal] = useState(false);
 
 
   // Memoize firstName to avoid recalculation and fix TypeScript issue
@@ -217,6 +225,135 @@ const generateCurrentWeek = useCallback(async () => {
     generateCurrentWeek();
   }, [generateCurrentWeek]);
 
+      // ─── Check if the user's plan timer has expired ───
+  useEffect(() => {
+    if (!user?.id || !profile) return;
+
+    const createdAt = profile_created_at || profile.plan_started_at || profile.created_at;
+
+    const speed = goal_speed || profile.goal_speed;
+    if (!createdAt || !speed) return;
+
+    const goalDays = parseInt(speed, 10);
+    const endTime = new Date(createdAt).getTime() + goalDays * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+
+    // Timer hasn't expired yet — do nothing
+    if (now < endTime) return;
+
+    // Check if user already dismissed this (so we don't show it every app open)
+    const checkDismissed = async () => {
+      const dismissedAt = await AsyncStorage.getItem(`plan_completed_dismissed_${user.id}`);
+      if (dismissedAt) {
+        // "forever" = user succeeded and dismissed — never show again
+        if (dismissedAt === "forever") return;
+
+        const elapsed = Date.now() - parseInt(dismissedAt, 10);
+        const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+        // If less than 3 days since last dismiss, don't show again yet
+        if (elapsed < threeDaysMs) return;
+      }
+
+      // Timer expired — check last 3 days of puffs to determine success
+      try {
+        const threeDaysAgo = new Date(now - 3 * 24 * 60 * 60 * 1000).toISOString();
+        const { data, error } = await supabase
+          .from("puffs")
+          .select("count")
+          .eq("user_id", user.id)
+          .gte("timestamp", threeDaysAgo);
+
+        if (error) {
+          console.error("Error checking plan completion:", error);
+          return;
+        }
+
+        // Sum up all puffs in the last 3 days
+        const totalPuffs = (data || []).reduce((sum, p) => sum + (p.count || 0), 0);
+
+        // Success = 0 puffs in last 3 days
+        setPlanIsSuccess(totalPuffs === 0);
+        setShowPlanCompleted(true);
+      } catch (error) {
+        console.error("Error checking plan completion:", error);
+      }
+    };
+
+    checkDismissed();
+  }, [user?.id, profile, profile_created_at, goal_speed]);
+
+
+    // ─── Handle dismissing the plan completed modal ───
+  const dismissPlanCompleted = useCallback(async () => {
+    setShowPlanCompleted(false);
+    if (user?.id) {
+      if (planIsSuccess) {
+        // Success: user quit — never show the plan-completed modal again
+        // (but if they add a puff, the relapse modal will trigger instead)
+        await AsyncStorage.setItem(
+          `plan_completed_dismissed_${user.id}`,
+          "forever"
+        );
+      } else {
+        // Retry: user still vaping — show again in 3 days
+        await AsyncStorage.setItem(
+          `plan_completed_dismissed_${user.id}`,
+          Date.now().toString()
+        );
+      }
+    }
+  }, [user?.id, planIsSuccess]);
+
+  // ─── Handle selecting a new plan (retry flow) ───
+  const selectNewPlan = useCallback(async (newGoalSpeed: string) => {
+    if (!user?.id) return;
+
+    const now = new Date().toISOString();
+
+    try {
+      // Update goal_speed AND plan_started_at in Supabase — survives reinstall
+      await updateProfile(user.id, {
+        goal_speed: newGoalSpeed,
+        plan_started_at: now,
+      });
+
+      // Store the new plan start date locally — this is what the countdown reads
+      setGoalSpeed(newGoalSpeed);
+      await setProfileCreatedAt(now);
+
+      // Clear the dismissed flag so future completions trigger the modal again
+      await AsyncStorage.removeItem(`plan_completed_dismissed_${user.id}`);
+
+      // Close the modal
+      setShowPlanCompleted(false);
+    } catch (error) {
+      console.error("Error setting new plan:", error);
+    }
+  }, [user?.id]);
+
+
+    // ─── Handle dismissing the relapse modal without choosing a plan ───
+  const dismissRelapseModal = useCallback(async () => {
+    setShowRelapseModal(false);
+    // Clear the "forever" flag so the relapse modal doesn't show on every puff
+    // Set it to a timestamp instead — it will re-check via the plan completion logic
+    if (user?.id) {
+      await AsyncStorage.setItem(
+        `plan_completed_dismissed_${user.id}`,
+        Date.now().toString()
+      );
+    }
+  }, [user?.id]);
+
+  // ─── Handle selecting a new plan from the relapse modal ───
+  const selectNewPlanFromRelapse = useCallback(async (newGoalSpeed: string) => {
+    setShowRelapseModal(false);
+    await selectNewPlan(newGoalSpeed);
+  }, [selectNewPlan]);
+
+
+
+
   // Load motivational message on mount and when profile loads
   useEffect(() => {
     if (!profileLoading) {
@@ -226,62 +363,79 @@ const generateCurrentWeek = useCallback(async () => {
 
 
 
-  const addPuff = useCallback(async () => {
-  if (!user?.id) return;
+    const addPuff = useCallback(async () => {
+      if (!user?.id) return;
 
-  const keys = getStorageKeys(user.id);
-  const now = new Date();
-  const newPuffCount = todayPuffs + 1;
+      const keys = getStorageKeys(user.id);
+      const now = new Date();
+      const newPuffCount = todayPuffs + 1;
 
-  // Update state immediately for UI responsiveness
-  setTodayPuffs(newPuffCount);
-  setLastPuffTime(now);
+      // Update state immediately for UI responsiveness
+      setTodayPuffs(newPuffCount);
+      setLastPuffTime(now);
 
-  // Persist to AsyncStorage (now user-scoped)
-  try {
-    await Promise.all([
-      AsyncStorage.setItem(keys.todayPuffs, newPuffCount.toString()),
-      AsyncStorage.setItem(keys.lastPuffTime, now.toISOString()),
-      AsyncStorage.setItem(keys.todayDate, now.toDateString()),
-    ]);
-  } catch (error) {
-    console.error("Error saving to AsyncStorage:", error);
-  }
+      // Check if this user previously completed their plan successfully
+      // If so, show the relapse modal (only on the first puff after success)
+      const dismissed = await AsyncStorage.getItem(`plan_completed_dismissed_${user.id}`);
+      if (dismissed === "forever") {
+        setShowRelapseModal(true);
+      }
 
-  // Save to Supabase
-  try {
-    const { error } = await supabase.from("puffs").insert({
-      user_id: user.id,
-      timestamp: now.toISOString(),
-      count: 1,
-    });
+      // Persist to AsyncStorage (now user-scoped)
+      try {
+        await Promise.all([
+          AsyncStorage.setItem(keys.todayPuffs, newPuffCount.toString()),
+          AsyncStorage.setItem(keys.lastPuffTime, now.toISOString()),
+          AsyncStorage.setItem(keys.todayDate, now.toDateString()),
+        ]);
+      } catch (error) {
+        console.error("Error saving to AsyncStorage:", error);
+      }
 
-    if (error) {
-      console.error("Error saving puff to Supabase:", error);
-    }
-  } catch (error) {
-    console.error("Error inserting puff:", error);
-  }
+      // Save to Supabase
+      try {
+        const { error } = await supabase.from("puffs").insert({
+          user_id: user.id,
+          timestamp: now.toISOString(),
+          count: 1,
+        });
 
-  await updateLastActivity();
+        if (error) {
+          console.error("Error saving puff to Supabase:", error);
+        }
+      } catch (error) {
+        console.error("Error inserting puff:", error);
+      }
 
-  scheduleDailyAchievementCheck(newPuffCount, dailyGoal);
+      await updateLastActivity();
 
-}, [todayPuffs, user?.id]);
+      scheduleDailyAchievementCheck(newPuffCount, dailyGoal);
+
+    }, [todayPuffs, user?.id]);
+
 
 
   return {
-  firstName,
-  dailyGoal,
-  todayPuffs,
-  percentage,
-  timeSinceLastPuff: getTimeSinceLastPuff(),
-  lastPuffTime,
-  motivationalMessage,
-  currentWeek,
-  addPuff,
-  // Home is ready only when BOTH profile and puffs data have loaded
-  loading: profileLoading || puffsLoading || quoteLoading,
-};
+    firstName,
+    dailyGoal,
+    todayPuffs,
+    percentage,
+    timeSinceLastPuff: getTimeSinceLastPuff(),
+    lastPuffTime,
+    motivationalMessage,
+    currentWeek,
+    addPuff,
+    loading: profileLoading || puffsLoading || quoteLoading,
+    showPlanCompleted,
+    planIsSuccess,
+    dismissPlanCompleted,
+    selectNewPlan,
+    // Relapse modal
+    showRelapseModal,
+    dismissRelapseModal,
+    selectNewPlanFromRelapse,
+  };
+
+
 
 }

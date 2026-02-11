@@ -13,6 +13,8 @@ export type Database = {
           timestamp: string
           count: number
           created_at: string | null
+ 
+
         }
         Insert: {
           id?: string
@@ -20,6 +22,8 @@ export type Database = {
           timestamp?: string
           count?: number
           created_at?: string | null
+        
+
         }
         Update: {
           id?: string
@@ -27,6 +31,7 @@ export type Database = {
           timestamp?: string
           count?: number
           created_at?: string | null
+         
         }
         Relationships: []
       }
@@ -40,6 +45,8 @@ export type Database = {
           id: string
           money_per_month: number | null
           puffs_per_day: number | null
+          plan_started_at: string | null
+
     
           updated_at: string | null
           user_id: string
@@ -59,6 +66,7 @@ export type Database = {
           user_id: string
           why_stopped?: string[] | null
           worries?: string[] | null
+          plan_started_at?: string | null
         }
         Update: {
           created_at?: string | null
@@ -73,6 +81,7 @@ export type Database = {
           user_id?: string
           why_stopped?: string[] | null
           worries?: string[] | null
+          plan_started_at?: string | null
         }
         Relationships: []
       }
