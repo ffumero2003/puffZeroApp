@@ -66,7 +66,7 @@ export default function DayDetailModal({
       onRequestClose={onClose}
     >
       <Pressable
-        style={[styles.overlay, { backgroundColor: colors.background }]}
+        style={styles.overlay}
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           onClose();
