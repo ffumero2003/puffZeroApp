@@ -12,6 +12,8 @@ import ThemePickerModal from "@/src/components/app/settings/ThemePickerModal";
 import { VerificationStatus } from "@/src/components/app/settings/VerificationStatus";
 // NEW: Import useThemeColors for dynamic colors
 import { useThemeColors } from "@/src/providers/theme-provider";
+import RevenueCatUI from "react-native-purchases-ui";
+
 // NEW: Import useTheme for theme preference getter/setter
 import { useAuth } from "@/src/providers/auth-provider";
 import { useTheme } from "@/src/providers/theme-provider";
@@ -60,6 +62,15 @@ export default function Settings() {
   // ============================================
   const handleLogout = async () => {
     await signOut();
+  };
+
+  // Opens RevenueCat's Customer Center (manage subscription, cancel, restore)
+  const handleManageSubscription = async () => {
+    try {
+      await RevenueCatUI.presentCustomerCenter();
+    } catch (e) {
+      console.error("Error presenting Customer Center:", e);
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -189,6 +200,15 @@ export default function Settings() {
             label="Tema"
             value={THEME_LABELS[themePreference]}
             onPress={() => setShowThemeModal(true)}
+            isLast={true}
+          />
+        </SettingsSection>
+
+        {/* Subscription Section */}
+        <SettingsSection title="Suscripción">
+          <SettingsRow
+            label="Gestionar Suscripción"
+            onPress={handleManageSubscription}
             isLast={true}
           />
         </SettingsSection>

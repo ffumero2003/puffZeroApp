@@ -4,6 +4,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Session, User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { AppState } from "react-native";
+import Purchases from "react-native-purchases";
+import {
+  checkPremiumEntitlement,
+  initRevenueCat,
+  resetRevenueCat,
+} from "../lib/revenue-cat";
 import { supabase } from "../lib/supabase";
 import { checkAndSendDailyAchievementOnOpen } from "../services/notifications/daily-achievement-notification";
 import { scheduleDailyQuoteNotification } from "../services/notifications/daily-quote-notification";
@@ -140,38 +146,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // ═══════════════════════════════════════════════════════════════
-  // NEW: Check premium status whenever user session loads/changes
+  // RevenueCat: Init SDK + check premium when user session loads
   // ═══════════════════════════════════════════════════════════════
   useEffect(() => {
     if (!user?.id) {
-      // No user = no premium
       setIsPremium(false);
       return;
     }
 
-    const checkPremiumStatus = async () => {
-      // ┌─────────────────────────────────────────────────────────┐
-      // │ PRODUCTION: Uncomment ONE of these when you integrate   │
-      // │ your real payment system                                │
-      // └─────────────────────────────────────────────────────────┘
-      // ── OPTION A: RevenueCat ──
-      // const customerInfo = await Purchases.getCustomerInfo();
-      // const isActive = customerInfo.entitlements.active["premium"] !== undefined;
-      // setIsPremium(isActive);
-      // ── OPTION B: Supabase profiles table ──
-      // const { data } = await supabase
-      //   .from("profiles")
-      //   .select("is_premium")
-      //   .eq("id", user.id)
-      //   .single();
-      // setIsPremium(data?.is_premium ?? false);
-      // ── OPTION C: Supabase user metadata ──
-      // setIsPremium(user.user_metadata?.is_premium === true);
-      // FOR NOW: do nothing, isPremium stays false
-      // The dev bypass in AuthGuard handles it during development
+    const setupRevenueCat = async () => {
+      // Initialize RevenueCat with the Supabase user ID
+      await initRevenueCat(user.id);
+
+      // Check if user already has "PuffZero Pro" entitlement
+      const isActive = await checkPremiumEntitlement();
+      setIsPremium(isActive);
+
+      // Listen for real-time subscription changes
+      // (e.g., user subscribes from another device, subscription renews/expires)
+      Purchases.addCustomerInfoUpdateListener((customerInfo) => {
+        const stillActive =
+          customerInfo.entitlements.active["PuffZero Pro"] !== undefined;
+        setIsPremium(stillActive);
+      });
     };
 
-    checkPremiumStatus();
+    setupRevenueCat();
   }, [user?.id]);
 
   const signUp = async (email: string, password: string, full_name: string) => {
@@ -244,8 +244,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAuthFlow(null);
     setAuthInProgress(false);
     setIsPremium(false);
-    // NEW: Reset post-signup flag on logout
-    await setPostSignupCompleted(true); // true so next login doesn't get stuck
+    // Reset RevenueCat so next login gets fresh identity
+    await resetRevenueCat();
+    await setPostSignupCompleted(true);
     await supabase.auth.signOut();
   };
 

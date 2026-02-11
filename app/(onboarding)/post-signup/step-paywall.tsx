@@ -1,3 +1,4 @@
+// app/(onboarding)/post-signup/step-paywall.tsx
 import Check from "@/assets/images/paywall/check.png";
 import Fire from "@/assets/images/paywall/fire.png";
 import Statistics from "@/assets/images/paywall/statistics.png";
@@ -7,6 +8,7 @@ import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import FeatureItem from "@/src/components/paywall/FeatureItem";
 import SubscriptionOption from "@/src/components/paywall/SubscriptionOption";
+import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import {
   BASE_PRICES_CRC,
   CRC_EXCHANGE_RATES,
@@ -18,14 +20,12 @@ import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { useOnboardingPaywallViewModel } from "@/src/viewmodels/onboarding/useOnboardingPaywallViewModel";
 import { router } from "expo-router";
-import { useState } from "react";
-import { StyleSheet, View } from "react-native";
-
-import ScreenWrapper from "@/src/components/system/ScreenWrapper";
+import { useEffect, useState } from "react";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+// RevenueCat
+import Purchases, { PurchasesPackage } from "react-native-purchases";
 
 export default function OnboardingPaywall() {
-  // const [selected, setSelected] = useState<"monthly" | "yearly">("yearly");
-  // const { grantAccess } = useSubscription();
   const {
     name,
     goal_speed,
@@ -39,34 +39,52 @@ export default function OnboardingPaywall() {
   const { user, setAuthFlow, setIsPremium, setPostSignupCompleted } = useAuth();
 
   const { formatMoney } = useOnboardingPaywallViewModel();
-  const [plan, setPlan] = useState<"weekly" | "yearly">("yearly");
+  const [plan, setPlan] = useState<"monthly" | "yearly">("yearly");
   const colors = useThemeColors();
 
-  // Calculate converted prices
+  // Fallback prices
   const userCurrency = currency || "CRC";
   const exchangeRate = CRC_EXCHANGE_RATES[userCurrency] || 1;
   const currencySymbol = CURRENCY_SYMBOLS[userCurrency] || "₡";
+  const fallbackMonthly = `${currencySymbol}${Math.round(
+    BASE_PRICES_CRC.weekly * exchangeRate
+  ).toLocaleString()}`;
+  const fallbackYearly = `${currencySymbol}${Math.round(
+    BASE_PRICES_CRC.yearly * exchangeRate
+  ).toLocaleString()}`;
 
-  const weeklyPrice = Math.round(BASE_PRICES_CRC.weekly * exchangeRate);
-  const yearlyPrice = Math.round(BASE_PRICES_CRC.yearly * exchangeRate);
+  // RevenueCat state
+  const [loading, setLoading] = useState(false);
+  const [monthlyPkg, setMonthlyPkg] = useState<PurchasesPackage | null>(null);
+  const [yearlyPkg, setYearlyPkg] = useState<PurchasesPackage | null>(null);
+  const [monthlyPrice, setMonthlyPrice] = useState(fallbackMonthly);
+  const [yearlyPrice, setYearlyPrice] = useState(fallbackYearly);
 
-  const formattedWeeklyPrice = `${currencySymbol}${weeklyPrice.toLocaleString()}`;
-  const formattedYearlyPrice = `${currencySymbol}${yearlyPrice.toLocaleString()}`;
+  // Load real prices from RevenueCat
+  useEffect(() => {
+    const loadOfferings = async () => {
+      try {
+        const offerings = await Purchases.getOfferings();
+        const current = offerings.current;
+        if (!current) return;
 
-  // console.log("🔍 PAYWALL DEBUG:", {
-  //   currency,
-  //   userCurrency,
-  //   exchangeRate,
-  //   currencySymbol,
-  //   weeklyPrice,
-  //   formattedWeeklyPrice,
-  //   yearlyPrice,
-  //   formattedYearlyPrice,
-  // });
+        if (current.monthly) {
+          setMonthlyPkg(current.monthly);
+          setMonthlyPrice(current.monthly.product.priceString);
+        }
+        if (current.annual) {
+          setYearlyPkg(current.annual);
+          setYearlyPrice(current.annual.product.priceString);
+        }
+      } catch (e) {
+        console.error("Error loading offerings:", e);
+      }
+    };
+    loadOfferings();
+  }, []);
 
   const displayName =
     name || (user?.user_metadata?.full_name as string | undefined) || undefined;
-
   const firstName = displayName?.trim().split(" ")[0];
 
   const puffsText = puffs_per_day ? (
@@ -90,9 +108,6 @@ export default function OnboardingPaywall() {
   ) : (
     "Tu plan está diseñado para que avances paso a paso con claridad"
   );
-
-  const trackingText =
-    "Seguí tu plan día a día sin confusión ni complicaciones";
 
   const moneyText =
     money_per_month && currency ? (
@@ -129,7 +144,6 @@ export default function OnboardingPaywall() {
   }
 
   const primaryWhy = why_stopped?.[0];
-
   const whyText = (
     <>
       Te ayudaremos a{" "}
@@ -139,13 +153,60 @@ export default function OnboardingPaywall() {
     </>
   );
 
-  function grantAccess() {
-    setIsPremium(true);
-    completeOnboarding();
-    resetAll();
-    setAuthFlow(null);
-    setPostSignupCompleted(true);
-    router.replace("/(app)/home");
+  // Purchase handler
+  async function handlePurchase() {
+    const pkg = plan === "monthly" ? monthlyPkg : yearlyPkg;
+    if (!pkg) {
+      Alert.alert("Error", "No hay planes disponibles en este momento.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const { customerInfo } = await Purchases.purchasePackage(pkg);
+
+      if (customerInfo.entitlements.active["PuffZero Pro"] !== undefined) {
+        setIsPremium(true);
+        completeOnboarding();
+        resetAll();
+        setAuthFlow(null);
+        setPostSignupCompleted(true);
+        router.replace("/(app)/home");
+      }
+    } catch (e: any) {
+      if (!e.userCancelled) {
+        Alert.alert(
+          "Error",
+          "No se pudo completar la compra. Intentá de nuevo."
+        );
+        console.error("Purchase error:", e);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Restore handler
+  async function handleRestore() {
+    try {
+      setLoading(true);
+      const customerInfo = await Purchases.restorePurchases();
+
+      if (customerInfo.entitlements.active["PuffZero Pro"] !== undefined) {
+        setIsPremium(true);
+        completeOnboarding();
+        resetAll();
+        setAuthFlow(null);
+        setPostSignupCompleted(true);
+        router.replace("/(app)/home");
+      } else {
+        Alert.alert("Info", "No se encontraron compras previas.");
+      }
+    } catch (e) {
+      Alert.alert("Error", "No se pudieron restaurar las compras.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -154,7 +215,6 @@ export default function OnboardingPaywall() {
         style={[layout.screenContainer, { backgroundColor: colors.background }]}
       >
         <View>
-          {/* Header */}
           <OnboardingHeader showProgress={false} showBack={false} />
 
           <AppText
@@ -170,7 +230,7 @@ export default function OnboardingPaywall() {
                 , desbloqueá Puff
               </>
             ) : (
-              <>Hey, desbloqueá PuffHOME</>
+              <>Hey, desbloqueá Puff</>
             )}
             <AppText weight="bold" style={{ color: colors.primary }}>
               Zero
@@ -187,32 +247,38 @@ export default function OnboardingPaywall() {
 
           <View style={styles.featureContainer}>
             <SubscriptionOption
-              title="Acceso semanal"
-              subtitle="3 días de prueba gratis"
-              price={formattedWeeklyPrice} // Dynamic now
-              strikePrice={true}
-              highlight="Mejor oferta"
-              badge="GRATIS"
-              selected={plan === "weekly"}
-              onPress={() => setPlan("weekly")}
+              title="Acceso mensual"
+              subtitle="Cancelá cuando quieras"
+              price={monthlyPrice}
+              selected={plan === "monthly"}
+              onPress={() => setPlan("monthly")}
             />
 
             <SubscriptionOption
               title="Acceso anual"
               subtitle="3 días de prueba gratis"
-              price={formattedYearlyPrice} // Dynamic now
-              strikePrice={false}
-              badge="Ahorra 90%"
+              price={yearlyPrice}
+              badge="Ahorra 80%"
+              highlight="Mejor oferta"
               selected={plan === "yearly"}
               onPress={() => setPlan("yearly")}
             />
           </View>
         </View>
-        <ContinueButton
-          text="Continuar"
-          onPress={grantAccess}
-          style={layout.bottomButtonContainer}
-        />
+
+        <View>
+          <ContinueButton
+            text={loading ? "Procesando..." : "Continuar"}
+            onPress={handlePurchase}
+            style={layout.bottomButtonContainer}
+          />
+
+          <TouchableOpacity onPress={handleRestore} disabled={loading}>
+            <AppText style={[styles.restoreText, { color: colors.text }]}>
+              Restaurar compras
+            </AppText>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScreenWrapper>
   );
@@ -222,18 +288,10 @@ const styles = StyleSheet.create({
   featureContainer: {
     marginTop: 25,
   },
-
-  devSkipButton: {
-    backgroundColor: "#FFD700",
-    borderWidth: 2,
-    borderColor: "#000",
-    borderRadius: 12,
-    padding: 12,
-    marginTop: 16,
-    alignItems: "center",
-  },
-  devSkipText: {
-    color: "#000",
+  restoreText: {
+    textAlign: "center",
+    opacity: 0.5,
+    marginTop: 14,
     fontSize: 14,
   },
 });

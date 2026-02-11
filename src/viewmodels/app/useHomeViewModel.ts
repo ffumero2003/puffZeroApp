@@ -50,8 +50,8 @@ export function useHomeViewModel() {
   const [quoteLoading, setQuoteLoading] = useState(true);
 
     // ─── Plan completion state ───
-  const [showPlanCompleted, setShowPlanCompleted] = useState(true);
-  const [planIsSuccess, setPlanIsSuccess] = useState(true);
+  const [showPlanCompleted, setShowPlanCompleted] = useState(false);
+  const [planIsSuccess, setPlanIsSuccess] = useState(false);
   const { profile_created_at, goal_speed, setGoalSpeed, setProfileCreatedAt } = useOnboarding();
 
   // ─── Relapse modal state ───

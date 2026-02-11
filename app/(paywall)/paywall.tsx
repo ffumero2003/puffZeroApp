@@ -1,3 +1,4 @@
+// app/(paywall)/paywall.tsx
 import Check from "@/assets/images/paywall/check.png";
 import Fire from "@/assets/images/paywall/fire.png";
 import Statistics from "@/assets/images/paywall/statistics.png";
@@ -13,19 +14,18 @@ import {
   CRC_EXCHANGE_RATES,
   CURRENCY_SYMBOLS,
 } from "@/src/constants/currency";
-import { useThemeColors } from "@/src/providers/theme-provider";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
+import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { useOnboardingPaywallViewModel } from "@/src/viewmodels/onboarding/useOnboardingPaywallViewModel";
 import { router } from "expo-router";
-import { useState } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+// RevenueCat imports
+import Purchases, { PurchasesPackage } from "react-native-purchases";
 
 export default function Paywall() {
-  // const [selected, setSelected] = useState<"monthly" | "yearly">("yearly");
-  // const { grantAccess } = useSubscription();
-
   const {
     name,
     goal_speed,
@@ -38,35 +38,55 @@ export default function Paywall() {
   } = useOnboarding();
   const { user, setAuthFlow, setIsPremium } = useAuth();
 
-  // Calculate converted prices
+  // Fallback prices (used until RevenueCat loads real ones)
   const userCurrency = currency || "CRC";
   const exchangeRate = CRC_EXCHANGE_RATES[userCurrency] || 1;
   const currencySymbol = CURRENCY_SYMBOLS[userCurrency] || "₡";
-
-  const weeklyPrice = Math.round(BASE_PRICES_CRC.weekly * exchangeRate);
-  const yearlyPrice = Math.round(BASE_PRICES_CRC.yearly * exchangeRate);
-
-  const formattedWeeklyPrice = `${currencySymbol}${weeklyPrice.toLocaleString()}`;
-  const formattedYearlyPrice = `${currencySymbol}${yearlyPrice.toLocaleString()}`;
-
-  // console.log("🔍 PAYWALL DEBUG:", {
-  //   currency,
-  //   userCurrency,
-  //   exchangeRate,
-  //   currencySymbol,
-  //   weeklyPrice,
-  //   formattedWeeklyPrice,
-  //   yearlyPrice,
-  //   formattedYearlyPrice,
-  // });
+  const fallbackMonthly = `${currencySymbol}${Math.round(
+    BASE_PRICES_CRC.weekly * exchangeRate
+  ).toLocaleString()}`;
+  const fallbackYearly = `${currencySymbol}${Math.round(
+    BASE_PRICES_CRC.yearly * exchangeRate
+  ).toLocaleString()}`;
 
   const { formatMoney } = useOnboardingPaywallViewModel();
-  const [plan, setPlan] = useState<"weekly" | "yearly">("yearly");
+  const [plan, setPlan] = useState<"monthly" | "yearly">("yearly");
   const colors = useThemeColors();
+
+  // RevenueCat state
+  const [loading, setLoading] = useState(false);
+  const [monthlyPkg, setMonthlyPkg] = useState<PurchasesPackage | null>(null);
+  const [yearlyPkg, setYearlyPkg] = useState<PurchasesPackage | null>(null);
+  const [monthlyPrice, setMonthlyPrice] = useState(fallbackMonthly);
+  const [yearlyPrice, setYearlyPrice] = useState(fallbackYearly);
+
+  // Load real prices from RevenueCat on mount
+  useEffect(() => {
+    const loadOfferings = async () => {
+      try {
+        const offerings = await Purchases.getOfferings();
+        const current = offerings.current;
+        if (!current) return;
+
+        // RevenueCat standard package types: $rc_monthly, $rc_annual
+        if (current.monthly) {
+          setMonthlyPkg(current.monthly);
+          setMonthlyPrice(current.monthly.product.priceString);
+        }
+        if (current.annual) {
+          setYearlyPkg(current.annual);
+          setYearlyPrice(current.annual.product.priceString);
+        }
+      } catch (e) {
+        console.error("Error loading offerings:", e);
+        // Falls back to hardcoded prices — no crash
+      }
+    };
+    loadOfferings();
+  }, []);
 
   const displayName =
     name || (user?.user_metadata?.full_name as string | undefined) || undefined;
-
   const firstName = displayName?.trim().split(" ")[0];
 
   const puffsText = puffs_per_day ? (
@@ -90,9 +110,6 @@ export default function Paywall() {
   ) : (
     "Tu plan está diseñado para que avances paso a paso con claridad"
   );
-
-  const trackingText =
-    "Seguí tu plan día a día sin confusión ni complicaciones";
 
   const moneyText =
     money_per_month && currency ? (
@@ -129,7 +146,6 @@ export default function Paywall() {
   }
 
   const primaryWhy = why_stopped?.[0];
-
   const whyText = (
     <>
       Te ayudaremos a{" "}
@@ -139,23 +155,83 @@ export default function Paywall() {
     </>
   );
 
-  function grantAccess() {
-    // ┌─────────────────────────────────────────────────────────┐
-    // │ PRODUCTION: This should ONLY be called after a          │
-    // │ successful RevenueCat/payment purchase confirmation.     │
-    // │ Right now it grants access directly for dev purposes.    │
-    // └─────────────────────────────────────────────────────────┘
-    setIsPremium(true); // Mark user as premium → AuthGuard lets them into (app)
-    completeOnboarding(); // Mark onboarding as completed
-    resetAll(); // Clear temporary onboarding data
-    setAuthFlow(null); // Reset authFlow so AuthGuard doesn't block
+  // ═══════════════════════════════════════════
+  // PURCHASE: Triggers Apple's payment sheet
+  // ═══════════════════════════════════════════
+  async function handlePurchase() {
+    const pkg = plan === "monthly" ? monthlyPkg : yearlyPkg;
+
+    if (!pkg) {
+      Alert.alert("Error", "No hay planes disponibles en este momento.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      // This shows the native Apple payment sheet
+      const { customerInfo } = await Purchases.purchasePackage(pkg);
+
+      // Check if "PuffZero Pro" entitlement is now active
+      if (customerInfo.entitlements.active["PuffZero Pro"] !== undefined) {
+        setIsPremium(true);
+        completeOnboarding();
+        resetAll();
+        setAuthFlow(null);
+        router.replace("/(app)/home");
+      }
+    } catch (e: any) {
+      // userCancelled = user tapped "Cancel" on Apple's sheet — not an error
+      if (!e.userCancelled) {
+        Alert.alert(
+          "Error",
+          "No se pudo completar la compra. Intentá de nuevo."
+        );
+        console.error("Purchase error:", e);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ═══════════════════════════════════════════
+  // RESTORE: Required by Apple for App Store approval
+  // ═══════════════════════════════════════════
+  async function handleRestore() {
+    try {
+      setLoading(true);
+      const customerInfo = await Purchases.restorePurchases();
+
+      if (customerInfo.entitlements.active["PuffZero Pro"] !== undefined) {
+        setIsPremium(true);
+        completeOnboarding();
+        resetAll();
+        setAuthFlow(null);
+        router.replace("/(app)/home");
+      } else {
+        Alert.alert("Info", "No se encontraron compras previas.");
+      }
+    } catch (e) {
+      Alert.alert("Error", "No se pudieron restaurar las compras.");
+      console.error("Restore error:", e);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ═══════════════════════════════════════════
+  // DEV ONLY: Skip paywall for testing
+  // ═══════════════════════════════════════════
+  function devSkip() {
+    setIsPremium(true);
+    completeOnboarding();
+    resetAll();
+    setAuthFlow(null);
     router.replace("/(app)/home");
   }
 
   return (
     <View style={layout.screenContainer}>
       <View>
-        {/* Header */}
         <OnboardingHeader showProgress={false} showBack={false} />
 
         <AppText style={layout.titleCenter} weight="bold">
@@ -168,7 +244,7 @@ export default function Paywall() {
               , desbloqueá Puff
             </>
           ) : (
-            <>Hey, desbloqueá PuffHOME</>
+            <>Hey, desbloqueá Puff</>
           )}
           <AppText weight="bold" style={{ color: colors.primary }}>
             Zero
@@ -185,42 +261,47 @@ export default function Paywall() {
 
         <View style={styles.featureContainer}>
           <SubscriptionOption
-            title="Acceso semanal"
-            subtitle="3 días de prueba gratis"
-            price={formattedWeeklyPrice} // Dynamic now
-            strikePrice={true}
-            highlight="Mejor oferta"
-            badge="GRATIS"
-            selected={plan === "weekly"}
-            onPress={() => setPlan("weekly")}
+            title="Acceso mensual"
+            subtitle="Cancelá cuando quieras"
+            price={monthlyPrice}
+            selected={plan === "monthly"}
+            onPress={() => setPlan("monthly")}
           />
 
           <SubscriptionOption
             title="Acceso anual"
             subtitle="3 días de prueba gratis"
-            price={formattedYearlyPrice} // Dynamic now
-            strikePrice={false}
-            badge="Ahorra 90%"
+            price={yearlyPrice}
+            badge="Ahorra 80%"
+            highlight="Mejor oferta"
             selected={plan === "yearly"}
             onPress={() => setPlan("yearly")}
           />
         </View>
 
+        {/* Purchase button */}
         <ContinueButton
-          text="Continuar"
-          onPress={grantAccess}
+          text={loading ? "Procesando..." : "Continuar"}
+          onPress={handlePurchase}
           style={layout.bottomButtonContainer}
         />
 
-        {/* 🔧 DEV: Skip paywall button - visible when BYPASS_PAYWALL = false but still in dev */}
+        {/* Restore purchases — REQUIRED by Apple */}
+        <TouchableOpacity onPress={handleRestore} disabled={loading}>
+          <AppText style={[styles.restoreText, { color: colors.text }]}>
+            Restaurar compras
+          </AppText>
+        </TouchableOpacity>
+
+        {/* DEV: Skip paywall button */}
         {__DEV__ && !BYPASS_PAYWALL && (
           <TouchableOpacity
             style={styles.devSkipButton}
-            onPress={grantAccess}
+            onPress={devSkip}
             activeOpacity={0.7}
           >
             <AppText weight="bold" style={styles.devSkipText}>
-              🔧 SKIP PAYWALL (DEV)
+              DEV: SKIP PAYWALL
             </AppText>
           </TouchableOpacity>
         )}
@@ -232,6 +313,12 @@ export default function Paywall() {
 const styles = StyleSheet.create({
   featureContainer: {
     marginTop: 25,
+  },
+  restoreText: {
+    textAlign: "center",
+    opacity: 0.5,
+    marginTop: 14,
+    fontSize: 14,
   },
   devSkipButton: {
     backgroundColor: "#FFD700",
