@@ -8,7 +8,7 @@ import Purchases, { LOG_LEVEL } from "react-native-purchases";
 // Your RevenueCat API key (from the dashboard)
 // This is a PUBLIC key — safe to include in client code
 const API_KEY = Platform.select({
-  ios: "test_zbJklFSftcvOeWTfxGLPBkkSIHF",
+  ios: "appl_KZEHQlsbsknNgXLadldfkxeKxPR",
   // android: "goog_XXXXXXXX", // add later if needed
 }) as string;
 

@@ -272,7 +272,7 @@ export default function Paywall() {
             title="Acceso anual"
             subtitle="3 días de prueba gratis"
             price={yearlyPrice}
-            badge="Ahorra 80%"
+            badge="Ahorra 42%"
             highlight="Mejor oferta"
             selected={plan === "yearly"}
             onPress={() => setPlan("yearly")}

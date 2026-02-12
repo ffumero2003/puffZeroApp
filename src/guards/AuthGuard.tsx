@@ -12,6 +12,8 @@ export function useAuthGuard() {
     authInProgress,
     isPremium,
     postSignupCompleted,
+    setIsPremium,
+    setPostSignupCompleted,
   } = useAuth();
   const segments = useSegments();
   const lastDevRoute = useRef<string | null>(null);
@@ -68,12 +70,17 @@ export function useAuthGuard() {
     // This now works on app restart because postSignupCompleted is persisted
     // ════════════════════════════════════════════════════════
     if (user && !postSignupCompleted) {
-      // If they're not already in the post-signup flow, send them there
+      // If bypass is active, skip the entire post-signup flow
+      if (shouldBypassPaywall()) {
+        setIsPremium(true);
+        setPostSignupCompleted(true);
+        router.replace("/(app)/home");
+        return;
+      }
       if (!inPostSignup) {
         router.replace("/(onboarding)/post-signup/step-review");
         return;
       }
-      // If they're already in post-signup, let them continue
       return;
     }
 

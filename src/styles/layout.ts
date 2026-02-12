@@ -86,7 +86,11 @@ export const layout = StyleSheet.create({
     fontSize: 30,
     textAlign: "center",
   },
- 
+  titleCenterPersonalizedPlan: {
+    fontSize: 26,
+    textAlign: "center",
+    marginBottom: 20,
+  },
 
   subtitle: {
     fontSize: 18,

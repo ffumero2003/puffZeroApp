@@ -64,7 +64,7 @@ export default function StepPersonalizedPlan() {
 
           <AppText
             weight="extrabold"
-            style={[layout.titleCenter, { color: colors.text }]}
+            style={[layout.titleCenterPersonalizedPlan, { color: colors.text }]}
           >
             ¡Felicidades! Tu plan personalizado está listo.
           </AppText>

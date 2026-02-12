@@ -47,12 +47,10 @@ export default function Login() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1 }}
+        style={{ flex: 1, backgroundColor: colors.background }}
         keyboardVerticalOffset={Platform.OS === "ios" ? 50 : 0}
       >
-        <View
-          style={[layout.containerAuth, { backgroundColor: colors.background }]}
-        >
+        <View style={[layout.containerAuth]}>
           <OnboardingHeader showProgress={false} />
 
           <AuthHeader

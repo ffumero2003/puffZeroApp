@@ -22,6 +22,7 @@ import { useOnboardingPaywallViewModel } from "@/src/viewmodels/onboarding/useOn
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+
 // RevenueCat
 import Purchases, { PurchasesPackage } from "react-native-purchases";
 
@@ -209,6 +210,15 @@ export default function OnboardingPaywall() {
     }
   }
 
+  function devSkip() {
+    setIsPremium(true);
+    completeOnboarding();
+    resetAll();
+    setAuthFlow(null);
+    setPostSignupCompleted(true);
+    router.replace("/(app)/home");
+  }
+
   return (
     <ScreenWrapper>
       <View
@@ -258,7 +268,7 @@ export default function OnboardingPaywall() {
               title="Acceso anual"
               subtitle="3 días de prueba gratis"
               price={yearlyPrice}
-              badge="Ahorra 80%"
+              badge="Ahorra 42%"
               highlight="Mejor oferta"
               selected={plan === "yearly"}
               onPress={() => setPlan("yearly")}

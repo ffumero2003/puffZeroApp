@@ -11,11 +11,14 @@
     "splash": {
       "image": "./assets/images/logo-puff-zero.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F6F3FF"
+      "backgroundColor": "#E5E0FF"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.codeharbor.puffzero"
+      "bundleIdentifier": "com.codeharbor.puffzero",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.codeharbor.puffzero",
@@ -27,7 +30,10 @@
               "scheme": "puffzero"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -37,7 +43,11 @@
     },
     "extra": {
       "supabaseRedirectUrl": "puffzero://reset-password",
-      "googleRedirectUrl": "puffzero://auth/callback"
+      "googleRedirectUrl": "puffzero://auth/callback",
+      "router": {},
+      "eas": {
+        "projectId": "ee2fd140-1596-4f87-82ac-08df585aed49"
+      }
     },
     "plugins": [
       "expo-router",
