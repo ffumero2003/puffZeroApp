@@ -1,16 +1,10 @@
-import { useThemeColors } from "@/src/providers/theme-provider";
+import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { Stack } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PaywallLayout() {
-  const colors = useThemeColors();
-
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: colors.background }}
-      edges={["top"]}
-    >
-      <Stack screenOptions={{ headerShown: false }} />
-    </SafeAreaView>
+    <ScreenWrapper>
+      <Stack screenOptions={{ headerShown: false, gestureEnabled: false }} />
+    </ScreenWrapper>
   );
 }
