@@ -1,27 +1,37 @@
 import AppText from "@/src/components/AppText";
 import { useThemeColors } from "@/src/providers/theme-provider";
-import { Pressable, StyleSheet, View } from "react-native";
+import {
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle,
+} from "react-native";
 
 type Props = {
   title: string;
-  subtitle?: string; // ✅ opcional
+  subtitle?: string;
   price: string;
-  strikePrice?: boolean; // 👈 NUEVO
+  period?: string; // ← ADD THIS: e.g. "semana" or "año"
+  strikePrice?: boolean;
   badge?: string;
   highlight?: string;
   selected?: boolean;
   onPress: () => void;
+  style?: StyleProp<ViewStyle>;
 };
 
 export default function SubscriptionOption({
   title,
   subtitle,
   price,
+  period = "semana",
   strikePrice,
   badge,
   highlight,
   selected,
   onPress,
+  style,
 }: Props) {
   const colors = useThemeColors();
 
@@ -32,6 +42,7 @@ export default function SubscriptionOption({
         styles.container,
         { backgroundColor: colors.secondary },
         selected && { borderColor: colors.primary },
+        style,
       ]}
     >
       {highlight && (
@@ -91,7 +102,7 @@ export default function SubscriptionOption({
               { color: colors.text },
             ]}
           >
-            semana
+            {period}
           </AppText>
         </View>
       </View>
@@ -103,7 +114,7 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 18,
     padding: 22,
-    marginBottom: 12,
+
     borderWidth: 2,
     borderColor: "transparent",
   },

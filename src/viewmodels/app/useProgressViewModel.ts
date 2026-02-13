@@ -3,10 +3,12 @@ import { useUserData } from "@/src/hooks/useUserData";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
-import { checkandSendMilestoneNotification } from "@/src/services/notifications/milestone-notification";
 import { checkAndSendMoneySavedMilestone } from "@/src/services/notifications/money-saved-milestone-notification";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useMemo, useState } from "react";
+// Add this import next to the other notification imports:
+import { scheduleGoalCompletedNotification } from "@/src/services/notifications/goal-completed-notification";
+
 
 const LAST_PUFF_TIME_KEY = "lastPuffTime";
 
@@ -288,11 +290,13 @@ export function useProgressViewModel() {
   }, [calculateTimeSinceLastPuff, calculateMoneySaved]);
 
   // Inside useProgressViewModel, add this useEffect after the other effects:
-  useEffect(() => {
-    if (profileCreatedDate && goalSpeedDays) {
-      checkandSendMilestoneNotification(profileCreatedDate, goalSpeedDays);
-    }
-  }, [profileCreatedDate, goalSpeedDays]);
+  // Schedule a notification for the exact moment the countdown timer hits zero
+useEffect(() => {
+  if (profileCreatedDate && goalSpeedDays) {
+    scheduleGoalCompletedNotification(profileCreatedDate, goalSpeedDays);
+  }
+}, [profileCreatedDate, goalSpeedDays]);
+
 
   // Check money saved milestones
   useEffect(() => {

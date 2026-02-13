@@ -55,6 +55,9 @@ interface AuthContextProps {
     password: string
   ) => Promise<{ data: any; error: any }>;
   signOut: () => Promise<void>;
+
+  // Add to AuthContextProps interface:
+  isRevenueCatReady: boolean;
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -76,6 +79,7 @@ const AuthContext = createContext<AuthContextProps>({
   isPremium: false,
   setIsPremium: () => {},
 
+  isRevenueCatReady: false,
   signUp: async () => ({ data: null, error: null }),
   signIn: async () => ({ data: null, error: null }),
   signOut: async () => {},
@@ -83,6 +87,8 @@ const AuthContext = createContext<AuthContextProps>({
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [postSignupCompleted, setPostSignupCompletedState] = useState(true);
+  // Add this state next to the existing isPremium state (around line 95):
+  const [isRevenueCatReady, setIsRevenueCatReady] = useState(false);
 
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -155,10 +161,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const setupRevenueCat = async () => {
-      // Initialize RevenueCat with the Supabase user ID
       await initRevenueCat(user.id);
+      setIsRevenueCatReady(true); // ← Signal that SDK is ready
 
-      // Check if user already has "PuffZero Pro" entitlement
       const isActive = await checkPremiumEntitlement();
       setIsPremium(isActive);
 
@@ -302,6 +307,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         postSignupCompleted,
         setPostSignupCompleted,
+
+        isRevenueCatReady,
       }}
     >
       {children}

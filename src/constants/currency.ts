@@ -34,10 +34,10 @@ export const MIN_BY_CURRENCY: Record<string, number> = {
 
 // Add to src/constants/currency.ts
 
-// Base prices in CRC (Costa Rican Colones)
-export const BASE_PRICES_CRC = {
-  weekly: 5000,
-  yearly: 700,
+// Base prices in USD (used as fallbacks if RevenueCat fails to load)
+export const BASE_PRICES_USD = {
+  monthly: 5.99,
+  yearly: 36.99,
 };
 
 // Approximate exchange rates from CRC to other currencies

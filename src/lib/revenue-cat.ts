@@ -36,10 +36,10 @@ export async function initRevenueCat(userId?: string) {
   isConfigured = true;
 }
 
-/**
- * Check if user has the "PuffZero Pro" entitlement active.
- * Returns true if they have a valid subscription.
- */
+// /**
+//  * Check if user has the "PuffZero Pro" entitlement active.
+//  * Returns true if they have a valid subscription.
+//  */
 export async function checkPremiumEntitlement(): Promise<boolean> {
   try {
     const customerInfo = await Purchases.getCustomerInfo();

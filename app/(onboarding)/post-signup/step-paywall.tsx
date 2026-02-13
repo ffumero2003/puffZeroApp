@@ -9,11 +9,6 @@ import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import FeatureItem from "@/src/components/paywall/FeatureItem";
 import SubscriptionOption from "@/src/components/paywall/SubscriptionOption";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
-import {
-  BASE_PRICES_CRC,
-  CRC_EXCHANGE_RATES,
-  CURRENCY_SYMBOLS,
-} from "@/src/constants/currency";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { useThemeColors } from "@/src/providers/theme-provider";
@@ -37,22 +32,21 @@ export default function OnboardingPaywall() {
     completeOnboarding,
     resetAll,
   } = useOnboarding();
-  const { user, setAuthFlow, setIsPremium, setPostSignupCompleted } = useAuth();
+  const {
+    user,
+    setAuthFlow,
+    setIsPremium,
+    setPostSignupCompleted,
+    isRevenueCatReady,
+  } = useAuth();
 
   const { formatMoney } = useOnboardingPaywallViewModel();
   const [plan, setPlan] = useState<"monthly" | "yearly">("yearly");
   const colors = useThemeColors();
 
-  // Fallback prices
-  const userCurrency = currency || "CRC";
-  const exchangeRate = CRC_EXCHANGE_RATES[userCurrency] || 1;
-  const currencySymbol = CURRENCY_SYMBOLS[userCurrency] || "₡";
-  const fallbackMonthly = `${currencySymbol}${Math.round(
-    BASE_PRICES_CRC.weekly * exchangeRate
-  ).toLocaleString()}`;
-  const fallbackYearly = `${currencySymbol}${Math.round(
-    BASE_PRICES_CRC.yearly * exchangeRate
-  ).toLocaleString()}`;
+  // Fallback prices (shown only if RevenueCat fails to load)
+  const fallbackMonthly = "$5.99";
+  const fallbackYearly = "$36.99";
 
   // RevenueCat state
   const [loading, setLoading] = useState(false);
@@ -63,6 +57,8 @@ export default function OnboardingPaywall() {
 
   // Load real prices from RevenueCat
   useEffect(() => {
+    if (!isRevenueCatReady) return; // ← Wait until auth-provider says SDK is ready
+
     const loadOfferings = async () => {
       try {
         const offerings = await Purchases.getOfferings();
@@ -82,7 +78,7 @@ export default function OnboardingPaywall() {
       }
     };
     loadOfferings();
-  }, []);
+  }, [isRevenueCatReady]); // ← Re-run when SDK becomes ready
 
   const displayName =
     name || (user?.user_metadata?.full_name as string | undefined) || undefined;
@@ -260,14 +256,17 @@ export default function OnboardingPaywall() {
               title="Acceso mensual"
               subtitle="Cancelá cuando quieras"
               price={monthlyPrice}
+              period="semana"
               selected={plan === "monthly"}
               onPress={() => setPlan("monthly")}
+              style={{ marginBottom: 18 }}
             />
 
             <SubscriptionOption
               title="Acceso anual"
               subtitle="3 días de prueba gratis"
               price={yearlyPrice}
+              period="año"
               badge="Ahorra 42%"
               highlight="Mejor oferta"
               selected={plan === "yearly"}

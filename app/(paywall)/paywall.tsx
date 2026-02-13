@@ -9,11 +9,6 @@ import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import FeatureItem from "@/src/components/paywall/FeatureItem";
 import SubscriptionOption from "@/src/components/paywall/SubscriptionOption";
 import { BYPASS_PAYWALL } from "@/src/config/dev";
-import {
-  BASE_PRICES_CRC,
-  CRC_EXCHANGE_RATES,
-  CURRENCY_SYMBOLS,
-} from "@/src/constants/currency";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { useThemeColors } from "@/src/providers/theme-provider";
@@ -36,18 +31,11 @@ export default function Paywall() {
     completeOnboarding,
     resetAll,
   } = useOnboarding();
-  const { user, setAuthFlow, setIsPremium } = useAuth();
+  const { user, setAuthFlow, setIsPremium, isRevenueCatReady } = useAuth();
 
-  // Fallback prices (used until RevenueCat loads real ones)
-  const userCurrency = currency || "CRC";
-  const exchangeRate = CRC_EXCHANGE_RATES[userCurrency] || 1;
-  const currencySymbol = CURRENCY_SYMBOLS[userCurrency] || "₡";
-  const fallbackMonthly = `${currencySymbol}${Math.round(
-    BASE_PRICES_CRC.weekly * exchangeRate
-  ).toLocaleString()}`;
-  const fallbackYearly = `${currencySymbol}${Math.round(
-    BASE_PRICES_CRC.yearly * exchangeRate
-  ).toLocaleString()}`;
+  // Fallback prices (shown only if RevenueCat fails to load)
+  const fallbackMonthly = "$5.99";
+  const fallbackYearly = "$36.99";
 
   const { formatMoney } = useOnboardingPaywallViewModel();
   const [plan, setPlan] = useState<"monthly" | "yearly">("yearly");
@@ -62,13 +50,14 @@ export default function Paywall() {
 
   // Load real prices from RevenueCat on mount
   useEffect(() => {
+    if (!isRevenueCatReady) return; // ← Wait until auth-provider says SDK is ready
+
     const loadOfferings = async () => {
       try {
         const offerings = await Purchases.getOfferings();
         const current = offerings.current;
         if (!current) return;
 
-        // RevenueCat standard package types: $rc_monthly, $rc_annual
         if (current.monthly) {
           setMonthlyPkg(current.monthly);
           setMonthlyPrice(current.monthly.product.priceString);
@@ -79,11 +68,10 @@ export default function Paywall() {
         }
       } catch (e) {
         console.error("Error loading offerings:", e);
-        // Falls back to hardcoded prices — no crash
       }
     };
     loadOfferings();
-  }, []);
+  }, [isRevenueCatReady]); // ← Re-run when SDK becomes ready
 
   const displayName =
     name || (user?.user_metadata?.full_name as string | undefined) || undefined;
@@ -264,8 +252,10 @@ export default function Paywall() {
             title="Acceso mensual"
             subtitle="Cancelá cuando quieras"
             price={monthlyPrice}
+            period="semana"
             selected={plan === "monthly"}
             onPress={() => setPlan("monthly")}
+            style={{ marginBottom: 18 }}
           />
 
           <SubscriptionOption
@@ -274,6 +264,7 @@ export default function Paywall() {
             price={yearlyPrice}
             badge="Ahorra 42%"
             highlight="Mejor oferta"
+            period="año"
             selected={plan === "yearly"}
             onPress={() => setPlan("yearly")}
           />

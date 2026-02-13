@@ -4,12 +4,12 @@
     "slug": "puffzero",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo-puff-zero.png",
+    "icon": "./assets/images/logo-puff-zero-app.png",
     "scheme": "puffzero",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/logo-puff-zero.png",
+      "image": "./assets/images/logo-puff-zero-app.png",
       "resizeMode": "contain",
       "backgroundColor": "#E5E0FF"
     },
@@ -36,7 +36,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/logo-puff-zero.png"
+      "favicon": "./assets/images/logo-puff-zero-app.png"
     },
     "extra": {
       "supabaseRedirectUrl": "puffzero://reset-password",

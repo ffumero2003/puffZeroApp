@@ -39,8 +39,8 @@ export default function UnderlineInput({
   const textContentTypeMap = {
     name: "name",
     email: "emailAddress",
-    password: "none",
-    confirmPassword: "none",
+    password: "oneTimeCode",
+    confirmPassword: "oneTimeCode",
   } as const;
 
   const autoCompleteMap = {
