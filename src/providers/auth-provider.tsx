@@ -158,19 +158,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const setupRevenueCat = async () => {
-      await initRevenueCat(user.id);
-      setIsRevenueCatReady(true); // ← Signal that SDK is ready
+      try {
+        await initRevenueCat(user.id);
+        setIsRevenueCatReady(true); // ← Signal that SDK is ready
 
-      const isActive = await checkPremiumEntitlement();
-      setIsPremium(isActive);
+        const isActive = await checkPremiumEntitlement();
+        setIsPremium(isActive);
 
-      // Listen for real-time subscription changes
-      // (e.g., user subscribes from another device, subscription renews/expires)
-      Purchases.addCustomerInfoUpdateListener((customerInfo) => {
-        const stillActive =
-          customerInfo.entitlements.active["PuffZero Pro"] !== undefined;
-        setIsPremium(stillActive);
-      });
+        // Listen for real-time subscription changes
+        // (e.g., user subscribes from another device, subscription renews/expires)
+        Purchases.addCustomerInfoUpdateListener((customerInfo) => {
+          const stillActive =
+            customerInfo.entitlements.active["PuffZero Pro"] !== undefined;
+          setIsPremium(stillActive);
+        });
+      } catch (e) {
+        console.warn("RevenueCat: setup failed (offerings may not be ready)", e);
+        setIsRevenueCatReady(true); // still mark ready so app doesn't hang
+      }
     };
 
     setupRevenueCat();

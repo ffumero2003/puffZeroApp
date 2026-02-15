@@ -14,7 +14,7 @@
       "backgroundColor": "#E5E0FF"
     },
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.codeharbor.puffzero",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false

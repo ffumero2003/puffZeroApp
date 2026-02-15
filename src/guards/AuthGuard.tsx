@@ -14,6 +14,7 @@ export function useAuthGuard() {
     postSignupCompleted,
     setIsPremium,
     setPostSignupCompleted,
+    isRevenueCatReady,
   } = useAuth();
   const segments = useSegments();
   const lastDevRoute = useRef<string | null>(null);
@@ -85,6 +86,13 @@ export function useAuthGuard() {
     }
 
     // ════════════════════════════════════════════════════════
+    // WAIT: Don't make premium routing decisions until RevenueCat
+    // has finished checking the user's entitlements.
+    // This prevents the paywall from flashing for paid users.
+    // ════════════════════════════════════════════════════════
+    if (user && postSignupCompleted && !isRevenueCatReady) return;
+
+    // ════════════════════════════════════════════════════════
     // TIPO 3: Usuario CON sesión activa y post-signup completado
     // ════════════════════════════════════════════════════════
     if (user) {
@@ -107,5 +115,13 @@ export function useAuthGuard() {
         return;
       }
     }
-  }, [user, initializing, segments, authFlow, isPremium, postSignupCompleted]);
+  }, [
+    user,
+    initializing,
+    segments,
+    authFlow,
+    isPremium,
+    postSignupCompleted,
+    isRevenueCatReady,
+  ]);
 }
