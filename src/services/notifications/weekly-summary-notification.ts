@@ -110,6 +110,10 @@ async function getTotalMoneySaved(
  * Call this on app open so the notification always has the latest stats.
  */
 export async function scheduleWeeklySummaryNotification(): Promise<void> {
+  const { areNotificationsEnabled } = await import("./notification-service");
+  const enabled = await areNotificationsEnabled();
+  if (!enabled) return;
+
   const Notif = await getNotifications();
   if (!Notif) return;
 

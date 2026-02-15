@@ -72,6 +72,10 @@ export async function checkandSendMilestoneNotification(
   profileCreatedAt: string,
   goalSpeedDays: number
 ): Promise<void> {
+  const { areNotificationsEnabled } = await import("./notification-service");
+  const enabled = await areNotificationsEnabled();
+  if (!enabled) return;
+
   const Notif = await getNotifications();
   if(!Notif) return;
 

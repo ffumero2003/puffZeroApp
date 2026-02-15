@@ -54,6 +54,10 @@ export async function updateLastActivity(): Promise<void> {
  * Schedule inactivity notifications for 24h, 48h, and 72h from now
  */
 export async function scheduleInactivityNotifications(): Promise<void> {
+  const { areNotificationsEnabled } = await import("./notification-service");
+  const enabled = await areNotificationsEnabled();
+  if (!enabled) return;
+
   const Notif = await getNotifications();
   if (!Notif) return;
 

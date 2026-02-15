@@ -11,16 +11,38 @@ export async function getNotifications() {
   if (!Notifications) {
     try {
       Notifications = await import("expo-notifications");
-      
+
       // Configure notification handler
       Notifications.setNotificationHandler({
-        handleNotification: async () => ({
-          // shouldShowAlert: true,
-          shouldPlaySound: true,
-          shouldSetBadge: false,
-          shouldShowBanner: true,
-          shouldShowList: true,
-        }),
+        handleNotification: async (notification) => {
+          // Check if this is a verification reminder
+          const data = notification.request.content.data;
+          if (data?.type === "verification_reminder") {
+            // Import verification service to check if still pending
+            const { getPendingVerification } = await import(
+              "@/src/services/verification/verification-service"
+            );
+            const pending = await getPendingVerification();
+
+            // If no pending verification (already verified), suppress the notification
+            if (!pending) {
+              return {
+                shouldPlaySound: false,
+                shouldSetBadge: false,
+                shouldShowBanner: false,
+                shouldShowList: false,
+              };
+            }
+          }
+
+          // Default: show the notification normally
+          return {
+            shouldPlaySound: true,
+            shouldSetBadge: false,
+            shouldShowBanner: true,
+            shouldShowList: true,
+          };
+        },
       });
     } catch (error) {
       console.log("⚠️ expo-notifications not available:", error);
@@ -32,9 +54,6 @@ export async function getNotifications() {
 
 
 
-/**
- * Check if notifications are enabled
- */
 /**
  * Check if notifications are enabled
  * Checks both the in-app preference (AsyncStorage) AND actual OS permission

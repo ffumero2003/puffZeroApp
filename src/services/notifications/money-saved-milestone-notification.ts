@@ -109,6 +109,10 @@ export async function checkAndSendMoneySavedMilestone(
   currentSaved: number,
   currencyCode: string
 ): Promise<void> {
+  const { areNotificationsEnabled } = await import("./notification-service");
+  const enabled = await areNotificationsEnabled();
+  if (!enabled) return;
+
   const Notif = await getNotifications();
   if (!Notif) return;
 

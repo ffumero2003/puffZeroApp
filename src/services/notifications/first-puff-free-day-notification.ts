@@ -61,6 +61,10 @@ async function markFirstPuffFreeDaySent(): Promise<void> {
  * Call this when the app opens or at the start of a new day
  */
 export async function checkAndSendFirstPuffFreeDayNotification(userId: string): Promise<void> {
+  const { areNotificationsEnabled } = await import("./notification-service");
+  const enabled = await areNotificationsEnabled();
+  if (!enabled) return;
+
   const Notif = await getNotifications();
   if (!Notif) return;
 
@@ -122,41 +126,18 @@ export async function checkAndSendFirstPuffFreeDayNotification(userId: string): 
   }
 }
 
-/**
- * Schedule end-of-day check for puff-free day
- * NOTE: Removed scheduled notification since it can't evaluate puff data at trigger time.
- * The actual check happens via checkAndSendFirstPuffFreeDayNotification() on app open.
- */
-export async function scheduleEndOfDayPuffFreeCheck(): Promise<void> {
-  // No-op: the puff-free day check is handled on app open
-  // via checkAndSendFirstPuffFreeDayNotification()
-  return;
-}
 
 
-/**
- * Cancel end-of-day puff-free check
- */
-export async function cancelEndOfDayPuffFreeCheck(): Promise<void> {
-  const Notif = await getNotifications();
-  if (!Notif) return;
 
-  try {
-    const scheduled = await Notif.getAllScheduledNotificationsAsync();
-    for (const notification of scheduled) {
-      if (notification.content.data?.type === "puff_free_day_check") {
-        await Notif.cancelScheduledNotificationAsync(notification.identifier);
-      }
-    }
-  } catch (error) {
-    console.log("⚠️ Error canceling puff-free check:", error);
-  }
-}
 
 /**
  * Check current day and send notification if puff-free (call at end of day)
  */
 export async function checkCurrentDayAndNotify(userId: string): Promise<void> {
+  const { areNotificationsEnabled } = await import("./notification-service");
+  const enabled = await areNotificationsEnabled();
+  if (!enabled) return;
+
   const Notif = await getNotifications();
   if (!Notif) return;
 

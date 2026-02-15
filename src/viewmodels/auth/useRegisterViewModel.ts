@@ -4,7 +4,7 @@ import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { sendVerificationEmail } from "@/src/services/auth-services";
 import { areNotificationsEnabled } from "@/src/services/notifications/notification-service";
-import { scheduleVerificationReminders } from "@/src/services/notifications/verification-notification";
+import { scheduleVerificationReminder } from "@/src/services/notifications/verification-notification";
 import { storePendingAccountVerification } from "@/src/services/verification/verification-service";
 import { Alert } from "react-native";
 
@@ -103,7 +103,7 @@ export function useRegisterViewModel() {
     // ⏰ Schedule verification reminders for day 3 and day 5
     const notificationsEnabled = await areNotificationsEnabled();
     if (notificationsEnabled) {
-      await scheduleVerificationReminders("account");
+      await scheduleVerificationReminder();
     }
 
 return true;

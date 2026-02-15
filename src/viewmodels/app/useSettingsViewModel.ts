@@ -7,7 +7,7 @@ import { useUserData } from "@/src/hooks/useUserData";
 import { updateProfile } from "@/src/lib/profile";
 import { supabase } from "@/src/lib/supabase";
 import {
-  scheduleVerificationReminders,
+  scheduleVerificationReminder,
 } from "@/src/services/notifications/verification-notification";
 import {
   storePendingEmailChange,
@@ -184,7 +184,7 @@ async function saveEmail(newEmail: string): Promise<{ success: boolean; error?: 
 
     // Store pending email change
     await storePendingEmailChange(email, newEmail);
-    await scheduleVerificationReminders("email_change");
+    await scheduleVerificationReminder();
 
     // DON'T update local email state yet - wait for verification
     // setEmail(newEmail); // ← Remove this line

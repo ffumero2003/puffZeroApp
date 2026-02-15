@@ -1,9 +1,9 @@
 // app/verify-email.tsx
 import AppText from "@/src/components/AppText";
 import { ROUTES } from "@/src/constants/routes";
-import { useThemeColors } from "@/src/providers/theme-provider";
 import { supabase } from "@/src/lib/supabase";
-import { cancelVerificationReminders } from "@/src/services/notifications/verification-notification";
+import { useThemeColors } from "@/src/providers/theme-provider";
+import { cancelVerificationReminder } from "@/src/services/notifications/verification-notification";
 import { clearPendingVerification } from "@/src/services/verification/verification-service";
 import { layout } from "@/src/styles/layout";
 import { router, useLocalSearchParams } from "expo-router";
@@ -50,7 +50,8 @@ export default function VerifyEmailScreen() {
 
       // ✅ Limpiar pending verification y reminders
       await clearPendingVerification();
-      await cancelVerificationReminders();
+      await cancelVerificationReminder();
+
       console.log("✅ Verification complete - pending cleared");
 
       setStatus("success");

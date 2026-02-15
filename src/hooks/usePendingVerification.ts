@@ -3,8 +3,7 @@
 
 import { supabase } from "@/src/lib/supabase";
 import {
-  cancelVerificationReminders,
-  sendVerificationExpiredNotification,
+  cancelVerificationReminder
 } from "@/src/services/notifications/verification-notification";
 import {
   clearPendingVerification,
@@ -50,7 +49,7 @@ export function usePendingVerification() {
         // Email change: verified when current email matches new email
         if (user?.email === pendingData.email) {
           await clearPendingVerification();
-          await cancelVerificationReminders();
+          await cancelVerificationReminder();
           setPending(null);
           setShowModal(false);
           console.log("✅ Email change verified successfully");
@@ -66,8 +65,8 @@ export function usePendingVerification() {
       // Check if expired (only for email change - account blocks app instead)
       if (pendingData.type === "email_change" && isVerificationExpired(pendingData)) {
         await clearPendingVerification();
-        await cancelVerificationReminders();
-        await sendVerificationExpiredNotification(pendingData.type);
+        await cancelVerificationReminder();
+
         setPending(null);
         setShowModal(false);
         console.log("⏰ Email change expired");

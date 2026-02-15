@@ -14,10 +14,7 @@ import { supabase } from "../lib/supabase";
 import { checkAndSendDailyAchievementOnOpen } from "../services/notifications/daily-achievement-notification";
 import { scheduleDailyQuoteNotification } from "../services/notifications/daily-quote-notification";
 import { refreshDailyReminderIfNeeded } from "../services/notifications/daily-reminder-notification";
-import {
-  checkAndSendFirstPuffFreeDayNotification,
-  scheduleEndOfDayPuffFreeCheck,
-} from "../services/notifications/first-puff-free-day-notification";
+import { checkAndSendFirstPuffFreeDayNotification } from "../services/notifications/first-puff-free-day-notification";
 import { updateLastActivity } from "../services/notifications/inactivity-notification";
 import { areNotificationsEnabled } from "../services/notifications/notification-service";
 import { scheduleWeeklySummaryNotification } from "../services/notifications/weekly-summary-notification";
@@ -264,7 +261,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     updateLastActivity();
     scheduleWeeklySummaryNotification();
     checkAndSendFirstPuffFreeDayNotification(user.id);
-    scheduleEndOfDayPuffFreeCheck();
     scheduleDailyQuoteNotification();
     refreshDailyReminderIfNeeded();
     checkAndSendDailyAchievementOnOpen(user.id);

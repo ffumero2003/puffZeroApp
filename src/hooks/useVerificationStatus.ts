@@ -2,7 +2,7 @@
 // Hook para manejar el estado de verificación en Settings
 
 import { supabase } from "@/src/lib/supabase";
-import { cancelVerificationReminders } from "@/src/services/notifications/verification-notification";
+import { cancelVerificationReminder } from "@/src/services/notifications/verification-notification";
 import {
   clearPendingVerification,
   getPendingVerification,
@@ -134,7 +134,7 @@ export function useVerificationStatus() {
       if (verified) {
         // ✅ Verificado - limpiar pending
         await clearPendingVerification();
-        await cancelVerificationReminders();
+        await cancelVerificationReminder();
         setIsVerified(true);
         Alert.alert("✅ Verificado", "Tu cuenta está verificada.");
         return true;
