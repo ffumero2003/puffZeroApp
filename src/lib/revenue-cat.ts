@@ -9,7 +9,7 @@ import Purchases, { LOG_LEVEL } from "react-native-purchases";
 // This is a PUBLIC key — safe to include in client code
 const API_KEY = Platform.select({
   ios: "appl_KZEHQlsbsknNgXLadldfkxeKxPR",
-  // android: "goog_XXXXXXXX", // add later if needed
+  android: "goog_xmBwpiqGHthzimpuLzgvhjrpQDq", 
 }) as string;
 
 // Track whether we've already configured the SDK this session
