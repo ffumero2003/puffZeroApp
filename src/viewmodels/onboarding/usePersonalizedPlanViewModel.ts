@@ -52,7 +52,7 @@ export function usePersonalizedPlanViewModel() {
       const fullPlan = buildPuffsPlan(puffs_per_day, days);
       setPuffsChart(sampleChartData(fullPlan, 12));
     }
-  }, []);
+  }, [goal_speed, profile_created_at, puffs_per_day]);
 
   // Send welcome notification when personalized plan screen mounts
   // This runs for both register and login flows

@@ -39,9 +39,10 @@ export function useLoginViewModel() {
 
     setLoading(true);
     const { error } = await signIn(email, password);
-    setLoading(false);
+    
 
     if (error) {
+      setLoading(false);
       Alert.alert("Error al iniciar sesión", error.message);
       return false;
     }

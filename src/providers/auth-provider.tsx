@@ -153,6 +153,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ═══════════════════════════════════════════════════════════════
   useEffect(() => {
     if (!user?.id) {
+      setIsRevenueCatReady(false);
       setIsPremium(false);
       return;
     }
@@ -160,10 +161,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const setupRevenueCat = async () => {
       try {
         await initRevenueCat(user.id);
-        setIsRevenueCatReady(true); // ← Signal that SDK is ready
+        // setIsRevenueCatReady(true); // ← Signal that SDK is ready
 
         const isActive = await checkPremiumEntitlement();
         setIsPremium(isActive);
+        setIsRevenueCatReady(true); // ← Signal AFTER premium status is known
 
         // Listen for real-time subscription changes
         // (e.g., user subscribes from another device, subscription renews/expires)
@@ -173,7 +175,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setIsPremium(stillActive);
         });
       } catch (e) {
-        console.warn("RevenueCat: setup failed (offerings may not be ready)", e);
+        console.warn(
+          "RevenueCat: setup failed (offerings may not be ready)",
+          e
+        );
         setIsRevenueCatReady(true); // still mark ready so app doesn't hang
       }
     };
@@ -184,6 +189,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, password: string, full_name: string) => {
     setLoading(true);
     setAuthFlow("register");
+    setPostSignupCompletedState(false);
+    AsyncStorage.setItem("postSignupCompleted", "false");
 
     const result = await supabase.auth.signUp({
       email,
@@ -193,8 +200,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // NEW: When a user registers, mark post-signup as not completed
     // This persists so even if app restarts, they'll go back to post-signup
-    if (!result.error) {
-      await setPostSignupCompleted(false);
+    if (result.error) {
+      setPostSignupCompletedState(true);
+      AsyncStorage.setItem("postSignupCompleted", "true");
     }
 
     setLoading(false);
@@ -211,6 +219,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     setLoading(false);
+
+    if (!result.error) {
+      await setPostSignupCompleted(true);
+    }
 
     // 🔔 Send welcome back notification on successful login
     if (!result.error && result.data?.user) {
@@ -248,6 +260,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
+    setIsRevenueCatReady(false);
     setAuthFlow(null);
     setAuthInProgress(false);
     setIsPremium(false);

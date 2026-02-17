@@ -28,7 +28,8 @@ WebBrowser.maybeCompleteAuthSession();
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigation() {
-  const { initializing } = useAuth();
+  const { initializing, user, isRevenueCatReady, postSignupCompleted } =
+    useAuth();
   // NEW: Get activeTheme to set StatusBar style dynamically
   const { activeTheme } = useTheme();
 
@@ -47,7 +48,10 @@ function RootNavigation() {
     // resetAll();
   }, []);
 
-  if (initializing) return <Splash />;
+  // Keep splash visible until auth AND RevenueCat are both ready
+  // This prevents the paywall from flashing for paid users
+  if (initializing || (user && postSignupCompleted && !isRevenueCatReady))
+    return <Splash />;
 
   return (
     <>

@@ -7,7 +7,7 @@
 // ════════════════════════════════════════════════════════════════
 // true = salta el paywall, va directo a la app (para testear el flow)
 // false = comportamiento normal (paywall bloquea)
-export const BYPASS_PAYWALL = false;
+export const BYPASS_PAYWALL = true;
 
 // ════════════════════════════════════════════════════════════════
 // 🎚️ DEV CONFIG - Para navegar directo a una pantalla

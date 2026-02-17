@@ -15,6 +15,7 @@ import GoogleButton from "@/src/components/onboarding/GoogleButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import SeparatorRow from "@/src/components/onboarding/SeparatorRow";
 import UnderlineInput from "@/src/components/onboarding/UnderlineInput";
+import { ROUTES } from "@/src/constants/routes";
 import {
   validateConfirmPassword,
   validateEmail,
@@ -78,15 +79,16 @@ export default function Register() {
   };
 
   const handleRegister = async () => {
+    setAuthInProgress(true);
     const ok = await register({
       email,
       password,
       nombre,
     });
 
-    // if (ok) {
-    //   router.push(ROUTES.POST_SIGNUP_REVIEW);
-    // }
+    if (ok) {
+      router.replace(ROUTES.POST_SIGNUP_REVIEW);
+    }
     setAuthInProgress(false);
   };
 

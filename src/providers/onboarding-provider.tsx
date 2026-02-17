@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useContext, useEffect, useState } from "react";
 import { DEBUG } from "../config/debug";
 import { supabase } from "../lib/supabase";
+import { useAuth } from "./auth-provider";
 
 interface OnboardingData {
   name: string | null;
@@ -39,6 +40,7 @@ export function OnboardingProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const { user, postSignupCompleted } = useAuth();
   const [loading, setLoading] = useState(true);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
 
@@ -100,15 +102,15 @@ export function OnboardingProvider({
       const postSignupFlag = await AsyncStorage.getItem("postSignupCompleted");
       if (postSignupFlag !== "false") return; // Already completed or first launch
 
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session?.user?.id) return; // No session, nothing to hydrate
+      if (!user?.id) {
+        resetAll();
+        return;
+      }
 
       const { data: profile, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("user_id", session.user.id)
+        .eq("user_id", user.id)
         .maybeSingle();
 
       if (error || !profile) return; // No profile yet, nothing to hydrate
@@ -130,7 +132,7 @@ export function OnboardingProvider({
     };
 
     hydrateFromProfile();
-  }, []);
+  }, [user?.id]);
 
   async function setProfileCreatedAt(d: string) {
     setProfileCreatedAtState(d);
