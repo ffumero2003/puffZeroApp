@@ -23,6 +23,7 @@ export default function OnboardingProgress() {
     activeTheme === "light" ? ProgressScreenLight : ProgressScreenDark;
 
   const screenWidth = Dimensions.get("window").width;
+  const screenHeight = Dimensions.get("window").height;
 
   return (
     <ScreenWrapper>
@@ -36,7 +37,7 @@ export default function OnboardingProgress() {
             source={ProgressScreen}
             style={{
               width: screenWidth * 0.9,
-              height: screenWidth * 1 * 1.2, // taller aspect ratio for phone mockups
+              height: screenHeight * 0.55, // taller aspect ratio for phone mockups
             }}
             resizeMode="contain"
           />

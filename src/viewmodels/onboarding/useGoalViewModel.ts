@@ -5,9 +5,11 @@ export function useGoalViewModel() {
   const { setGoal } = useOnboarding();
 
   function submitGoal(goal: string) {
-    setGoal(goal);
-    return true; // señal, NO navegación
-  }
+  if (!goal) return false;
+  setGoal(goal);
+  return true;
+}
+
 
   return {
     submitGoal,

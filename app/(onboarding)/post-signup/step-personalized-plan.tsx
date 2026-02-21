@@ -12,6 +12,7 @@ import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
 import { useTheme } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
+import { useEffect } from "react";
 
 import { usePersonalizedPlanViewModel } from "@/src/viewmodels/onboarding/usePersonalizedPlanViewModel";
 
@@ -19,17 +20,18 @@ export default function StepPersonalizedPlan() {
   const { colors, activeTheme } = useTheme();
   const { targetDate, puffsChart, status, finishFlow } =
     usePersonalizedPlanViewModel();
+
   const screenWidth = Dimensions.get("window").width;
 
   const checkIcon = activeTheme === "light" ? CheckIconLight : CheckIconDark;
 
-  //  useEffect(() => {
-  //     if (status === "invalid") {
-  //       router.replace(ROUTES.POST_SIGNUP_REVIEW);
-  //     }
-  //   }, [status]);
+  useEffect(() => {
+    if (status === "invalid") {
+      router.replace(ROUTES.POST_SIGNUP_REVIEW);
+    }
+  }, [status]);
 
-  //   if (status === "invalid") return null;
+  if (status === "invalid") return null;
 
   const handleContinue = () => {
     const ok = finishFlow();
@@ -43,7 +45,7 @@ export default function StepPersonalizedPlan() {
       <View
         style={[layout.screenContainer, { backgroundColor: colors.background }]}
       >
-        <View style={layout.content}>
+        <View style={[layout.content, { flex: 1 }]}>
           <OnboardingHeader
             step={0}
             total={11}
@@ -129,11 +131,13 @@ export default function StepPersonalizedPlan() {
 }
 
 const styles = StyleSheet.create({
+  // Remove this block:
   checkImage: {
     width: "100%",
     height: 100,
     marginBottom: 20,
   },
+
   dateText: {
     fontSize: 24,
     marginTop: 4,

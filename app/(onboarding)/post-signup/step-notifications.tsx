@@ -6,7 +6,14 @@ import { ROUTES } from "@/src/constants/routes";
 import { useTheme } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { router } from "expo-router";
-import { Dimensions, Image, Pressable, StyleSheet, View } from "react-native";
+import {
+  Alert,
+  Dimensions,
+  Image,
+  Pressable,
+  StyleSheet,
+  View,
+} from "react-native";
 
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { useNotificationsViewModel } from "@/src/viewmodels/onboarding/useNotificationsViewModel";
@@ -24,7 +31,13 @@ export default function NotificationsStep() {
   };
 
   const handleAllow = async () => {
-    await requestPermission();
+    const granted = await requestPermission();
+    if (!granted) {
+      Alert.alert(
+        "Notificaciones desactivadas",
+        "Podés activarlas después desde Configuración."
+      );
+    }
     goNext();
   };
 
@@ -176,7 +189,6 @@ const styles = StyleSheet.create({
   btnOptionAllow: {
     flex: 1,
     paddingVertical: 14,
-    borderRadius: 0,
     alignItems: "center",
     justifyContent: "center",
   },

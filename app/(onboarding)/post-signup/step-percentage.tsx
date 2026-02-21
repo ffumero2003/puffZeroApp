@@ -29,11 +29,24 @@ export default function StepPercentage() {
     outputRange: ["0%", "100%"],
   });
 
+  const hasNavigated = useRef(false);
+
   useEffect(() => {
-    if (completed) {
+    if (completed && !hasNavigated.current) {
+      hasNavigated.current = true;
       router.push(ROUTES.POST_SIGNUP_PLAN);
     }
   }, [completed]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (!completed && !hasNavigated.current) {
+        hasNavigated.current = true;
+        router.push(ROUTES.POST_SIGNUP_PLAN);
+      }
+    }, 15000);
+    return () => clearTimeout(timeout);
+  }, []);
 
   return (
     <ScreenWrapper>
@@ -64,7 +77,9 @@ export default function StepPercentage() {
             />
           </View>
 
-          <AppText style={styles.statusText}>{getStatusText()}</AppText>
+          <AppText style={[styles.statusText, { color: colors.textMuted }]}>
+            {getStatusText()}
+          </AppText>
 
           <View style={styles.checklist}>
             <CheckItem text="Mejorar tu salud" active={progress >= 20} />

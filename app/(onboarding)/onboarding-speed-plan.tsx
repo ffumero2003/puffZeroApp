@@ -27,12 +27,14 @@ const OPTIONS = [
   {
     id: "30",
     title: "30 DÍAS — REINICIO COMPLETO  ✨",
-    description: "Ideal para quienes vapearon poco y buscan un cambio rápido.",
+    description:
+      "Un mes completo para crear nuevas rutinas y dejar el vape con calma.",
   },
   {
     id: "60",
     title: "2 MESES — CAMINO ESTABLE  🚀",
-    description: "Ideal para quienes vapearon poco y buscan un cambio rápido.",
+    description:
+      "Más tiempo para adaptarte y consolidar el cambio de forma gradual.",
   },
   {
     id: "90",
@@ -46,8 +48,9 @@ export default function OnboardingSpeedPlan() {
   const [selected, setSelected] = useState<string | null>(null);
   const { submitSpeed } = useSpeedPlanViewModel();
 
-  const handleContinue = (speed: string) => {
-    const ok = submitSpeed(speed);
+  const handleContinue = () => {
+    if (!selected) return;
+    const ok = submitSpeed(selected);
     if (ok) {
       router.push(ROUTES.ONBOARDING_MOTIVATION);
     }
@@ -91,7 +94,7 @@ export default function OnboardingSpeedPlan() {
         <ContinueButton
           text="Continuar"
           disabled={selected === null}
-          onPress={() => handleContinue(selected!)}
+          onPress={handleContinue}
           style={layout.bottomButtonContainer}
         />
       </View>

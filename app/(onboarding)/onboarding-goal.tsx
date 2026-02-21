@@ -44,7 +44,7 @@ export default function OnboardingGoal() {
       <View
         style={[layout.screenContainer, { backgroundColor: colors.background }]}
       >
-        <View>
+        <View style={{ flex: 1 }}>
           <OnboardingHeader step={8} total={11} />
 
           <View style={layout.content}>

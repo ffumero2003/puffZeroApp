@@ -6,15 +6,17 @@ export function useMoneySpentViewModel() {
   const { setMoney, setCurrency } = useOnboarding();
 
   function isValidAmount(amount: number, currency: string) {
-    const min = MIN_BY_CURRENCY[currency] ?? 0;
+    const min = MIN_BY_CURRENCY[currency] ?? 1;
     return amount >= min;
   }
 
   function submitMoney(amount: number, currency: string) {
-    setMoney(amount);
-    setCurrency(currency);
-    return true;
-  }
+  if (!isValidAmount(amount, currency)) return false;
+  setMoney(amount);
+  setCurrency(currency);
+  return true;
+}
+
 
   
 

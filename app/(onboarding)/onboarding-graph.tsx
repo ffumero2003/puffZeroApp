@@ -17,7 +17,7 @@ export default function OnboardingGraph() {
     router.push(ROUTES.ONBOARDING_PUFFS);
   }
   const screenWidth = Dimensions.get("window").width;
-
+  const screenHeight = Dimensions.get("window").height;
   const Graph = activeTheme === "light" ? GraphLight : GraphDark;
 
   return (
@@ -37,23 +37,25 @@ export default function OnboardingGraph() {
               source={Graph}
               style={{
                 width: screenWidth * 0.9, // 85% of screen width
-                height: screenWidth * 0.9 * 0.85, // maintain aspect ratio (~4:3)
+                height: screenHeight * 0.3, // maintain aspect ratio (~4:3)
                 marginTop: 30,
               }}
               resizeMode="contain"
             />
+            <AppText
+              weight="bold"
+              style={[
+                layout.titleCenter,
+                { color: colors.text, marginTop: 20 },
+              ]}
+            >
+              Visualiza tu progreso día a día
+            </AppText>
           </View>
         </View>
 
         {/* 🟢 GROUP 2 — botón + login */}
         <View style={{ width: "100%" }}>
-          <AppText
-            weight="bold"
-            style={[layout.titleCenter, { color: colors.text }]}
-          >
-            Visualiza tu progreso día a día
-          </AppText>
-
           <ContinueButton
             text="Continuar"
             onPress={goToPuffCount}

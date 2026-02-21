@@ -40,14 +40,19 @@ export default function CheckItem({
           styles.circle,
           active
             ? { borderColor: colors.primary, backgroundColor: colors.primary }
-            : styles.circleInactive,
+            : { ...styles.circleInactive, borderColor: colors.textSecondary },
+
           {
             transform: [{ scale: scaleAnim }],
             opacity: active ? opacityAnim : 1,
           },
         ]}
       >
-        {active && <AppText style={styles.checkMark}>✓</AppText>}
+        {active && (
+          <AppText style={[styles.checkMark, { color: colors.textWhite }]}>
+            ✓
+          </AppText>
+        )}
       </Animated.View>
 
       <AppText

@@ -32,7 +32,7 @@ export default function OnboardingComparison() {
       <View
         style={[layout.screenContainer, { backgroundColor: colors.background }]}
       >
-        <View>
+        <View style={{ flex: 1 }}>
           <OnboardingHeader step={7} total={11} />
 
           <View style={layout.content}>
@@ -45,10 +45,11 @@ export default function OnboardingComparison() {
               source={conPuffZero}
               style={{
                 width: screenWidth * 0.9,
-                height: screenWidth * 0.95 * 0.85, // wider aspect ratio for this comparison image
+                height: screenWidth * 0.95 * 0.85,
                 marginVertical: 20,
               }}
               resizeMode="contain"
+              accessibilityLabel="Comparación: con y sin Puff Zero"
             />
 
             {/* Texto inferior */}

@@ -18,7 +18,7 @@ export default function OnboardingMoneySaved() {
 
   const MoneySaved = activeTheme === "light" ? MoneySavedLight : MoneySavedDark;
   const screenWidth = Dimensions.get("window").width;
-
+  const screenHeight = Dimensions.get("window").height;
   return (
     <ScreenWrapper>
       <View
@@ -33,23 +33,22 @@ export default function OnboardingMoneySaved() {
               source={MoneySaved}
               style={{
                 width: screenWidth * 0.9, // 85% of screen width
-                height: screenWidth * 0.9 * 0.85, // maintain aspect ratio (~4:3)
+                height: screenHeight * 0.3,
                 marginTop: 30,
               }}
               resizeMode="contain"
             />
           </View>
+          <AppText
+            weight="bold"
+            style={[layout.titleCenter, { color: colors.text, marginTop: 20 }]}
+          >
+            Cada puff evitado suma a tu ahorro
+          </AppText>
         </View>
 
         {/* 🟢 GROUP 2 — botón + login */}
         <View style={{ width: "100%" }}>
-          <AppText
-            weight="bold"
-            style={[layout.titleCenter, { color: colors.text }]}
-          >
-            Cada puff evitado suma a tu ahorro
-          </AppText>
-
           <ContinueButton
             text="Continuar"
             onPress={goToGraph}

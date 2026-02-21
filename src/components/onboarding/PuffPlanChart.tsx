@@ -2,7 +2,6 @@ import AppText from "@/src/components/AppText";
 import { useThemeColors } from "@/src/providers/theme-provider";
 import { StyleSheet, View } from "react-native";
 
-
 interface Props {
   data: number[];
   /** Texto opcional para el valor inicial (ej: "20 puffs/día") */
@@ -11,11 +10,7 @@ interface Props {
   endLabel?: string;
 }
 
-export default function PuffsPlanChart({
-  data,
-  startLabel,
-  endLabel,
-}: Props) {
+export default function PuffsPlanChart({ data, startLabel, endLabel }: Props) {
   // Guard rail
   const colors = useThemeColors();
 
@@ -30,31 +25,34 @@ export default function PuffsPlanChart({
       <View style={styles.scale}>
         {/* START VALUE */}
         <View style={styles.startGroup}>
-          <AppText style={[styles.startNumber, { color: colors.primary }]} weight="bold">
+          <AppText
+            style={[styles.startNumber, { color: colors.primary }]}
+            weight="bold"
+          >
             {startValue}
           </AppText>
-          <AppText style={styles.startUnit}>
+          <AppText style={[styles.startUnit, { color: colors.textMuted }]}>
             puffs/día
           </AppText>
         </View>
 
         <View style={styles.startGroup}>
-          <AppText style={[styles.startNumber, { color: colors.primary }]} weight="bold">
+          <AppText
+            style={[styles.startNumber, { color: colors.primary }]}
+            weight="bold"
+          >
             0
           </AppText>
-          <AppText style={styles.startUnit}>
+          <AppText style={[styles.startUnit, { color: colors.textMuted }]}>
             puffs/día
           </AppText>
         </View>
-        
       </View>
-
 
       {/* Chart */}
       <View style={[styles.chart, { backgroundColor: colors.secondary }]}>
         {data.map((value, index) => {
-          const heightPct =
-            maxValue === 0 ? 0 : (value / maxValue) * 100;
+          const heightPct = maxValue === 0 ? 0 : (value / maxValue) * 100;
 
           return (
             <View key={index} style={styles.barWrapper}>
@@ -71,8 +69,13 @@ export default function PuffsPlanChart({
 
       {/* Labels inferiores */}
       <View style={styles.labels}>
-        <AppText style={styles.label}>Hoy</AppText>
-        <AppText style={styles.label}>Fin</AppText>
+        <AppText style={[styles.label, { color: colors.textMuted }]}>
+          Hoy
+        </AppText>
+
+        <AppText style={[styles.label, { color: colors.textMuted }]}>
+          Fin
+        </AppText>
       </View>
     </View>
   );
@@ -120,10 +123,10 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   startGroup: {
-  flexDirection: "row",
-  alignItems: "flex-end",
-  gap: 4,
-},
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 4,
+  },
   startNumber: {
     fontSize: 18,
     fontWeight: "800",
@@ -137,5 +140,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
     opacity: 0.5,
   },
-
 });

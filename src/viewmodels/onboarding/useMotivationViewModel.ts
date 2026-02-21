@@ -5,9 +5,11 @@ export function useMotivationViewModel() {
   const { setWhyStopped } = useOnboarding();
 
   function submitMotivation(id: string) {
-    setWhyStopped([id]);
-    return true;
-  }
+  if (!id) return false;
+  setWhyStopped([id]);
+  return true;
+}
+
 
   return {
     submitMotivation,

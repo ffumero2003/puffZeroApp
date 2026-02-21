@@ -54,7 +54,7 @@ export default function Review() {
             weight="bold"
             style={[layout.titleCenter, { color: colors.text }]}
           >
-            Dejanos una calificación
+            Ellos lo lograron
           </AppText>
 
           <Image
@@ -79,29 +79,30 @@ export default function Review() {
           </AppText>
         </View>
 
-        {/* 🟣 REVIEWS CON SCROLL */}
-        <ScrollView showsVerticalScrollIndicator={false} c>
-          <ReviewCard
-            name="Antonio"
-            age={26}
-            text="Después de varios intentos fallidos, PuffZero me ayudó a dejar el vape. Mi respiración mejoró muchísimo y ahora hasta volví a jugar con mis hijos sin cansarme. Esta app funcionó cuando nada más lo hacía."
-            image={AntonioReview}
-          />
+        <View style={{ flex: 1 }}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <ReviewCard
+              name="Antonio"
+              age={26}
+              text="Después de varios intentos fallidos, PuffZero me ayudó a dejar el vape. Mi respiración mejoró muchísimo y ahora hasta volví a jugar con mis hijos sin cansarme. Esta app funcionó cuando nada más lo hacía."
+              image={AntonioReview}
+            />
 
-          <ReviewCard
-            name="María"
-            age={24}
-            text="Pensé que nunca iba a poder dejar el vape. Cada vez que me estresaba, lo usaba sin pensarlo. PuffZero me ayudó a entender mis hábitos y a mantenerme firme. Hoy respiro mejor, duermo mejor y me siento más segura de mí misma."
-            image={MariaReview}
-          />
+            <ReviewCard
+              name="María"
+              age={24}
+              text="Pensé que nunca iba a poder dejar el vape. Cada vez que me estresaba, lo usaba sin pensarlo. PuffZero me ayudó a entender mis hábitos y a mantenerme firme. Hoy respiro mejor, duermo mejor y me siento más segura de mí misma."
+              image={MariaReview}
+            />
 
-          <ReviewCard
-            name="Alex"
-            age={31}
-            text="Ver cuánto dinero estaba gastando fue un cambio total. PuffZero me abrió los ojos y me ayudó a mantenerme firme."
-            image={AlexReview}
-          />
-        </ScrollView>
+            <ReviewCard
+              name="Alex"
+              age={31}
+              text="Ver cuánto dinero estaba gastando fue un cambio total. PuffZero me abrió los ojos y me ayudó a mantenerme firme."
+              image={AlexReview}
+            />
+          </ScrollView>
+        </View>
 
         {/* 🟢 BOTÓN ABAJO FIJO */}
         <ContinueButton

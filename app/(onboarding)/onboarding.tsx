@@ -21,6 +21,7 @@ export default function Onboarding() {
 
   const HomePage = activeTheme === "light" ? HomePageLight : HomePageDark;
   const screenWidth = Dimensions.get("window").width;
+  const screenHeight = Dimensions.get("window").height;
 
   return (
     <ScreenWrapper>
@@ -39,7 +40,7 @@ export default function Onboarding() {
             source={HomePage}
             style={{
               width: screenWidth * 0.9,
-              height: screenWidth * 1 * 1.2, // taller aspect ratio for phone mockups
+              height: screenHeight * 0.55,
             }}
             resizeMode="contain"
           />

@@ -24,7 +24,7 @@ import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 
-import { LATAM_CURRENCIES } from "@/src/constants/currency";
+import { LATAM_CURRENCIES, MIN_BY_CURRENCY } from "@/src/constants/currency";
 import { formatCurrency } from "@/src/utils/currency";
 import { useMoneySpentViewModel } from "@/src/viewmodels/onboarding/useMoneySpentViewModel";
 
@@ -110,9 +110,23 @@ export default function OnboardingMoneySpent() {
 
               {formatted ? (
                 <AppText style={layout.previewText}>
-                  ≈ {formatted} por semana
+                  ≈ {formatted} por semana (equivalente semanal)
                 </AppText>
               ) : null}
+
+              {/* Minimum amount hint — always visible so user knows the threshold */}
+              <AppText
+                style={[
+                  layout.previewText,
+                  { color: colors.textMuted, marginTop: 4 },
+                ]}
+              >
+                El monto mínimo es{" "}
+                {MIN_BY_CURRENCY[localCurrency]?.toLocaleString()}{" "}
+                {LATAM_CURRENCIES.find(
+                  (c) => c.code === localCurrency
+                )?.label.match(/\((.+)\)/)?.[1] ?? localCurrency}
+              </AppText>
 
               <TouchableOpacity
                 style={[
@@ -192,10 +206,17 @@ export default function OnboardingMoneySpent() {
                     style={[
                       styles.modalOption,
                       { borderBottomColor: colors.border },
+                      item.code === localCurrency && {
+                        backgroundColor: colors.inputBackground,
+                      },
                     ]}
                     onPress={() => {
                       setLocalCurrency(item.code);
-                      setPickerOpen(false);
+                      // Animate close — same as outside-tap dismiss
+                      overlayOpacity.value = withTiming(0, { duration: 150 });
+                      modalOpacity.value = withTiming(0, { duration: 150 });
+                      modalTranslate.value = withTiming(50, { duration: 150 });
+                      setTimeout(() => setPickerOpen(false), 150);
                     }}
                   >
                     <AppText weight="medium">{item.label}</AppText>

@@ -78,10 +78,7 @@ export default function OnboardingWorries() {
         <ContinueButton
           text="Continuar"
           disabled={selected.length === 0}
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            handleContinue(selected);
-          }}
+          onPress={() => handleContinue(selected)}
           style={layout.bottomButtonContainer}
         />
       </View>

@@ -5,9 +5,11 @@ export function useSpeedPlanViewModel() {
   const { setGoalSpeed } = useOnboarding();
 
   function submitSpeed(speed: string) {
-    setGoalSpeed(speed);
-    return true;
-  }
+  if (!speed) return false;
+  setGoalSpeed(speed);
+  return true;
+}
+
 
   return {
     submitSpeed,

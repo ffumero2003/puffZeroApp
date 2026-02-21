@@ -72,9 +72,10 @@ export function usePersonalizedPlanViewModel() {
   }, []);
 
   function finishFlow() {
-    
-    return true;
-  }
+  if (status === "invalid") return false;
+  return true;
+}
+
 
   return {
     targetDate,

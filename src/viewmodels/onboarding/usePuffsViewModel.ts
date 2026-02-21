@@ -5,9 +5,11 @@ export function usePuffsViewModel() {
   const { setPuffs } = useOnboarding();
 
   function submitPuffs(value: number) {
-    setPuffs(value);
-    return true;
-  }
+  if (!isValidPuffs(value)) return false;
+  setPuffs(value);
+  return true;
+}
+
 
   function isValidPuffs(value: number) {
     return value >= 20;

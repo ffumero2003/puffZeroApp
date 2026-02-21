@@ -92,15 +92,40 @@ export default function OnboardingPuffs() {
               editable={false}
               animatedProps={animatedProps}
             />
+            <AppText
+              style={{
+                textAlign: "center",
+                marginTop: 4,
+                fontSize: 14,
+                color: colors.textMuted,
+              }}
+            >
+              puffs por día
+            </AppText>
 
-            <Animated.View style={labelStyle}>
+            {addiction !== "" && (
+              <Animated.View style={labelStyle}>
+                <AppText
+                  weight="semibold"
+                  style={[styles.classification, { color: colors.primary }]}
+                >
+                  {addiction}
+                </AppText>
+              </Animated.View>
+            )}
+
+            {value > 0 && !isValidPuffs(value) && (
               <AppText
-                weight="semibold"
-                style={[styles.classification, { color: colors.primary }]}
+                style={{
+                  textAlign: "center",
+                  marginTop: 8,
+                  fontSize: 18,
+                  color: colors.textMuted,
+                }}
               >
-                {addiction}
+                El mínimo es 20 puffs por día
               </AppText>
-            </Animated.View>
+            )}
           </View>
         </View>
 
@@ -108,6 +133,7 @@ export default function OnboardingPuffs() {
           text="Continuar"
           disabled={!isValidPuffs(value)}
           onPress={handleContinue}
+          style={layout.bottomButtonContainer}
         />
       </View>
     </ScreenWrapper>

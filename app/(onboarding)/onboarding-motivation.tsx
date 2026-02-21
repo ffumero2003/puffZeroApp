@@ -11,6 +11,7 @@ import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { useThemeColors } from "@/src/providers/theme-provider";
 import { useMotivationViewModel } from "@/src/viewmodels/onboarding/useMotivationViewModel";
 import * as Haptics from "expo-haptics";
+import { useState } from "react";
 const MOTIVATION_OPTIONS = [
   { id: "salud", title: "Salud ❤️" },
   { id: "finanzas", title: "Libertad Financiera 💰" },
@@ -23,13 +24,17 @@ const MOTIVATION_OPTIONS = [
 
 export default function OnboardingMotivation() {
   const colors = useThemeColors();
+  const [selected, setSelected] = useState<string | null>(null);
   const { submitMotivation } = useMotivationViewModel();
 
   const handleSelect = (id: string) => {
-    const ok = submitMotivation(id);
-    if (ok) {
-      router.push("/onboarding-worries");
-    }
+    setSelected(id);
+    setTimeout(() => {
+      const ok = submitMotivation(id);
+      if (ok) {
+        router.push("/onboarding-worries");
+      }
+    }, 200);
   };
 
   return (
@@ -49,21 +54,23 @@ export default function OnboardingMotivation() {
           />
         </View>
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 40 }}
-        >
-          {MOTIVATION_OPTIONS.map((opt) => (
-            <OnboardingWhiteButton
-              key={opt.id}
-              title={opt.title}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                handleSelect(opt.id);
-              }}
-            />
-          ))}
-        </ScrollView>
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 40 }}
+          >
+            {MOTIVATION_OPTIONS.map((opt) => (
+              <OnboardingWhiteButton
+                key={opt.id}
+                title={opt.title}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  handleSelect(opt.id);
+                }}
+              />
+            ))}
+          </ScrollView>
+        </View>
       </View>
     </ScreenWrapper>
   );

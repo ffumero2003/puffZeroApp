@@ -26,7 +26,10 @@ export default function ReviewCard({
     >
       {/* Top row */}
       <View style={styles.topRow}>
-        <Image source={image} style={styles.profileImage} />
+        <Image
+          source={image}
+          style={[styles.profileImage, { borderColor: colors.cardBorder }]}
+        />
 
         <View style={styles.headerText}>
           <AppText weight="bold" style={[styles.name, { color: colors.text }]}>

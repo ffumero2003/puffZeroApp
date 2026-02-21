@@ -5,8 +5,12 @@ export function formatCurrency(value: string, currency: string) {
 
   const iso = currency.startsWith("USD") ? "USD" : currency;
 
-  return new Intl.NumberFormat("es-LA", {
-    style: "currency",
-    currency: iso,
-  }).format(num);
+  try {
+    return new Intl.NumberFormat("es-LA", {
+      style: "currency",
+      currency: iso,
+    }).format(num);
+  } catch {
+    return `${num.toLocaleString()} ${iso}`;
+  }
 }

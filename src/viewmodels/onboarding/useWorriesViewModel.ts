@@ -5,9 +5,11 @@ export function useWorriesViewModel() {
   const { setWorries } = useOnboarding();
 
   function submitWorries(worries: string[]) {
-    setWorries(worries);
-    return true;
-  }
+  if (!worries || worries.length === 0) return false;
+  setWorries(worries);
+  return true;
+}
+
 
   return {
     submitWorries,

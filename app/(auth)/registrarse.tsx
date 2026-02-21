@@ -50,6 +50,8 @@ export default function Register() {
   const [nombreError, setNombreError] = useState("");
   const { register } = useRegisterViewModel();
 
+  const [loading, setLoading] = useState(false);
+
   /* ---------------------------
      HANDLERS
   ------------------------------*/
@@ -79,6 +81,8 @@ export default function Register() {
   };
 
   const handleRegister = async () => {
+    if (loading) return;
+    setLoading(true);
     setAuthInProgress(true);
     const ok = await register({
       email,
@@ -90,6 +94,7 @@ export default function Register() {
       router.replace(ROUTES.POST_SIGNUP_REVIEW);
     }
     setAuthInProgress(false);
+    setLoading(false);
   };
 
   /* ---------------------------
@@ -249,13 +254,25 @@ export default function Register() {
 
             {/* Botón */}
             <ContinueButtonAuth
-              text="Registrarse"
-              disabled={isInvalid}
+              text={loading ? "Creando cuenta..." : "Registrarse"}
+              disabled={isInvalid || loading}
               onPress={handleRegister}
             />
 
             <SeparatorRow />
             <GoogleButton mode="register" disabled={!acceptedTerms} />
+            {!acceptedTerms && (
+              <AppText
+                style={{
+                  textAlign: "center",
+                  fontSize: 13,
+                  color: colors.textMuted,
+                  marginTop: 6,
+                }}
+              >
+                Aceptá los términos para continuar
+              </AppText>
+            )}
           </ScrollView>
         </View>
       </KeyboardAvoidingView>

@@ -53,38 +53,6 @@ export function useNotificationsViewModel() {
     return true;
   }
 
-  /**
-   * 🧪 Test function - sends a local notification immediately
-   */
-  // async function sendTestNotification(): Promise<void> {
-  //   // console.log("🧪 Sending test notification...");
-
-  //   const Notifications = await import("expo-notifications");
-
-  //   Notifications.setNotificationHandler({
-  //     handleNotification: async () => ({
-        
-  //       shouldPlaySound: true,
-  //       shouldSetBadge: false,
-  //       shouldShowBanner: true,
-  //       shouldShowList: true,
-  //     }),
-  //   });
-
-  //   await Notifications.scheduleNotificationAsync({
-  //     content: {
-  //       title: "💨 PuffZero Test",
-  //       body: "¡Las notificaciones funcionan! 🎉",
-  //       sound: true,
-  //     },
-  //     trigger: {
-  //       type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-  //       seconds: 2,
-  //     },
-  //   });
-
-  //   // console.log("✅ Test notification scheduled!");
-  // }
 
   /**
    * 🧪 Test function - fetch today's AI quote and show as notification
@@ -137,11 +105,13 @@ export function useNotificationsViewModel() {
   }
 
   return {
-    requestPermission,
-    skipPermission,
+  requestPermission,
+  skipPermission,
+  ...__DEV__ && {
     testDailyQuoteNotification,
     testWelcomeNotification,
     testWelcomeBackNotification,
-    // REMOVED: savePushTokenToProfile - no longer needed
-  };
+  },
+};
+
 }

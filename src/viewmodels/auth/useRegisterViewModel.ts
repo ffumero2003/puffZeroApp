@@ -28,12 +28,21 @@ export function useRegisterViewModel() {
     setName
   } = useOnboarding();
 
+  function getErrorMessage(error: any): string {
+  const msg = error?.message?.toLowerCase() ?? "";
+  if (msg.includes("already registered")) return "Este correo ya está registrado.";
+  if (msg.includes("rate limit")) return "Demasiados intentos. Esperá un momento.";
+  if (msg.includes("invalid email")) return "El correo ingresado no es válido.";
+  return "Ocurrió un error. Intentá de nuevo.";
+}
+
+
 
   async function register({ email, password, nombre }: RegisterPayload) {
     const { data, error } = await signUp(email, password, nombre);
 
     if (error) {
-      Alert.alert("Error", error.message);
+      Alert.alert("Error", getErrorMessage(error));
       return false;
     }
 
@@ -58,37 +67,22 @@ export function useRegisterViewModel() {
     });
 
     if (profileError) {
-      Alert.alert("Error creando perfil", profileError.message);
+      Alert.alert("Error", "Hubo un problema al crear tu cuenta. Intentá de nuevo.");
+
       return false;
     }
 
     if (!profile?.created_at) {
       Alert.alert(
-        "Error crítico",
-        "El perfil se creó, pero no se pudo obtener la fecha."
+        "Error",
+        "Hubo un problema al crear tu cuenta. Intentá de nuevo."
       );
+
       return false;
     }
 
     setProfileCreatedAt(profile.created_at);
 
-    
-
-
-
-
-    // Alert.alert(
-    //   "Verificá tu cuenta",
-    //   "Te enviamos un email de verificación. Revisá tu bandeja de entrada para activar tu cuenta.",
-    //   [{ text: "OK" }]
-    // );
-
-
-    // Alert.alert(
-    //   "¡Cuenta creada!",
-    //   "Tu cuenta fue creada exitosamente.",
-    //   [{ text: "OK" }]
-    // );
 
     // 📧 Send verification email
     const { error: accountVerificationError } = await sendVerificationEmail(email);
