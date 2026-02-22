@@ -37,7 +37,7 @@ export function useStepPercentageViewModel() {
     if (progress < 20) return "Analizando tu perfil…";
     if (progress < 45) return "Ajustando tus recomendaciones…";
     if (progress < 75) return "Construyendo tu plan diario…";
-    return "Todo listo 🚀";
+    return "Todo listo";
   }
 
   return {

@@ -1,10 +1,10 @@
 import AppText from "@/src/components/AppText";
 import { useThemeColors } from "@/src/providers/theme-provider";
-import { Image, StyleSheet, View } from "react-native";
+import { Image, ImageSourcePropType, StyleSheet, View } from "react-native";
 
 interface Props {
-  icon: any; // imagen local
   value: string;
+  icon: ImageSourcePropType;
   label: string;
 }
 

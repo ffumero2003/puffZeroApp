@@ -16,7 +16,13 @@ import { layout } from "@/src/styles/layout";
 import { useOnboardingPaywallViewModel } from "@/src/viewmodels/onboarding/useOnboardingPaywallViewModel";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 // RevenueCat
 import Purchases, { PurchasesPackage } from "react-native-purchases";
@@ -206,79 +212,87 @@ export default function OnboardingPaywall() {
     }
   }
 
-  function devSkip() {
-    setIsPremium(true);
-    completeOnboarding();
-    resetAll();
-    setAuthFlow(null);
-    setPostSignupCompleted(true);
-    router.replace("/(app)/home");
-  }
+  const devSkip = __DEV__
+    ? () => {
+        setIsPremium(true);
+        completeOnboarding();
+        resetAll();
+        setAuthFlow(null);
+        setPostSignupCompleted(true);
+        router.replace("/(app)/home");
+      }
+    : undefined;
 
   return (
     <ScreenWrapper>
       <View
         style={[layout.screenContainer, { backgroundColor: colors.background }]}
       >
-        <View>
-          <OnboardingHeader showProgress={false} showBack={false} />
-
-          <AppText
-            style={[layout.titleCenter, { color: colors.text }]}
-            weight="bold"
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
           >
-            {firstName ? (
-              <>
-                Hey{" "}
-                <AppText weight="bold" style={{ color: colors.primary }}>
-                  {firstName}
-                </AppText>
-                , desbloqueá Puff
-              </>
-            ) : (
-              <>Hey, desbloqueá Puff</>
-            )}
-            <AppText weight="bold" style={{ color: colors.primary }}>
-              Zero
-            </AppText>{" "}
-            para llegar a tu mejor versión.
-          </AppText>
+            <OnboardingHeader showProgress={false} showBack={false} />
 
-          <View style={styles.featureContainer}>
-            <FeatureItem icon={Statistics} text={puffsText} />
-            <FeatureItem icon={Target} text={planText} />
-            <FeatureItem icon={Fire} text={whyText} />
-            <FeatureItem icon={Check} text={moneyText} />
-          </View>
+            <AppText
+              style={[layout.titleCenter, { color: colors.text }]}
+              weight="bold"
+            >
+              {firstName ? (
+                <>
+                  Hey{" "}
+                  <AppText weight="bold" style={{ color: colors.primary }}>
+                    {firstName}
+                  </AppText>
+                  , desbloqueá Puff
+                </>
+              ) : (
+                <>Hey, desbloqueá Puff</>
+              )}
+              <AppText weight="bold" style={{ color: colors.primary }}>
+                Zero
+              </AppText>{" "}
+              para llegar a tu mejor versión.
+            </AppText>
 
-          <View style={styles.featureContainer}>
-            <SubscriptionOption
-              title="Acceso mensual"
-              subtitle="Cancelá cuando quieras"
-              price={monthlyPrice}
-              period="semana"
-              selected={plan === "monthly"}
-              onPress={() => setPlan("monthly")}
-              style={{ marginBottom: 18 }}
-            />
+            <View style={styles.featureContainer}>
+              <FeatureItem icon={Statistics} text={puffsText} />
+              <FeatureItem icon={Target} text={planText} />
+              <FeatureItem icon={Fire} text={whyText} />
+              <FeatureItem icon={Check} text={moneyText} />
+            </View>
 
-            <SubscriptionOption
-              title="Acceso anual"
-              subtitle="3 días de prueba gratis"
-              price={yearlyPrice}
-              period="año"
-              badge="Ahorra 42%"
-              highlight="Mejor oferta"
-              selected={plan === "yearly"}
-              onPress={() => setPlan("yearly")}
-            />
-          </View>
+            <View style={styles.featureContainer}>
+              <SubscriptionOption
+                title="Acceso mensual"
+                subtitle="Cancelá cuando quieras"
+                price={monthlyPrice}
+                period="mes"
+                selected={plan === "monthly"}
+                onPress={() => setPlan("monthly")}
+                style={{ marginBottom: 18 }}
+              />
+
+              <SubscriptionOption
+                title="Acceso anual"
+                subtitle="3 días de prueba gratis"
+                price={yearlyPrice}
+                period="año"
+                badge="Ahorra 42%"
+                highlight="Mejor oferta"
+                selected={plan === "yearly"}
+                onPress={() => setPlan("yearly")}
+              />
+            </View>
+          </ScrollView>
         </View>
 
         <View>
           <ContinueButton
             text={loading ? "Procesando..." : "Continuar"}
             onPress={handlePurchase}
+            disabled={loading}
             style={layout.bottomButtonContainer}
           />
 

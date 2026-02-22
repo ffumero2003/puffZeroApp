@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import AppText from "@/src/components/AppText";
 import ContinueButton from "@/src/components/onboarding/ContinueButton";
@@ -8,46 +8,53 @@ import HowToFacts from "@/src/components/onboarding/HowToFacts";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
-import { FACTS, HOW_TO_FACTS } from "@/src/lib/onboarding/facts.library";
+import { getFacts, HOW_TO_FACTS } from "@/src/lib/onboarding/facts.library";
+import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 
 export default function StepFacts() {
   const colors = useThemeColors();
+  const { money_per_month, currency } = useOnboarding();
+  const FACTS = getFacts(money_per_month, currency);
   const goPay = () => {
     router.push(ROUTES.POST_SIGNUP_PAYWALL);
   };
+
   return (
     <ScreenWrapper>
       <View
         style={[layout.screenContainer, { backgroundColor: colors.background }]}
       >
-        <View style={layout.content}>
-          <OnboardingHeader showBack={false} showProgress={false} />
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          >
+            <OnboardingHeader showBack={false} showProgress={false} />
 
-          {/* FACTS */}
-          {FACTS.map((fact) => (
-            <FactItem
-              key={fact.key}
-              icon={fact.icon}
-              value={fact.value}
-              label={fact.label}
-            />
-          ))}
-
-          {/* HOW TO */}
-          <View style={styles.section}>
-            <AppText
-              weight="extrabold"
-              style={[styles.sectionTitle, { color: colors.text }]}
-            >
-              Cómo alcanzar tus metas
-            </AppText>
-
-            {HOW_TO_FACTS.map((item) => (
-              <HowToFacts key={item.key} icon={item.icon} text={item.text} />
+            {FACTS.map((fact) => (
+              <FactItem
+                key={fact.key}
+                icon={fact.icon}
+                value={fact.value}
+                label={fact.label}
+              />
             ))}
-          </View>
+
+            <View style={styles.section}>
+              <AppText
+                weight="extrabold"
+                style={[styles.sectionTitle, { color: colors.text }]}
+              >
+                Cómo alcanzar tus metas
+              </AppText>
+
+              {HOW_TO_FACTS.map((item) => (
+                <HowToFacts key={item.key} icon={item.icon} text={item.text} />
+              ))}
+            </View>
+          </ScrollView>
         </View>
 
         <ContinueButton text="¡Listo para empezar!" onPress={goPay} />
