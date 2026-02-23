@@ -3,7 +3,7 @@ import { components } from "@/src/styles/components";
 import * as Haptics from "expo-haptics";
 import { Href, router } from "expo-router";
 import { useEffect, useRef } from "react"; // <-- NEW: for animation
-import { Animated, Vibration, ViewStyle } from "react-native"; // <-- NEW: Animated
+import { Animated, TextStyle, Vibration, ViewStyle } from "react-native"; // <-- NEW: Animated
 
 interface ContinueButtonProps {
   text?: string;
@@ -11,6 +11,7 @@ interface ContinueButtonProps {
   style?: ViewStyle;
   disabled?: boolean;
   onPress?: () => void;
+  textStyle?: TextStyle;
 }
 
 export default function ContinueButton({
@@ -19,6 +20,7 @@ export default function ContinueButton({
   style,
   disabled = false,
   onPress,
+  textStyle,
 }: ContinueButtonProps) {
   // ─── Animated opacity: smoothly transitions when disabled changes ───
   const opacity = useRef(new Animated.Value(disabled ? 0.6 : 1)).current;
@@ -58,7 +60,12 @@ export default function ContinueButton({
         { opacity }, // <-- animated value instead of static ternary
       ]}
     >
-      <KeepGoingButton text={text} disabled={disabled} onPress={handlePress} />
+      <KeepGoingButton
+        text={text}
+        disabled={disabled}
+        onPress={handlePress}
+        textStyle={textStyle}
+      />
     </Animated.View>
   );
 }

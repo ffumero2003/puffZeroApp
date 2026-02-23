@@ -39,18 +39,52 @@ export function useVerificationStatus() {
   const [loading, setLoading] = useState(true);
   const [countdownMs, setCountdownMs] = useState<number>(0);
 
-  // Cargar estado inicial
+  // Cargar estado inicial — check Supabase user data, not AsyncStorage
   const loadVerificationState = useCallback(async () => {
     setLoading(true);
     try {
-      // Verificar si hay pending verification
+      // Fetch fresh user data from the server
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (error || !user) {
+        setIsVerified(false);
+        return;
+      }
+
+      // Check if there's a pending email change in AsyncStorage
+      // (email changes still need local tracking since Supabase doesn't store "pending" state)
       const pending = await getPendingVerification();
 
-      // Si NO hay pending → está verificado
-      // Si hay pending → no está verificado
-      setIsVerified(!pending);
+      if (pending?.type === "email_change") {
+        // Email change: verified when current email matches the pending new email
+        const verified = user.email === pending.email;
+        setIsVerified(verified);
+        if (verified) {
+          // Clean up AsyncStorage since it's confirmed
+          await clearPendingVerification();
+          await cancelVerificationReminder();
+        }
+      }  else {
+        // Account verification: check email_verified from profiles table
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("email_verified")
+          .eq("user_id", user.id)
+          .maybeSingle();
 
-      // Verificar si ya checkeó hoy
+        const verified = !!profile?.email_verified;
+        setIsVerified(verified);
+        if (verified && pending) {
+          await clearPendingVerification();
+          await cancelVerificationReminder();
+        }
+      }
+
+
+      // Check cooldown timer
       const lastCheckTs = await AsyncStorage.getItem(LAST_VERIFICATION_CHECK_KEY);
       const remaining = getMsRemaining(lastCheckTs);
       const canCheck = remaining <= 0;
@@ -65,6 +99,7 @@ export function useVerificationStatus() {
       setLoading(false);
     }
   }, []);
+
 
   // Cargar al montar
   useEffect(() => {
@@ -90,15 +125,13 @@ export function useVerificationStatus() {
     return () => clearInterval(interval);
   }, [canCheckToday, isVerified]);
 
-  // Función para verificar (cuando toca el botón)
+
+    // Función para verificar (cuando toca el botón)
   const checkVerification = useCallback(async (): Promise<boolean> => {
     setChecking(true);
 
     try {
-      // Refrescar sesión
-      await supabase.auth.refreshSession();
-
-      // Obtener usuario actualizado
+      // Fetch fresh user data from the server
       const {
         data: { user },
         error,
@@ -109,37 +142,35 @@ export function useVerificationStatus() {
         return false;
       }
 
-      // Obtener pending verification
+      // Check for pending email change
       const pending = await getPendingVerification();
 
-      // Si no hay pending → ya está verificado
-      if (!pending) {
-        setIsVerified(true);
-        Alert.alert("✅ Verificado", "Tu cuenta está verificada.");
-        return true;
-      }
-
-      // Verificar según el tipo
+      // Determine verification status
       let verified = false;
 
-      if (pending.type === "email_change") {
-        // Email change: verificado cuando el email actual = email pendiente
+      if (pending?.type === "email_change") {
+        // Email change: verified when current email matches pending
         verified = user?.email === pending.email;
-      } else if (pending.type === "account") {
-        // Account: para account verification, el link ya debería haber
-        // borrado el pending. Si llegamos aquí, no está verificado.
-        verified = false;
+      } else {
+        // Account verification: check email_verified from profiles table
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("email_verified")
+          .eq("user_id", user!.id)
+          .maybeSingle();
+
+        verified = !!profile?.email_verified;
       }
 
       if (verified) {
-        // ✅ Verificado - limpiar pending
+        // Clean up local state
         await clearPendingVerification();
         await cancelVerificationReminder();
         setIsVerified(true);
         Alert.alert("✅ Verificado", "Tu cuenta está verificada.");
         return true;
       } else {
-        // ❌ No verificado - marcar que ya checkeó hoy
+        // Not verified — start cooldown
         const now = Date.now().toString();
         await AsyncStorage.setItem(LAST_VERIFICATION_CHECK_KEY, now);
         setCanCheckToday(false);
@@ -158,6 +189,8 @@ export function useVerificationStatus() {
       setChecking(false);
     }
   }, []);
+
+
 
   return {
     isVerified,

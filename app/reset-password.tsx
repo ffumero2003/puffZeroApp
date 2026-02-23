@@ -32,6 +32,8 @@ export default function ResetPasswordScreen() {
     password.length > 0 &&
     confirm.length > 0 &&
     password === confirm &&
+    !passwordError &&
+    !confirmError &&
     !loading;
 
   const handleSubmit = async () => {

@@ -19,7 +19,7 @@ const getStorageKeys = (userId: string) => ({
 });
 
 
-type DayPuffs = {
+export type DayPuffs = {
   date: string;
   day: string;
   puffs: number;

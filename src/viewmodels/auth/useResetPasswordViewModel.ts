@@ -63,7 +63,7 @@ export function useResetPasswordViewModel() {
     const access = params.access_token as string | undefined;
     const refresh = params.refresh_token as string | undefined;
 
-   
+    
 
     if (!access || !refresh) {
       if (!isDevMode()) {
@@ -72,7 +72,7 @@ export function useResetPasswordViewModel() {
       return;
     }
 
-   
+    
 
     hydrateSessionFromUrl(
       `puffzero://reset-password?access_token=${access}&refresh_token=${refresh}`
@@ -87,22 +87,22 @@ export function useResetPasswordViewModel() {
 
 
   async function submit() {
-    if (!password || !confirm) {
-      Alert.alert("Error", "Completá ambos campos.");
-      return false;
-    }
+  if (!password || !confirm) {
+    Alert.alert("Error", "Completá ambos campos.");
+    return false;
+  }
 
-    if (password !== confirm) {
-      Alert.alert("Error", "Las contraseñas no coinciden.");
-      return false;
-    }
+  if (password !== confirm) {
+    Alert.alert("Error", "Las contraseñas no coinciden.");
+    return false;
+  }
 
+  try {
     setLoading(true);
 
     const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
-      setLoading(false);
       if (
         error.message.toLowerCase().includes("different") ||
         error.message.toLowerCase().includes("old password")
@@ -112,27 +112,26 @@ export function useResetPasswordViewModel() {
           "La nueva contraseña no puede ser igual a la anterior."
         );
       } else {
-        Alert.alert("Error", error.message);
+        Alert.alert("Error", "No se pudo actualizar la contraseña. Intentá de nuevo.");
       }
       return false;
     }
 
-    // Mark recovery as used BEFORE signing out
     recoveryUsed.current = true;
-
-    // Sign out the recovery session and WAIT for it to fully complete
     await supabase.auth.signOut();
 
-    // Also explicitly clear any persisted session from AsyncStorage
-    // This ensures no stale recovery session survives app restart
     const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
     await AsyncStorage.removeItem("sb-ifjbatvmxeujewbrfjzg-auth-token");
 
-    setLoading(false);
-
     Alert.alert("Listo", "Tu contraseña fue actualizada.");
     return true;
+  } catch {
+    Alert.alert("Error", "Ocurrió un error inesperado. Intentá de nuevo.");
+    return false;
+  } finally {
+    setLoading(false);
   }
+}
 
 
 

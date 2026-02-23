@@ -191,6 +191,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAuthFlow("register");
     setPostSignupCompletedState(false);
     AsyncStorage.setItem("postSignupCompleted", "false");
+    // Clear any leftover verification cooldown from a previous account
+    AsyncStorage.removeItem("last_verification_check_timestamp");
 
     const result = await supabase.auth.signUp({
       email,
@@ -264,9 +266,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAuthFlow(null);
     setAuthInProgress(false);
     setIsPremium(false);
-    // Reset RevenueCat so next login gets fresh identity
     await resetRevenueCat();
     await setPostSignupCompleted(true);
+    // Clear verification cooldown so next account starts fresh
+    await AsyncStorage.removeItem("last_verification_check_timestamp");
     await supabase.auth.signOut();
   };
 

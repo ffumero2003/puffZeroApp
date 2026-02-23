@@ -8,7 +8,6 @@ import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import FeatureItem from "@/src/components/paywall/FeatureItem";
 import SubscriptionOption from "@/src/components/paywall/SubscriptionOption";
-import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { useThemeColors } from "@/src/providers/theme-provider";
@@ -16,13 +15,7 @@ import { layout } from "@/src/styles/layout";
 import { useOnboardingPaywallViewModel } from "@/src/viewmodels/onboarding/useOnboardingPaywallViewModel";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 // RevenueCat imports
 import Purchases, { PurchasesPackage } from "react-native-purchases";
 
@@ -226,98 +219,97 @@ export default function Paywall() {
     : undefined;
 
   return (
-    <ScreenWrapper>
-      <View
-        style={[layout.screenContainer, { backgroundColor: colors.background }]}
-      >
-        <View style={{ flex: 1 }}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 20 }}
-          >
-            <OnboardingHeader showProgress={false} showBack={false} />
+    // <ScreenWrapper>
+    <View
+      style={[layout.screenContainer, { backgroundColor: colors.background }]}
+    >
+      <View style={{ flex: 1 }}>
+        <OnboardingHeader showProgress={false} showBack={false} />
 
-            <AppText
-              style={[layout.titleCenter, { color: colors.text }]}
-              weight="bold"
-            >
-              {firstName ? (
-                <>
-                  Hey{" "}
-                  <AppText weight="bold" style={{ color: colors.primary }}>
-                    {firstName}
-                  </AppText>
-                  , desbloqueá Puff
-                </>
-              ) : (
-                <>Hey, desbloqueá Puff</>
-              )}
+        <AppText
+          style={[layout.titleCenter, { color: colors.text }]}
+          weight="bold"
+        >
+          {firstName ? (
+            <>
+              Hey{" "}
               <AppText weight="bold" style={{ color: colors.primary }}>
-                Zero
-              </AppText>{" "}
-              para llegar a tu mejor versión.
-            </AppText>
+                {firstName}
+              </AppText>
+              , desbloqueá Puff
+            </>
+          ) : (
+            <>Hey, desbloqueá Puff</>
+          )}
+          <AppText weight="bold" style={{ color: colors.primary }}>
+            Zero
+          </AppText>{" "}
+          para llegar a tu mejor versión.
+        </AppText>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
+          <View style={styles.featureContainer}>
+            <FeatureItem icon={Statistics} text={puffsText} />
+            <FeatureItem icon={Target} text={planText} />
+            <FeatureItem icon={Fire} text={whyText} />
+            <FeatureItem icon={Check} text={moneyText} />
+          </View>
 
-            <View style={styles.featureContainer}>
-              <FeatureItem icon={Statistics} text={puffsText} />
-              <FeatureItem icon={Target} text={planText} />
-              <FeatureItem icon={Fire} text={whyText} />
-              <FeatureItem icon={Check} text={moneyText} />
-            </View>
+          <View style={styles.featureContainer}>
+            <SubscriptionOption
+              title="Acceso mensual"
+              subtitle="Cancelá cuando quieras"
+              price={monthlyPrice}
+              period="mes"
+              selected={plan === "monthly"}
+              onPress={() => setPlan("monthly")}
+              style={{ marginBottom: 18 }}
+            />
 
-            <View style={styles.featureContainer}>
-              <SubscriptionOption
-                title="Acceso mensual"
-                subtitle="Cancelá cuando quieras"
-                price={monthlyPrice}
-                period="mes"
-                selected={plan === "monthly"}
-                onPress={() => setPlan("monthly")}
-                style={{ marginBottom: 18 }}
-              />
+            <SubscriptionOption
+              title="Acceso anual"
+              subtitle="3 días de prueba gratis"
+              price={yearlyPrice}
+              period="año"
+              badge="Ahorra 42%"
+              highlight="Mejor oferta"
+              selected={plan === "yearly"}
+              onPress={() => setPlan("yearly")}
+            />
+          </View>
+        </ScrollView>
+      </View>
 
-              <SubscriptionOption
-                title="Acceso anual"
-                subtitle="3 días de prueba gratis"
-                price={yearlyPrice}
-                period="año"
-                badge="Ahorra 42%"
-                highlight="Mejor oferta"
-                selected={plan === "yearly"}
-                onPress={() => setPlan("yearly")}
-              />
-            </View>
-          </ScrollView>
-        </View>
+      <View>
+        <ContinueButton
+          text={loading ? "Procesando..." : "Continuar"}
+          onPress={handlePurchase}
+          disabled={loading}
+          style={layout.bottomButtonContainer}
+        />
 
-        <View>
-          <ContinueButton
-            text={loading ? "Procesando..." : "Continuar"}
-            onPress={handlePurchase}
-            disabled={loading}
-            style={layout.bottomButtonContainer}
-          />
+        {/* <TouchableOpacity onPress={handleRestore} disabled={loading}>
+          <AppText style={[styles.restoreText, { color: colors.text }]}>
+            Restaurar compras
+          </AppText>
+        </TouchableOpacity> */}
 
-          <TouchableOpacity onPress={handleRestore} disabled={loading}>
-            <AppText style={[styles.restoreText, { color: colors.text }]}>
-              Restaurar compras
+        {/* {__DEV__ && (
+          <TouchableOpacity
+            style={styles.devSkipButton}
+            onPress={devSkip}
+            activeOpacity={0.7}
+          >
+            <AppText weight="bold" style={styles.devSkipText}>
+              DEV: SKIP PAYWALL
             </AppText>
           </TouchableOpacity>
-
-          {__DEV__ && (
-            <TouchableOpacity
-              style={styles.devSkipButton}
-              onPress={devSkip}
-              activeOpacity={0.7}
-            >
-              <AppText weight="bold" style={styles.devSkipText}>
-                DEV: SKIP PAYWALL
-              </AppText>
-            </TouchableOpacity>
-          )}
-        </View>
+        )} */}
       </View>
-    </ScreenWrapper>
+    </View>
+    // </ScreenWrapper>
   );
 }
 

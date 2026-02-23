@@ -70,14 +70,8 @@ export function useAuthGuard() {
     // TIPO 2: Usuario CON sesión que NO ha completado post-signup
     // This now works on app restart because postSignupCompleted is persisted
     // ════════════════════════════════════════════════════════
-    if (user && !postSignupCompleted) {
-      // If bypass is active, skip the entire post-signup flow
-      if (shouldBypassPaywall()) {
-        setIsPremium(true);
-        setPostSignupCompleted(true);
-        router.replace("/(app)/home");
-        return;
-      }
+    // If bypassing paywall in dev, also skip the post-signup gate
+    if (user && !postSignupCompleted && !shouldBypassPaywall()) {
       if (!inPostSignup) {
         router.replace("/(onboarding)/post-signup/step-review");
         return;
@@ -90,7 +84,13 @@ export function useAuthGuard() {
     // has finished checking the user's entitlements.
     // This prevents the paywall from flashing for paid users.
     // ════════════════════════════════════════════════════════
-    if (user && postSignupCompleted && !isRevenueCatReady) return;
+    if (
+      user &&
+      postSignupCompleted &&
+      !isRevenueCatReady &&
+      !shouldBypassPaywall()
+    )
+      return;
 
     // ════════════════════════════════════════════════════════
     // TIPO 3: Usuario CON sesión activa y post-signup completado

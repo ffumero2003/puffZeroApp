@@ -1,5 +1,6 @@
 import { supabase, SUPABASE_ANON_KEY } from "../lib/supabase";
-const INTERNAL_SECRET = "puffzero_internal_9f3KxP2mLQa8Zx72dW0HcR"; 
+const INTERNAL_SECRET = process.env.EXPO_PUBLIC_INTERNAL_SECRET;
+
 
 
 export async function signUp(email: string, password: string) {
@@ -37,7 +38,12 @@ export async function resetPassword(email: string) {
     }
   );
 
-  const data = await res.json();
+  let data: any;
+  try {
+    data = await res.json();
+  } catch {
+    data = { error: `Error del servidor (${res.status})` };
+  }
 
   if (!res.ok) {
     console.log("EDGE ERROR RESPONSE:", data);
@@ -63,7 +69,12 @@ export async function sendVerificationEmail(email: string) {
     }
   );
 
-  const data = await res.json();
+  let data: any;
+  try {
+    data = await res.json();
+  } catch {
+    data = { error: `Error del servidor (${res.status})` };
+  }
 
   if (!res.ok) {
     console.log("VERIFICATION EMAIL ERROR:", data);
@@ -87,22 +98,30 @@ export async function resendEmailChangeVerification(newEmail: string) {
 
 // Calls the delete-account edge function to erase all user data + auth account
 export async function deleteAccount(userId: string) {
+  // Get the current user's access token for authentication
+  const { data: { session } } = await supabase.auth.getSession();
   const res = await fetch(
     "https://ifjbatvmxeujewbrfjzg.supabase.co/functions/v1/delete-account",
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // 🔒 SUPABASE EDGE GUARD (OBLIGATORIO)
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        // 🔒 Use the user's access token so the edge function can verify identity
+        Authorization: `Bearer ${session?.access_token ?? SUPABASE_ANON_KEY}`,
         // 🔐 TU PROPIA SEGURIDAD
-        "x-internal-key": INTERNAL_SECRET,
+        "x-internal-key": INTERNAL_SECRET ?? "",
       },
+
       body: JSON.stringify({ user_id: userId }),
     }
   );
 
-  const data = await res.json();
+  let data: any;
+  try {
+    data = await res.json();
+  } catch {
+    data = { error: `Error del servidor (${res.status})` };
+  }
 
   if (!res.ok) {
     console.log("DELETE ACCOUNT ERROR:", data);

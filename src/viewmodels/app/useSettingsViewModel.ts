@@ -179,7 +179,8 @@ async function saveEmail(newEmail: string): Promise<{ success: boolean; error?: 
 
     if (error) {
       console.error("❌ Error updating email:", error);
-      return { success: false, error: error.message };
+      return { success: false, error: "No se pudo actualizar el correo. Intentá de nuevo." };
+
     }
 
     // Store pending email change

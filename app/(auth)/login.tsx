@@ -16,7 +16,6 @@ import GoogleButton from "@/src/components/onboarding/GoogleButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import SeparatorRow from "@/src/components/onboarding/SeparatorRow";
 import UnderlineInput from "@/src/components/onboarding/UnderlineInput";
-import { useAuth } from "@/src/providers/auth-provider";
 import { useThemeColors } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
 import { useLoginViewModel } from "@/src/viewmodels/auth/useLoginViewModel";
@@ -24,7 +23,6 @@ import * as Haptics from "expo-haptics";
 
 export default function Login() {
   const colors = useThemeColors();
-  const { isRevenueCatReady, isPremium } = useAuth();
   const {
     email,
     password,
@@ -38,10 +36,7 @@ export default function Login() {
   } = useLoginViewModel();
 
   const handleLogin = async () => {
-    const ok = await submit();
-    // if (ok) {
-    //   router.replace(ROUTES.HOME);
-    // }
+    await submit();
   };
 
   return (

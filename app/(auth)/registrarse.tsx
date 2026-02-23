@@ -84,17 +84,22 @@ export default function Register() {
     if (loading) return;
     setLoading(true);
     setAuthInProgress(true);
-    const ok = await register({
-      email,
-      password,
-      nombre,
-    });
+    try {
+      const ok = await register({
+        email,
+        password,
+        nombre,
+      });
 
-    if (ok) {
-      router.replace(ROUTES.POST_SIGNUP_REVIEW);
+      if (ok) {
+        router.replace(ROUTES.POST_SIGNUP_REVIEW);
+      }
+    } catch (e) {
+      console.error("Register error:", e);
+    } finally {
+      setAuthInProgress(false);
+      setLoading(false);
     }
-    setAuthInProgress(false);
-    setLoading(false);
   };
 
   /* ---------------------------

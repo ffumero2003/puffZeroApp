@@ -31,6 +31,7 @@ export default function AuthHeader({ title, subtitle }: AuthHeaderProps) {
         source={Logo}
         style={{ width: logoSize, height: logoSize }}
         resizeMode="contain"
+        accessibilityLabel="Logo de PuffZero"
       />
     </View>
   );

@@ -15,7 +15,7 @@ import { layout } from "@/src/styles/layout";
 import { useForgotPasswordViewModel } from "@/src/viewmodels/auth/useForgotPasswordViewModel";
 export default function ForgotPassword() {
   const colors = useThemeColors();
-  const { email, emailError, loading, onEmailChange, submit } =
+  const { email, emailError, loading, onEmailChange, submit, isInvalid } =
     useForgotPasswordViewModel();
 
   return (
@@ -68,7 +68,7 @@ export default function ForgotPassword() {
           <ContinueButton
             text={loading ? "Enviando..." : "Restablecer contraseña"}
             onPress={submit}
-            disabled={loading}
+            disabled={isInvalid} // ← cambiar de loading a isInvalid
             style={layout.bottomButtonContainer}
           />
         </View>

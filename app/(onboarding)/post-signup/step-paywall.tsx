@@ -9,6 +9,7 @@ import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import FeatureItem from "@/src/components/paywall/FeatureItem";
 import SubscriptionOption from "@/src/components/paywall/SubscriptionOption";
 import ScreenWrapper from "@/src/components/system/ScreenWrapper";
+import { shouldBypassPaywall } from "@/src/config/dev";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { useThemeColors } from "@/src/providers/theme-provider";
@@ -16,13 +17,7 @@ import { layout } from "@/src/styles/layout";
 import { useOnboardingPaywallViewModel } from "@/src/viewmodels/onboarding/useOnboardingPaywallViewModel";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 
 // RevenueCat
 import Purchases, { PurchasesPackage } from "react-native-purchases";
@@ -212,16 +207,17 @@ export default function OnboardingPaywall() {
     }
   }
 
-  const devSkip = __DEV__
-    ? () => {
-        setIsPremium(true);
-        completeOnboarding();
-        resetAll();
-        setAuthFlow(null);
-        setPostSignupCompleted(true);
-        router.replace("/(app)/home");
-      }
-    : undefined;
+  // Auto-skip this paywall screen when BYPASS_PAYWALL is enabled
+  useEffect(() => {
+    if (shouldBypassPaywall()) {
+      setIsPremium(true);
+      completeOnboarding();
+      resetAll();
+      setAuthFlow(null);
+      setPostSignupCompleted(true);
+      router.replace("/(app)/home");
+    }
+  }, []);
 
   return (
     <ScreenWrapper>
@@ -229,63 +225,58 @@ export default function OnboardingPaywall() {
         style={[layout.screenContainer, { backgroundColor: colors.background }]}
       >
         <View style={{ flex: 1 }}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 20 }}
+          <OnboardingHeader showProgress={false} showBack={false} />
+
+          <AppText
+            style={[layout.titleCenter, { color: colors.text }]}
+            weight="bold"
           >
-            <OnboardingHeader showProgress={false} showBack={false} />
+            {firstName ? (
+              <>
+                Hey{" "}
+                <AppText weight="bold" style={{ color: colors.primary }}>
+                  {firstName}
+                </AppText>
+                , desbloqueá Puff
+              </>
+            ) : (
+              <>Hey, desbloqueá Puff</>
+            )}
+            <AppText weight="bold" style={{ color: colors.primary }}>
+              Zero
+            </AppText>{" "}
+            para llegar a tu mejor versión.
+          </AppText>
 
-            <AppText
-              style={[layout.titleCenter, { color: colors.text }]}
-              weight="bold"
-            >
-              {firstName ? (
-                <>
-                  Hey{" "}
-                  <AppText weight="bold" style={{ color: colors.primary }}>
-                    {firstName}
-                  </AppText>
-                  , desbloqueá Puff
-                </>
-              ) : (
-                <>Hey, desbloqueá Puff</>
-              )}
-              <AppText weight="bold" style={{ color: colors.primary }}>
-                Zero
-              </AppText>{" "}
-              para llegar a tu mejor versión.
-            </AppText>
+          <View style={styles.featureContainer}>
+            <FeatureItem icon={Statistics} text={puffsText} />
+            <FeatureItem icon={Target} text={planText} />
+            <FeatureItem icon={Fire} text={whyText} />
+            <FeatureItem icon={Check} text={moneyText} />
+          </View>
 
-            <View style={styles.featureContainer}>
-              <FeatureItem icon={Statistics} text={puffsText} />
-              <FeatureItem icon={Target} text={planText} />
-              <FeatureItem icon={Fire} text={whyText} />
-              <FeatureItem icon={Check} text={moneyText} />
-            </View>
+          <View style={styles.featureContainer}>
+            <SubscriptionOption
+              title="Acceso mensual"
+              subtitle="Cancelá cuando quieras"
+              price={monthlyPrice}
+              period="mes"
+              selected={plan === "monthly"}
+              onPress={() => setPlan("monthly")}
+              style={{ marginBottom: 18 }}
+            />
 
-            <View style={styles.featureContainer}>
-              <SubscriptionOption
-                title="Acceso mensual"
-                subtitle="Cancelá cuando quieras"
-                price={monthlyPrice}
-                period="mes"
-                selected={plan === "monthly"}
-                onPress={() => setPlan("monthly")}
-                style={{ marginBottom: 18 }}
-              />
-
-              <SubscriptionOption
-                title="Acceso anual"
-                subtitle="3 días de prueba gratis"
-                price={yearlyPrice}
-                period="año"
-                badge="Ahorra 42%"
-                highlight="Mejor oferta"
-                selected={plan === "yearly"}
-                onPress={() => setPlan("yearly")}
-              />
-            </View>
-          </ScrollView>
+            <SubscriptionOption
+              title="Acceso anual"
+              subtitle="3 días de prueba gratis"
+              price={yearlyPrice}
+              period="año"
+              badge="Ahorra 42%"
+              highlight="Mejor oferta"
+              selected={plan === "yearly"}
+              onPress={() => setPlan("yearly")}
+            />
+          </View>
         </View>
 
         <View>
@@ -296,11 +287,11 @@ export default function OnboardingPaywall() {
             style={layout.bottomButtonContainer}
           />
 
-          <TouchableOpacity onPress={handleRestore} disabled={loading}>
+          {/* <TouchableOpacity onPress={handleRestore} disabled={loading}>
             <AppText style={[styles.restoreText, { color: colors.text }]}>
               Restaurar compras
             </AppText>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </ScreenWrapper>
@@ -313,7 +304,7 @@ const styles = StyleSheet.create({
   },
   restoreText: {
     textAlign: "center",
-    opacity: 0.5,
+    opacity: 0.7,
     marginTop: 14,
     fontSize: 14,
   },

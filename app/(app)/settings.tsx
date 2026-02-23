@@ -14,6 +14,8 @@ import { VerificationStatus } from "@/src/components/app/settings/VerificationSt
 import { useThemeColors } from "@/src/providers/theme-provider";
 import RevenueCatUI from "react-native-purchases-ui";
 
+import Constants from "expo-constants";
+
 // NEW: Import useTheme for theme preference getter/setter
 import { useAuth } from "@/src/providers/auth-provider";
 import { useTheme } from "@/src/providers/theme-provider";
@@ -28,6 +30,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   ScrollView,
   StyleSheet,
   Switch,
@@ -73,44 +76,48 @@ export default function Settings() {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    try {
-      const userId = user?.id;
-      if (!userId) return;
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Eliminar cuenta",
+      "¿Estás seguro? Se eliminará toda tu información permanentemente. Esta acción no se puede deshacer.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const userId = user?.id;
+              if (!userId) return;
 
-      // Step 1: Call the edge function to delete all user data from Supabase
-      const { error } = await deleteAccount(userId);
+              const { error } = await deleteAccount(userId);
 
-      if (error) {
-        console.error("❌ Failed to delete account:", error.message);
-        return;
-      }
+              if (error) {
+                Alert.alert(
+                  "Error",
+                  "No se pudo eliminar la cuenta. Intentá de nuevo."
+                );
+                return;
+              }
 
-      // Step 2: Clear ALL local AsyncStorage keys tied to this user
-      // This prevents stale data from leaking to a new account on the same device
-      await AsyncStorage.multiRemove([
-        "postSignupCompleted",
-        "onboardingCompleted",
-        "onboarding_name",
-        "profile_created_at",
-        "notifications_enabled",
-        "theme_preference",
-      ]);
+              await AsyncStorage.multiRemove([
+                "postSignupCompleted",
+                "onboardingCompleted",
+                "onboarding_name",
+                "profile_created_at",
+                "notifications_enabled",
+                "theme_preference",
+              ]);
 
-      // Step 3: Reset the in-memory onboarding state
-      resetAll();
-
-      // Step 4: Sign out from Supabase (clears session token locally)
-      // We call supabase.auth.signOut() directly instead of the signOut()
-      // from auth provider, because signOut() sets postSignupCompleted to true,
-      // which we just cleared. We want it to stay cleared.
-      await supabase.auth.signOut();
-
-      // Step 5: No explicit navigation needed — AuthGuard detects user becomes
-      // null and automatically redirects to /(onboarding)/onboarding
-    } catch (error) {
-      console.error("❌ Error deleting account:", error);
-    }
+              resetAll();
+              await supabase.auth.signOut();
+            } catch (error) {
+              Alert.alert("Error", "Ocurrió un error. Intentá de nuevo.");
+            }
+          },
+        },
+      ]
+    );
   };
 
   // ============================================
@@ -229,7 +236,7 @@ export default function Settings() {
           />
           <SettingsRow
             label="Versión"
-            value="1.0.0"
+            value={Constants.expoConfig?.version ?? "1.0.0"}
             showChevron={false}
             isLast={true}
           />
@@ -293,28 +300,5 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingBottom: 40,
-  },
-  // NEW: Modal styles for the theme picker
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    width: "80%",
-    borderRadius: 16,
-    padding: 20,
-  },
-  modalTitle: {
-    fontSize: 18,
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  modalOption: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderRadius: 8,
   },
 });

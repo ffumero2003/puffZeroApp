@@ -1,16 +1,17 @@
 // src/viewmodels/app/useProgressViewModel.ts
+import { CURRENCY_SYMBOLS } from "@/src/constants/currency";
 import { useUserData } from "@/src/hooks/useUserData";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
+import { scheduleGoalCompletedNotification } from "@/src/services/notifications/goal-completed-notification";
 import { checkAndSendMoneySavedMilestone } from "@/src/services/notifications/money-saved-milestone-notification";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useMemo, useState } from "react";
-// Add this import next to the other notification imports:
-import { scheduleGoalCompletedNotification } from "@/src/services/notifications/goal-completed-notification";
 
 
-const LAST_PUFF_TIME_KEY = "lastPuffTime";
+const getLastPuffKey = (userId: string) => `lastPuffTime_${userId}`;
+
 
 type PuffRecord = {
   id: string;
@@ -74,15 +75,16 @@ export function useProgressViewModel() {
 
   // Load last puff time from AsyncStorage as fallback
   const loadLastPuffFromStorage = useCallback(async () => {
+    if (!user?.id) return;
     try {
-      const stored = await AsyncStorage.getItem(LAST_PUFF_TIME_KEY);
+      const stored = await AsyncStorage.getItem(getLastPuffKey(user.id));
       if (stored) {
         setLastPuffTime(prev => prev ? prev : new Date(stored));
       }
     } catch (error) {
       console.error("Error loading last puff time:", error);
     }
-  }, []);
+  }, [user?.id]);
 
   useEffect(() => {
     loadPuffData();
@@ -148,15 +150,9 @@ export function useProgressViewModel() {
 
   // Get currency symbol
   const currencySymbol = useMemo(() => {
-    const curr = currency || profile?.currency || "CRC";
-    const symbols: Record<string, string> = {
-      CRC: "₡",
-      USD: "$",
-      EUR: "€",
-      MXN: "$",
-    };
-    return symbols[curr] || curr;
-  }, [currency, profile?.currency]);
+  const curr = currency || profile?.currency || "CRC";
+  return CURRENCY_SYMBOLS[curr] || "$";
+}, [currency, profile?.currency]);
 
   // Streak calculation (time since last puff)
   const streak = useMemo(() => {
@@ -289,13 +285,12 @@ export function useProgressViewModel() {
     return () => clearInterval(interval);
   }, [calculateTimeSinceLastPuff, calculateMoneySaved]);
 
-  // Inside useProgressViewModel, add this useEffect after the other effects:
   // Schedule a notification for the exact moment the countdown timer hits zero
-useEffect(() => {
-  if (profileCreatedDate && goalSpeedDays) {
-    scheduleGoalCompletedNotification(profileCreatedDate, goalSpeedDays);
-  }
-}, [profileCreatedDate, goalSpeedDays]);
+  useEffect(() => {
+    if (profileCreatedDate && goalSpeedDays) {
+      scheduleGoalCompletedNotification(profileCreatedDate, goalSpeedDays);
+    }
+  }, [profileCreatedDate, goalSpeedDays]);
 
 
   // Check money saved milestones

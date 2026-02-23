@@ -1,5 +1,6 @@
 // app/verify-email.tsx
 import AppText from "@/src/components/AppText";
+import ContinueButton from "@/src/components/onboarding/ContinueButton";
 import { ROUTES } from "@/src/constants/routes";
 import { supabase } from "@/src/lib/supabase";
 import { useThemeColors } from "@/src/providers/theme-provider";
@@ -54,6 +55,17 @@ export default function VerifyEmailScreen() {
 
       console.log("✅ Verification complete - pending cleared");
 
+      // Mark email as verified in the profile (server-side, tied to account)
+      const {
+        data: { user: verifiedUser },
+      } = await supabase.auth.getUser();
+      if (verifiedUser?.id) {
+        await supabase
+          .from("profiles")
+          .update({ email_verified: true })
+          .eq("user_id", verifiedUser.id);
+      }
+
       setStatus("success");
 
       // Wait a moment to show success, then navigate
@@ -77,7 +89,7 @@ export default function VerifyEmailScreen() {
         {status === "loading" && (
           <>
             <ActivityIndicator size="large" color={colors.primary} />
-            <AppText style={{ marginTop: 16 }}>
+            <AppText style={{ marginTop: 16, color: colors.text }}>
               Verificando tu cuenta...
             </AppText>
           </>
@@ -85,10 +97,15 @@ export default function VerifyEmailScreen() {
 
         {status === "success" && (
           <>
-            <AppText weight="bold" style={{ fontSize: 24, marginBottom: 8 }}>
+            <AppText
+              weight="bold"
+              style={{ fontSize: 24, marginBottom: 8, color: colors.text }}
+            >
               ¡Cuenta verificada!
             </AppText>
-            <AppText style={{ opacity: 0.7 }}>Entrando a PuffZero...</AppText>
+            <AppText style={{ opacity: 0.7, color: colors.text }}>
+              Entrando a PuffZero...
+            </AppText>
           </>
         )}
 
@@ -96,13 +113,21 @@ export default function VerifyEmailScreen() {
           <>
             <AppText
               weight="bold"
-              style={{ fontSize: 24, marginBottom: 8, color: "red" }}
+              style={{ fontSize: 24, marginBottom: 8, color: colors.danger }}
             >
               Error de verificación
             </AppText>
-            <AppText style={{ opacity: 0.7, textAlign: "center" }}>
+            <AppText
+              style={{ opacity: 0.7, textAlign: "center", color: colors.text }}
+            >
               El enlace puede haber expirado.{"\n"}Intentá registrarte de nuevo.
             </AppText>
+
+            <ContinueButton
+              text="Volver al inicio"
+              onPress={() => router.replace("/(onboarding)/onboarding")}
+              style={{ marginTop: 24, width: "100%" }}
+            />
           </>
         )}
       </View>
