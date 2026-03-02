@@ -98,36 +98,45 @@ export async function resendEmailChangeVerification(newEmail: string) {
 
 // Calls the delete-account edge function to erase all user data + auth account
 export async function deleteAccount(userId: string) {
-  // Get the current user's access token for authentication
-  const { data: { session } } = await supabase.auth.getSession();
-  const res = await fetch(
-    "https://ifjbatvmxeujewbrfjzg.supabase.co/functions/v1/delete-account",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 🔒 Use the user's access token so the edge function can verify identity
-        Authorization: `Bearer ${session?.access_token ?? SUPABASE_ANON_KEY}`,
-        // 🔐 TU PROPIA SEGURIDAD
-        "x-internal-key": INTERNAL_SECRET ?? "",
-      },
+  console.log("🗑️ deleteAccount called with userId:", userId);
 
-      body: JSON.stringify({ user_id: userId }),
-    }
-  );
-
-  let data: any;
   try {
-    data = await res.json();
-  } catch {
-    data = { error: `Error del servidor (${res.status})` };
-  }
+    const res = await fetch(
+      "https://ifjbatvmxeujewbrfjzg.supabase.co/functions/v1/delete-account",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 🔒 Use anon key (same as other edge functions)
+          // Security is handled by x-internal-key, not the auth token
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          // 🔐 TU PROPIA SEGURIDAD
+          "x-internal-key": INTERNAL_SECRET ?? "",
+        },
+        body: JSON.stringify({ user_id: userId }),
+      }
+    );
 
-  if (!res.ok) {
-    console.log("DELETE ACCOUNT ERROR:", data);
-    return { error: { message: data.error ?? "Error eliminando cuenta" } };
-  }
+    console.log("🗑️ Edge function response status:", res.status);
 
-  return { error: null };
+    let data: any;
+    try {
+      data = await res.json();
+    } catch {
+      data = { error: `Error del servidor (${res.status})` };
+    }
+
+    console.log("🗑️ Edge function response data:", JSON.stringify(data));
+
+    if (!res.ok) {
+      console.log("❌ DELETE ACCOUNT ERROR:", data);
+      return { error: { message: data.error ?? "Error eliminando cuenta" } };
+    }
+
+    console.log("✅ Account deleted successfully");
+    return { error: null };
+  } catch (fetchError) {
+    console.log("❌ FETCH ERROR:", fetchError);
+    return { error: { message: "Error de conexión" } };
+  }
 }
-

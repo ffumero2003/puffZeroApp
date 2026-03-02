@@ -26,12 +26,15 @@ export const DEV_CONFIG = {
 
 export const isDevMode = () => {
   return __DEV__ && DEV_CONFIG.ENABLED;
+  // return true
+  //return true is for beta testers.
 };
 
 // 🚪 BYPASS PAYWALL - Independiente de ENABLED
 // Solo requiere estar en desarrollo (__DEV__) y BYPASS_PAYWALL = true
 export const shouldBypassPaywall = () => {
   return __DEV__ && BYPASS_PAYWALL;
+  // return true
 };
 
 export const getInitialRoute = () => {

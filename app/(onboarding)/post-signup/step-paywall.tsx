@@ -17,7 +17,7 @@ import { layout } from "@/src/styles/layout";
 import { useOnboardingPaywallViewModel } from "@/src/viewmodels/onboarding/useOnboardingPaywallViewModel";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 
 // RevenueCat
 import Purchases, { PurchasesPackage } from "react-native-purchases";
@@ -55,10 +55,11 @@ export default function OnboardingPaywall() {
   const [yearlyPkg, setYearlyPkg] = useState<PurchasesPackage | null>(null);
   const [monthlyPrice, setMonthlyPrice] = useState(fallbackMonthly);
   const [yearlyPrice, setYearlyPrice] = useState(fallbackYearly);
+  const [offersLoaded, setOffersLoaded] = useState(false);
 
   // Load real prices from RevenueCat
   useEffect(() => {
-    if (!isRevenueCatReady) return; // ← Wait until auth-provider says SDK is ready
+    if (!isRevenueCatReady) return;
 
     const loadOfferings = async () => {
       try {
@@ -76,10 +77,13 @@ export default function OnboardingPaywall() {
         }
       } catch (e) {
         console.error("Error loading offerings:", e);
+      } finally {
+        // ← NEW: mark as loaded even if it failed
+        setOffersLoaded(true);
       }
     };
     loadOfferings();
-  }, [isRevenueCatReady]); // ← Re-run when SDK becomes ready
+  }, [isRevenueCatReady]);
 
   const displayName =
     name || (user?.user_metadata?.full_name as string | undefined) || undefined;
@@ -175,7 +179,7 @@ export default function OnboardingPaywall() {
       if (!e.userCancelled) {
         Alert.alert(
           "Error",
-          "No se pudo completar la compra. Intentá de nuevo."
+          "No se pudo completar la compra. Intentá de nuevo.",
         );
         console.error("Purchase error:", e);
       }
@@ -277,21 +281,27 @@ export default function OnboardingPaywall() {
               onPress={() => setPlan("yearly")}
             />
           </View>
+
+          <TouchableOpacity onPress={handleRestore} disabled={loading}>
+            <AppText style={[styles.restoreText, { color: colors.text }]}>
+              Restaurar compras
+            </AppText>
+          </TouchableOpacity>
         </View>
 
         <View>
           <ContinueButton
-            text={loading ? "Procesando..." : "Continuar"}
+            text={
+              loading
+                ? "Procesando..."
+                : !offersLoaded
+                  ? "Cargando planes..."
+                  : "Continuar"
+            }
             onPress={handlePurchase}
-            disabled={loading}
+            disabled={loading || !offersLoaded}
             style={layout.bottomButtonContainer}
           />
-
-          {/* <TouchableOpacity onPress={handleRestore} disabled={loading}>
-            <AppText style={[styles.restoreText, { color: colors.text }]}>
-              Restaurar compras
-            </AppText>
-          </TouchableOpacity> */}
         </View>
       </View>
     </ScreenWrapper>

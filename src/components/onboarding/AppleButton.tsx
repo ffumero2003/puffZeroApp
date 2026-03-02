@@ -1,9 +1,13 @@
-// src/components/onboarding/GoogleButton.tsx
+// src/components/onboarding/AppleButton.tsx
+// Sign in with Apple button — follows the same pattern as GoogleButton.tsx
+import { Ionicons } from "@expo/vector-icons";
+import * as AppleAuthentication from "expo-apple-authentication";
+import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-import * as WebBrowser from "expo-web-browser";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   TouchableOpacity,
   Vibration,
 } from "react-native";
@@ -17,21 +21,20 @@ import { useTheme } from "@/src/providers/theme-provider";
 import { areNotificationsEnabled } from "@/src/services/notifications/notification-service";
 import { sendWelcomeBackNotification } from "@/src/services/notifications/welcome-back-notification";
 import { components } from "@/src/styles/components";
-import * as Haptics from "expo-haptics";
-import GoogleLogo from "../Icons/GoogleLogo";
 
-type GoogleButtonProps = {
+type AppleButtonProps = {
   mode: "login" | "register";
   disabled?: boolean;
 };
 
-export default function GoogleButton({
+export default function AppleButton({
   mode,
   disabled = false,
-}: GoogleButtonProps) {
+}: AppleButtonProps) {
   const { authInProgress, setAuthInProgress, setAuthFlow } = useAuth();
   const { activeTheme } = useTheme();
   const {
+    name,
     setName,
     puffs_per_day,
     money_per_month,
@@ -43,58 +46,72 @@ export default function GoogleButton({
     setProfileCreatedAt,
   } = useOnboarding();
 
-  const signInWithGoogle = async () => {
+  // Apple Sign In is only available on iOS
+  if (Platform.OS !== "ios") return null;
+
+  const signInWithApple = async () => {
     if (authInProgress) return;
 
     setAuthFlow(mode);
     setAuthInProgress(true);
 
-    const redirectTo = "puffzero://auth/callback";
-
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo,
-          skipBrowserRedirect: true,
-          queryParams: {
-            prompt: "consent",
-            access_type: "offline",
-          },
-        },
+      // 1. Request credentials from Apple's native dialog
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
       });
 
-      if (error || !data?.url) throw error;
-
-      const result = await WebBrowser.openAuthSessionAsync(
-        data.url,
-        redirectTo,
-      );
-
-      if (result.type !== "success" || !result.url) {
-        setAuthInProgress(false);
-        return;
+      if (!credential.identityToken) {
+        throw new Error("No se recibió el token de Apple");
       }
 
-      const hash = new URL(result.url).hash;
-
-      const access_token = hash.match(/access_token=([^&]+)/)?.[1];
-      const refresh_token = hash.match(/refresh_token=([^&]+)/)?.[1];
-
-      if (!access_token || !refresh_token) {
-        throw new Error("Tokens no encontrados");
-      }
-
+      // 2. Pass the Apple identity token to Supabase
       const { data: sessionData, error: sessionError } =
-        await supabase.auth.setSession({
-          access_token,
-          refresh_token,
+        await supabase.auth.signInWithIdToken({
+          provider: "apple",
+          token: credential.identityToken,
         });
 
       if (sessionError) throw sessionError;
 
-      const full_name = sessionData?.user?.user_metadata?.full_name;
       const userId = sessionData?.user?.id;
+
+      // Apple only returns the name on the FIRST sign-in, so grab it here
+      const appleName = credential.fullName
+        ? [credential.fullName.givenName, credential.fullName.familyName]
+            .filter(Boolean)
+            .join(" ")
+        : null;
+
+      // Fall back to Supabase user_metadata if Apple didn't provide a name
+      let full_name =
+        appleName ||
+        sessionData?.user?.user_metadata?.full_name ||
+        name ||
+        null;
+
+      // If still no name and registering, ask the user
+      if (!full_name && mode === "register") {
+        full_name = await new Promise<string | null>((resolve) => {
+          Alert.prompt(
+            "¿Cómo te llamás?",
+            "Apple no compartió tu nombre. Ingresalo para personalizar tu experiencia.",
+            [
+              {
+                text: "Continuar",
+                onPress: (value) => resolve(value?.trim() || null),
+              },
+            ],
+            "plain-text",
+            "",
+            "default",
+          );
+        });
+      }
+
       const firstName = full_name?.trim().split(" ")[0];
 
       if (full_name && mode === "register") {
@@ -105,10 +122,9 @@ export default function GoogleButton({
       const notificationsEnabled = await areNotificationsEnabled();
 
       if (mode === "register" && userId) {
-        console.log("📝 Creando perfil para usuario de Google...");
+        console.log("📝 Creando perfil para usuario de Apple...");
 
-        // Check if a profile already exists for this user
-        // (Google OAuth reuses the same user_id for the same email)
+        // Check if a profile already exists (Apple OAuth reuses the same user_id)
         const { data: existingProfile } = await supabase
           .from("profiles")
           .select("id, created_at")
@@ -124,7 +140,7 @@ export default function GoogleButton({
           const { data: updatedProfile, error: updateError } = await supabase
             .from("profiles")
             .update({
-              full_name: full_name || "Usuario Google",
+              full_name: full_name || "Usuario Apple",
               puffs_per_day,
               money_per_month,
               currency,
@@ -154,7 +170,7 @@ export default function GoogleButton({
           // No profile exists — create a new one
           const { data: profile, error: profileError } = await createProfile({
             user_id: userId,
-            full_name: full_name || "Usuario Google",
+            full_name: full_name || "Usuario Apple",
             puffs_per_day,
             money_per_month,
             currency,
@@ -180,7 +196,7 @@ export default function GoogleButton({
           }
         }
       } else if (mode === "login" && userId) {
-        // ─── Check if this Google user_id already has a profile ───
+        // Check if this Apple user already has a profile
         const { data: existingProfile } = await supabase
           .from("profiles")
           .select("id")
@@ -188,79 +204,55 @@ export default function GoogleButton({
           .maybeSingle();
 
         if (!existingProfile) {
-          // No profile for this Google user_id.
-          // The user may have registered with email/password before,
-          // which created a DIFFERENT user_id for the same email.
-          // Try to find the orphaned profile by looking up the old
-          // user_id via the email in auth.users (through profiles).
-          const userEmail = sessionData?.user?.email;
+          // No profile found for this Apple ID.
+          // Check if there's a profile linked via identities (account migration)
+          const identities = sessionData?.user?.identities || [];
+          const otherUserIds = identities
+            .map((identity: any) => identity.user_id)
+            .filter((id: string) => id !== userId);
 
-          if (userEmail) {
-            // Look for ANY other auth user with this email that has a profile.
-            // We use an RPC or direct query — but since we can't query auth.users
-            // from the client, we search profiles by checking all profiles and
-            // matching by email is not possible directly.
-            //
-            // SIMPLEST APPROACH: Find profiles NOT matching this userId,
-            // and update the first one that matches the old account.
-            // Since Supabase may have linked/merged identities, we look
-            // for a profile with a different user_id that belongs to
-            // the same email by querying auth identities.
+          let migrated = false;
 
-            // Get all identity user IDs linked to this account
-            const identities = sessionData?.user?.identities || [];
-            const allUserIds = identities
-              .map((identity: any) => identity.user_id)
-              .filter((id: string) => id !== userId);
+          for (const oldId of otherUserIds) {
+            const { data: oldProfile } = await supabase
+              .from("profiles")
+              .select("id")
+              .eq("user_id", oldId)
+              .maybeSingle();
 
-            // Also try finding a profile where user_id matches any old identity
-            let migrated = false;
-
-            for (const oldId of allUserIds) {
-              const { data: oldProfile } = await supabase
-                .from("profiles")
-                .select("id")
-                .eq("user_id", oldId)
-                .maybeSingle();
-
-              if (oldProfile) {
-                // Found the orphaned profile — reassign it to the Google user_id
-                console.log(
-                  "🔄 Migrating profile from old user_id:",
-                  oldId,
-                  "→",
-                  userId,
-                );
-                await supabase
-                  .from("profiles")
-                  .update({ user_id: userId })
-                  .eq("user_id", oldId);
-                migrated = true;
-                break;
-              }
-            }
-
-            if (!migrated) {
-              // No old profile found via identities either.
-              // As a last resort, create a minimal profile so the user
-              // doesn't see empty data. They can update it in Settings.
+            if (oldProfile) {
               console.log(
-                "⚠️ No existing profile found for Google login, creating a new one",
+                "🔄 Migrating profile from old user_id:",
+                oldId,
+                "→",
+                userId,
               );
-              await createProfile({
-                user_id: userId,
-                full_name: full_name || "Usuario Google",
-              });
+              await supabase
+                .from("profiles")
+                .update({ user_id: userId })
+                .eq("user_id", oldId);
+              migrated = true;
+              break;
             }
+          }
+
+          if (!migrated) {
+            // No existing profile found — this Apple ID has no account
+            // Sign out and tell user to use their original sign-in method
+            await supabase.auth.signOut();
+            Alert.alert(
+              "Cuenta no encontrada",
+              "No encontramos una cuenta con este Apple ID. Si ya tenés una cuenta, iniciá sesión con Google o email. Si sos nuevo, registrate primero.",
+            );
+            setAuthInProgress(false);
+            return;
           }
         }
 
         // 🔔 Send welcome back notification for returning user
         if (notificationsEnabled) {
-          console.log("🔔 Sending welcome back notification for Google login");
+          console.log("🔔 Sending welcome back notification for Apple login");
 
-          // Always prefer the name stored in the profile (set during registration)
-          // over Google's user_metadata, which may differ from what the user chose.
           let notifName = firstName;
 
           const { data: profileData } = await supabase
@@ -277,21 +269,27 @@ export default function GoogleButton({
         }
       }
 
-      // 🔥 NAVEGACIÓN EXPLÍCITA SEGÚN CONTEXTO
+      // 🔥 NAVIGATE BASED ON CONTEXT
       if (mode === "register") {
         router.replace(ROUTES.POST_SIGNUP_REVIEW);
       } else {
         router.replace(ROUTES.HOME);
       }
-    } catch (err) {
-      console.error("❌ Google OAuth error:", err);
+    } catch (err: any) {
+      // User cancelled the Apple dialog — don't show an error
+      if (err.code === "ERR_REQUEST_CANCELED") {
+        console.log("Apple sign-in cancelled by user");
+      } else {
+        console.error("❌ Apple OAuth error:", err);
+      }
       setAuthInProgress(false);
     }
   };
 
-  // Google's official style: always white bg with dark text
-  const btnBg = "#000";
-  const btnText = "#fff";
+  // Apple's official style: black bg + white text (light mode),
+  // white bg + black text (dark mode)
+  const btnBg = activeTheme === "dark" ? "#fff" : "#000";
+  const btnText = activeTheme === "dark" ? "#000" : "#fff";
 
   return (
     <TouchableOpacity
@@ -299,8 +297,6 @@ export default function GoogleButton({
         components.googleBtn,
         {
           backgroundColor: btnBg,
-          borderWidth: 3,
-
           width: undefined,
           flex: 1,
         },
@@ -309,20 +305,19 @@ export default function GoogleButton({
       activeOpacity={0.7}
       disabled={authInProgress}
       onPress={() => {
-        // If externally disabled (terms not accepted), vibrate and bail
         if (disabled) {
           Vibration.vibrate(30);
           return;
         }
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        signInWithGoogle();
+        signInWithApple();
       }}
     >
       {authInProgress ? (
         <ActivityIndicator color={btnText} />
       ) : (
         <>
-          <GoogleLogo size={28} />
+          <Ionicons name="logo-apple" size={28} color={btnText} />
         </>
       )}
     </TouchableOpacity>

@@ -13,3 +13,11 @@ eas build --platform ios --profile production
 # 2. Once the build completes, submit to TestFlight
 
 eas submit --platform ios --latest
+
+# 1. Build for android
+
+eas build --platform android --profile production
+
+# 2. Once the build completes, submit
+
+eas submit --platform android --latest

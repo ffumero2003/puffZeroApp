@@ -11,6 +11,7 @@ import {
 import AppText from "@/src/components/AppText";
 import AuthHeader from "@/src/components/auth/AuthHeader";
 import ContinueButtonAuth from "@/src/components/auth/ContinueButtonAuth";
+import AppleButton from "@/src/components/onboarding/AppleButton";
 import GoogleButton from "@/src/components/onboarding/GoogleButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import SeparatorRow from "@/src/components/onboarding/SeparatorRow";
@@ -265,7 +266,11 @@ export default function Register() {
             />
 
             <SeparatorRow />
-            <GoogleButton mode="register" disabled={!acceptedTerms} />
+            {/* Google & Apple side by side */}
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <GoogleButton mode="register" disabled={!acceptedTerms} />
+              <AppleButton mode="register" disabled={!acceptedTerms} />
+            </View>
             {!acceptedTerms && (
               <AppText
                 style={{

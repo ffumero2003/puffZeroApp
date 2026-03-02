@@ -12,6 +12,7 @@ import {
 import AppText from "@/src/components/AppText";
 import AuthHeader from "@/src/components/auth/AuthHeader";
 import ContinueButtonAuth from "@/src/components/auth/ContinueButtonAuth";
+import AppleButton from "@/src/components/onboarding/AppleButton";
 import GoogleButton from "@/src/components/onboarding/GoogleButton";
 import OnboardingHeader from "@/src/components/onboarding/OnboardingHeader";
 import SeparatorRow from "@/src/components/onboarding/SeparatorRow";
@@ -116,7 +117,11 @@ export default function Login() {
 
             <SeparatorRow />
 
-            <GoogleButton mode="login" />
+            {/* Google & Apple side by side */}
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <GoogleButton mode="login" />
+              <AppleButton mode="login" />
+            </View>
           </ScrollView>
 
           {/* MOVED OUTSIDE ScrollView — stays pinned at the bottom */}

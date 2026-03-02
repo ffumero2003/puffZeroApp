@@ -88,18 +88,27 @@ export default function Settings() {
           onPress: async () => {
             try {
               const userId = user?.id;
-              if (!userId) return;
+              console.log("🗑️ Delete account started, userId:", userId);
+
+              if (!userId) {
+                console.log("❌ No userId found, aborting");
+                return;
+              }
 
               const { error } = await deleteAccount(userId);
 
               if (error) {
+                console.log("❌ deleteAccount error:", error);
                 Alert.alert(
                   "Error",
-                  "No se pudo eliminar la cuenta. Intentá de nuevo."
+                  "No se pudo eliminar la cuenta. Intentá de nuevo.",
                 );
                 return;
               }
 
+              console.log("✅ Account deleted, clearing local data...");
+
+              // Clear local storage
               await AsyncStorage.multiRemove([
                 "postSignupCompleted",
                 "onboardingCompleted",
@@ -110,13 +119,23 @@ export default function Settings() {
               ]);
 
               resetAll();
-              await supabase.auth.signOut();
+
+              // Sign out globally to prevent auto-restore of OAuth sessions
+              try {
+                await supabase.auth.signOut({ scope: "global" });
+              } catch {
+                console.log("⚠️ Sign out failed (user already deleted)");
+              }
+
+              // Force navigation — don't rely on auth provider
+              router.replace("/(onboarding)/onboarding");
             } catch (error) {
+              console.log("❌ CATCH error:", error);
               Alert.alert("Error", "Ocurrió un error. Intentá de nuevo.");
             }
           },
         },
-      ]
+      ],
     );
   };
 

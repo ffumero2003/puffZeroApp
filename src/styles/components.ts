@@ -36,10 +36,10 @@ export const components = StyleSheet.create({
 
     googleBtn: {
       backgroundColor: "#000",
-      height: 65,                 // 🔥 ALTURA FIJA
+      paddingVertical: 20,
       paddingHorizontal: 32,
       borderRadius: 20,
-      width: "100%",
+      height: 68,
 
       flexDirection: "row",
       alignItems: "center",
@@ -55,7 +55,7 @@ export const components = StyleSheet.create({
     button: {
       marginTop: 30,
 
-      height: 65,              // 🔥 ALTURA FIJA GLOBAL
+      height: 68,              // 🔥 ALTURA FIJA GLOBAL
       paddingHorizontal: 32,   // OK
       borderRadius: 20,
       width: "100%",

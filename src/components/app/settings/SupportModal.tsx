@@ -39,7 +39,7 @@ export default function SupportModal({ visible, onClose }: SupportModalProps) {
     }
   }, [visible]);
 
-  const INTERNAL_SECRET = "puffzero_internal_9f3KxP2mLQa8Zx72dW0HcR";
+  const INTERNAL_SECRET = process.env.EXPO_PUBLIC_INTERNAL_SECRET;
 
   const handleSend = async () => {
     if (!name.trim()) {
@@ -61,31 +61,34 @@ export default function SupportModal({ visible, onClose }: SupportModalProps) {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            "x-internal-key": INTERNAL_SECRET,
+            "x-internal-key": INTERNAL_SECRET ?? "",
           },
           body: JSON.stringify({
             from_name: name.trim(),
             message: message.trim(),
           }),
-        }
+        },
       );
+
+      console.log("📧 Support email response status:", res.status);
+      const data = await res.json();
+      console.log("📧 Support email response data:", JSON.stringify(data));
 
       if (res.ok) {
         Alert.alert(
           "Mensaje enviado",
-          "Gracias por contactarnos. Te responderemos lo antes posible."
+          "Gracias por contactarnos. Te responderemos lo antes posible.",
         );
         onClose();
       } else {
-        throw new Error("Failed");
+        throw new Error(data.error || "Failed");
       }
     } catch (error) {
+      console.log("❌ Support email error:", error);
       Alert.alert(
         "Error",
-        "No se pudo enviar el mensaje. Intenta de nuevo más tarde."
+        "No se pudo enviar el mensaje. Intenta de nuevo más tarde.",
       );
-    } finally {
-      setSending(false);
     }
   };
 
