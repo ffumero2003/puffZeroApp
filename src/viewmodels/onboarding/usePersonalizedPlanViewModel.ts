@@ -1,4 +1,6 @@
 // usePersonalizedPlanViewModel.ts
+import { supabase } from "@/src/lib/supabase";
+import { useAuth } from "@/src/providers/auth-provider";
 import { useOnboarding } from "@/src/providers/onboarding-provider";
 import { areNotificationsEnabled } from "@/src/services/notifications/notification-service";
 import { sendWelcomeNotification } from "@/src/services/notifications/welcome-notification";
@@ -20,62 +22,103 @@ function formatDate(date: Date): string {
   });
 }
 
-export type PersonalizedPlanStatus = "ok" | "invalid";
+export type PersonalizedPlanStatus = "loading" | "ok" | "invalid";
 
 export function usePersonalizedPlanViewModel() {
   const {
     goal_speed,
     profile_created_at,
     puffs_per_day,
-    
+    setGoalSpeed,
+    setPuffs,
+    setProfileCreatedAt,
   } = useOnboarding();
+  const { user } = useAuth();
 
   const [targetDate, setTargetDate] = useState<string | null>(null);
   const [puffsChart, setPuffsChart] = useState<number[]>([]);
-  const [status, setStatus] = useState<PersonalizedPlanStatus>("ok");
+  const [status, setStatus] = useState<PersonalizedPlanStatus>("loading");
 
+  // Fallback: fetch from Supabase if local state is missing
   useEffect(() => {
-    if (!goal_speed || !profile_created_at) {
-      setStatus("invalid");
-      return;
+    let cancelled = false;
+
+    async function resolve() {
+      let speed = goal_speed;
+      let createdAt = profile_created_at;
+      let puffs = puffs_per_day;
+
+      // If local data is missing, try Supabase
+      if ((!speed || !createdAt) && user?.id) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("goal_speed, puffs_per_day, created_at")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (cancelled) return;
+
+        if (profile) {
+          if (!speed && profile.goal_speed) {
+            speed = profile.goal_speed;
+            setGoalSpeed(profile.goal_speed);
+          }
+          if (!createdAt && profile.created_at) {
+            createdAt = profile.created_at;
+            setProfileCreatedAt(profile.created_at);
+          }
+          if (!puffs && profile.puffs_per_day) {
+            puffs = profile.puffs_per_day;
+            setPuffs(profile.puffs_per_day);
+          }
+        }
+      }
+
+      if (cancelled) return;
+
+      if (!speed || !createdAt) {
+        setStatus("invalid");
+        return;
+      }
+
+      const days = Number(speed);
+      if (Number.isNaN(days)) {
+        setStatus("invalid");
+        return;
+      }
+
+      setTargetDate(formatDate(getTargetDate(createdAt, days)));
+
+      if (puffs && days > 0) {
+        const fullPlan = buildPuffsPlan(puffs, days);
+        setPuffsChart(sampleChartData(fullPlan, 12));
+      }
+
+      setStatus("ok");
     }
 
-    const days = Number(goal_speed);
-    if (Number.isNaN(days)) {
-      setStatus("invalid");
-      return;
-    }
-
-    setTargetDate(formatDate(getTargetDate(profile_created_at, days)));
-
-    if (puffs_per_day && days > 0) {
-      const fullPlan = buildPuffsPlan(puffs_per_day, days);
-      setPuffsChart(sampleChartData(fullPlan, 12));
-    }
-  }, [goal_speed, profile_created_at, puffs_per_day]);
+    resolve();
+    return () => { cancelled = true; };
+  }, [goal_speed, profile_created_at, puffs_per_day, user?.id]);
 
   // Send welcome notification when personalized plan screen mounts
-  // This runs for both register and login flows
   useEffect(() => {
     async function handleWelcomeNotification() {
       try {
         const notificationsEnabled = await areNotificationsEnabled();
         if (!notificationsEnabled) return;
-
         await sendWelcomeNotification();
       } catch (error) {
         console.error("Error sending welcome notification:", error);
       }
     }
-
     handleWelcomeNotification();
   }, []);
 
   function finishFlow() {
-  if (status === "invalid") return false;
-  return true;
-}
-
+    if (status !== "ok") return false;
+    return true;
+  }
 
   return {
     targetDate,

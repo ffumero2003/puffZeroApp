@@ -1,6 +1,12 @@
 // step-personalized-plan.tsx
 import { router } from "expo-router";
-import { Dimensions, Image, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  StyleSheet,
+  View,
+} from "react-native";
 
 import CheckIconDark from "@/assets/images/onboarding/dark/checked-dark.png";
 import CheckIconLight from "@/assets/images/onboarding/light/checked-light.png";
@@ -12,7 +18,6 @@ import ScreenWrapper from "@/src/components/system/ScreenWrapper";
 import { ROUTES } from "@/src/constants/routes";
 import { useTheme } from "@/src/providers/theme-provider";
 import { layout } from "@/src/styles/layout";
-import { useEffect } from "react";
 
 import { usePersonalizedPlanViewModel } from "@/src/viewmodels/onboarding/usePersonalizedPlanViewModel";
 
@@ -25,20 +30,31 @@ export default function StepPersonalizedPlan() {
 
   const checkIcon = activeTheme === "light" ? CheckIconLight : CheckIconDark;
 
-  useEffect(() => {
-    if (status === "invalid") {
-      router.replace(ROUTES.POST_SIGNUP_REVIEW);
-    }
-  }, [status]);
-
-  if (status === "invalid") return null;
-
   const handleContinue = () => {
     const ok = finishFlow();
     if (ok) {
       router.push(ROUTES.POST_SIGNUP_FACTS);
     }
   };
+
+  if (status === "loading") {
+    return (
+      <ScreenWrapper>
+        <View
+          style={[
+            layout.screenContainer,
+            {
+              backgroundColor: colors.background,
+              justifyContent: "center",
+              alignItems: "center",
+            },
+          ]}
+        >
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </ScreenWrapper>
+    );
+  }
 
   return (
     <ScreenWrapper>

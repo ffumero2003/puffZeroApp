@@ -103,7 +103,6 @@ export function OnboardingProvider({
       if (postSignupFlag !== "false") return; // Already completed or first launch
 
       if (!user?.id) {
-        resetAll();
         return;
       }
 

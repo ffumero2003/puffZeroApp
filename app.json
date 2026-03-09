@@ -19,7 +19,7 @@
       "usesAppleSignIn": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "UIRequiredDeviceCapabilities": ["telephony"]
+        "UIRequiredDeviceCapabilities": ["arm64"]
       }
     },
     "android": {
