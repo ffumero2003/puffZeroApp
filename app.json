@@ -18,8 +18,7 @@
       "bundleIdentifier": "com.codeharbor.puffzero",
       "usesAppleSignIn": true,
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false,
-        "UIRequiredDeviceCapabilities": ["arm64"]
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {

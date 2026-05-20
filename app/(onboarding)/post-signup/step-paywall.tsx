@@ -17,7 +17,13 @@ import { layout } from "@/src/styles/layout";
 import { useOnboardingPaywallViewModel } from "@/src/viewmodels/onboarding/useOnboardingPaywallViewModel";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 // RevenueCat
 import Purchases, { PurchasesPackage } from "react-native-purchases";
@@ -224,13 +230,17 @@ export default function OnboardingPaywall() {
   }, []);
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper edges={["top", "bottom"]}>
       <View
         style={[layout.screenContainer, { backgroundColor: colors.background }]}
       >
-        <View style={{ flex: 1 }}>
-          <OnboardingHeader showProgress={false} showBack={false} />
+        <OnboardingHeader showProgress={false} showBack={false} />
 
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 16 }}
+          showsVerticalScrollIndicator={false}
+        >
           <AppText
             style={[layout.titleCenter, { color: colors.text }]}
             weight="bold"
@@ -282,27 +292,53 @@ export default function OnboardingPaywall() {
             />
           </View>
 
+          <AppText style={[styles.disclosure, { color: colors.text }]}>
+            Suscripción con renovación automática. Se cobrará el monto indicado
+            a tu cuenta de Apple ID al confirmar la compra. Se renovará al mismo
+            precio salvo que canceles al menos 24 horas antes del fin del
+            período. Podés cancelar en cualquier momento desde Ajustes &gt;
+            Apple ID &gt; Suscripciones.
+          </AppText>
+
           <TouchableOpacity onPress={handleRestore} disabled={loading}>
             <AppText style={[styles.restoreText, { color: colors.text }]}>
               Restaurar compras
             </AppText>
           </TouchableOpacity>
-        </View>
 
-        <View>
-          <ContinueButton
-            text={
-              loading
-                ? "Procesando..."
-                : !offersLoaded
-                  ? "Cargando planes..."
-                  : "Continuar"
-            }
-            onPress={handlePurchase}
-            disabled={loading || !offersLoaded}
-            style={layout.bottomButtonContainer}
-          />
-        </View>
+          <View style={styles.legalLinks}>
+            <AppText
+              style={[styles.legalLink, { color: colors.primary }]}
+              weight="semibold"
+              onPress={() => router.push("/privacy-policy")}
+            >
+              Política de Privacidad
+            </AppText>
+            <AppText style={[styles.legalSep, { color: colors.text }]}>
+              ·
+            </AppText>
+            <AppText
+              style={[styles.legalLink, { color: colors.primary }]}
+              weight="semibold"
+              onPress={() => router.push("/terms-of-use")}
+            >
+              Términos de Uso
+            </AppText>
+          </View>
+        </ScrollView>
+
+        <ContinueButton
+          text={
+            loading
+              ? "Procesando..."
+              : !offersLoaded
+                ? "Cargando planes..."
+                : "Continuar"
+          }
+          onPress={handlePurchase}
+          disabled={loading || !offersLoaded}
+          style={layout.bottomButtonContainer}
+        />
       </View>
     </ScreenWrapper>
   );
@@ -317,5 +353,27 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     marginTop: 14,
     fontSize: 14,
+  },
+  disclosure: {
+    fontSize: 12,
+    lineHeight: 16,
+    opacity: 0.65,
+    marginTop: 18,
+    textAlign: "center",
+  },
+  legalLinks: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 12,
+    gap: 8,
+  },
+  legalLink: {
+    fontSize: 13,
+    textDecorationLine: "underline",
+  },
+  legalSep: {
+    fontSize: 13,
+    opacity: 0.5,
   },
 });

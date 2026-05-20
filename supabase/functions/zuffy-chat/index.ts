@@ -1,76 +1,123 @@
 // supabase/functions/zuffy-chat/index.ts
-// This edge function runs on Supabase's servers, keeping your API key secure
-// The mobile app calls this function instead of OpenAI directly
+// Calls Google Gemini (free tier) — keeps API key off the device.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import OpenAI from "https://deno.land/x/openai@v4.52.0/mod.ts";
 
-// CORS headers to allow requests from your app
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
-// Initialize OpenAI with secret from Supabase
-// This key is stored securely in Supabase, not in your app
-const openai = new OpenAI({
-  apiKey: Deno.env.get("OPENAI_API_KEY"),
-});
+const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+
+// Try models in this order. If one returns 503 / no text, the next is tried.
+// gemini-2.5-flash-lite is cheapest; gemini-2.5-flash is on a separate
+// availability pool, so when lite is overloaded, flash often works.
+const GEMINI_MODELS = ["gemini-2.5-flash-lite", "gemini-2.5-flash"];
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+async function callGemini(
+  model: string,
+  body: unknown
+): Promise<string | null> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.warn(
+        `Gemini ${model} returned HTTP ${response.status}:`,
+        JSON.stringify(data)
+      );
+      return null;
+    }
+
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
+    if (!text) {
+      console.warn(
+        `Gemini ${model} returned no text:`,
+        JSON.stringify(data)
+      );
+    }
+    return text;
+  } catch (e) {
+    console.warn(`Gemini ${model} fetch threw:`, e);
+    return null;
+  }
+}
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    // Parse the request body
     const { userMessage, conversationHistory, userContext } = await req.json();
-
-    // Build the system prompt (same logic as before)
     const systemPrompt = buildSystemPrompt(userContext);
 
-    // Build messages array
-    const messages = [
-      { role: "system", content: systemPrompt },
-      ...conversationHistory.map((msg: any) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
-      { role: "user", content: userMessage },
+    // Gemini uses "user" + "model" (not "assistant"). Map OpenAI-style history.
+    const mapped = (conversationHistory || []).map((msg: any) => ({
+      role: msg.role === "assistant" ? "model" : "user",
+      parts: [{ text: msg.content }],
+    }));
+    // Gemini rejects payloads that start with a "model" turn. Drop any
+    // leading "model" entries (e.g. an initial assistant greeting).
+    while (mapped.length > 0 && mapped[0].role !== "user") {
+      mapped.shift();
+    }
+    // Keep only the last 20 turns to avoid bloating context.
+    const trimmed = mapped.slice(-20);
+
+    const geminiContents = [
+      ...trimmed,
+      { role: "user", parts: [{ text: userMessage }] },
     ];
 
-    // Call OpenAI
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages,
-      max_tokens: 300,
-      temperature: 0.7,
+    const body = {
+      systemInstruction: { parts: [{ text: systemPrompt }] },
+      contents: geminiContents,
+      generationConfig: {
+        maxOutputTokens: 300,
+        temperature: 0.7,
+      },
+    };
+
+    // Try each model in order. If all fail, retry the cheapest model once
+    // after a short delay (handles transient 503 high-demand errors).
+    let assistantMessage: string | null = null;
+    for (const model of GEMINI_MODELS) {
+      assistantMessage = await callGemini(model, body);
+      if (assistantMessage) break;
+    }
+    if (!assistantMessage) {
+      await sleep(1200);
+      assistantMessage = await callGemini(GEMINI_MODELS[0], body);
+    }
+
+    if (!assistantMessage) {
+      throw new Error("No response from Gemini after retries");
+    }
+
+    return new Response(JSON.stringify({ message: assistantMessage }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 200,
     });
-
-    const assistantMessage = response.choices[0]?.message?.content;
-
-    // Return the response
-    return new Response(
-      JSON.stringify({ message: assistantMessage }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      }
-    );
   } catch (error) {
     console.error("Error:", error);
-    return new Response(
-      JSON.stringify({ error: "Failed to get response" }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
-      }
-    );
+    return new Response(JSON.stringify({ error: "Failed to get response" }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
   }
 });
 
-// Helper function to build system prompt
 function buildSystemPrompt(context: any): string {
   const currencySymbols: Record<string, string> = {
     CRC: "₡",

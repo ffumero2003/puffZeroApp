@@ -26,6 +26,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -173,7 +174,11 @@ export default function Home() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <HomeHeader firstName={firstName} dailyGoal={dailyGoal} />
 
-      <View style={[styles.scrollView, styles.content]}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Week selector */}
         {currentWeek && (
           <View style={styles.daysRow}>
@@ -242,7 +247,7 @@ export default function Home() {
             Agregar Puffs
           </AppText>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
 
       {/* Day Detail Modal */}
       {selectedDay && (
@@ -287,9 +292,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
+    flexGrow: 1,
     paddingLeft: 10,
     paddingRight: 10,
-    paddingBottom: 10,
+    paddingBottom: 32,
+    alignItems: "stretch",
   },
 
   daysRow: {

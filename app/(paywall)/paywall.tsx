@@ -22,6 +22,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // RevenueCat imports
 import Purchases, { PurchasesPackage } from "react-native-purchases";
@@ -231,37 +232,41 @@ export default function Paywall() {
     : undefined;
 
   return (
-    // <ScreenWrapper>
-    <View
-      style={[layout.screenContainer, { backgroundColor: colors.background }]}
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      edges={["top", "bottom"]}
     >
-      <View style={{ flex: 1 }}>
+      <View
+        style={[layout.screenContainer, { backgroundColor: colors.background }]}
+      >
         <OnboardingHeader showProgress={false} showBack={false} />
 
-        <AppText
-          style={[layout.titleCenter, { color: colors.text }]}
-          weight="bold"
-        >
-          {firstName ? (
-            <>
-              Hey{" "}
-              <AppText weight="bold" style={{ color: colors.primary }}>
-                {firstName}
-              </AppText>
-              , desbloqueá Puff
-            </>
-          ) : (
-            <>Hey, desbloqueá Puff</>
-          )}
-          <AppText weight="bold" style={{ color: colors.primary }}>
-            Zero
-          </AppText>{" "}
-          para llegar a tu mejor versión.
-        </AppText>
         <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 16 }}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 20 }}
         >
+          <AppText
+            style={[layout.titleCenter, { color: colors.text }]}
+            weight="bold"
+          >
+            {firstName ? (
+              <>
+                Hey{" "}
+                <AppText weight="bold" style={{ color: colors.primary }}>
+                  {firstName}
+                </AppText>
+                , desbloqueá Puff
+              </>
+            ) : (
+              <>Hey, desbloqueá Puff</>
+            )}
+            <AppText weight="bold" style={{ color: colors.primary }}>
+              Zero
+            </AppText>{" "}
+            para llegar a tu mejor versión.
+          </AppText>
+
           <View style={styles.featureContainer}>
             <FeatureItem icon={Statistics} text={puffsText} />
             <FeatureItem icon={Target} text={planText} />
@@ -291,15 +296,42 @@ export default function Paywall() {
               onPress={() => setPlan("yearly")}
             />
           </View>
+
+          <AppText style={[styles.disclosure, { color: colors.text }]}>
+            Suscripción con renovación automática. Se cobrará el monto indicado
+            a tu cuenta de Apple ID al confirmar la compra. Se renovará al mismo
+            precio salvo que canceles al menos 24 horas antes del fin del
+            período. Podés cancelar en cualquier momento desde Ajustes &gt;
+            Apple ID &gt; Suscripciones.
+          </AppText>
+
           <TouchableOpacity onPress={handleRestore} disabled={loading}>
             <AppText style={[styles.restoreText, { color: colors.text }]}>
               Restaurar compras
             </AppText>
           </TouchableOpacity>
-        </ScrollView>
-      </View>
 
-      <View>
+          <View style={styles.legalLinks}>
+            <AppText
+              style={[styles.legalLink, { color: colors.primary }]}
+              weight="semibold"
+              onPress={() => router.push("/privacy-policy")}
+            >
+              Política de Privacidad
+            </AppText>
+            <AppText style={[styles.legalSep, { color: colors.text }]}>
+              ·
+            </AppText>
+            <AppText
+              style={[styles.legalLink, { color: colors.primary }]}
+              weight="semibold"
+              onPress={() => router.push("/terms-of-use")}
+            >
+              Términos de Uso
+            </AppText>
+          </View>
+        </ScrollView>
+
         <ContinueButton
           text={
             loading
@@ -312,21 +344,8 @@ export default function Paywall() {
           disabled={loading || !offersLoaded}
           style={layout.bottomButtonContainer}
         />
-
-        {/* {__DEV__ && (
-          <TouchableOpacity
-            style={styles.devSkipButton}
-            onPress={devSkip}
-            activeOpacity={0.7}
-          >
-            <AppText weight="bold" style={styles.devSkipText}>
-              DEV: SKIP PAYWALL
-            </AppText>
-          </TouchableOpacity>
-        )} */}
       </View>
-    </View>
-    // </ScreenWrapper>
+    </SafeAreaView>
   );
 }
 
@@ -339,6 +358,28 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     marginTop: 14,
     fontSize: 14,
+  },
+  disclosure: {
+    fontSize: 12,
+    lineHeight: 16,
+    opacity: 0.65,
+    marginTop: 18,
+    textAlign: "center",
+  },
+  legalLinks: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 12,
+    gap: 8,
+  },
+  legalLink: {
+    fontSize: 13,
+    textDecorationLine: "underline",
+  },
+  legalSep: {
+    fontSize: 13,
+    opacity: 0.5,
   },
   devSkipButton: {
     backgroundColor: "#FFD700",
